@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyTasks</title>
+<style>
+  :root{
+    --bg: #171B24;
+    --bg-soft: #1D222D;
+    --card: #1F2530;
+    --card-hover: #252C39;
+    --line: #2C3342;
+    --text: #ECEFF4;
+    --muted: #8B93A7;
+    --amber: #F5A65B;
+    --amber-dark: #C97F3E;
+
+    --baixo: #4FB0A5;
+    --medio: #E8B84B;
+    --alto: #E8823D;
+    --urgente: #E1524B;
+
+    --ni: #6B7385;
+    --andamento: #5B8DEF;
+    --finalizada: #4CAF7D;
+
+    --font-display: "Avenir Next", "Segoe UI Semibold", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 500px at 15% -10%, rgba(245,166,91,0.08), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height:100vh;
+    padding-bottom: 60px;
+  }
+
+  header{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+  }
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+  }
+
+  .brand h1{
+    font-family: var(--font-display);
+    font-size: 34px;
+    letter-spacing: -0.5px;
+    margin: 0;
+  }
+  .brand h1 span{ color: var(--amber); }
+
+  .brand .tag{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  /* Tabs styled like folder tabs on an index-card box */
+  .tabs{
+    display:flex;
+    gap: 6px;
+    margin-top: 28px;
+  }
+  .tab{
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--bg-soft);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    padding: 12px 22px 10px;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    position: relative;
+    top: 1px;
+  }
+  .tab .count{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-left: 8px;
+    color: var(--muted);
+  }
+  .tab.active{
+    background: var(--card);
+    color: var(--text);
+    border-color: var(--line);
+  }
+  .tab.active::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:1px;
+    background: var(--card);
+  }
+
+  main{
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 0 12px 12px 12px;
+    padding: 28px 24px 36px;
+  }
+
+  .toolbar{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items:center;
+    margin-bottom: 22px;
+  }
+
+  input[type=text], input[type=search], select, textarea{
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+  }
+  input[type=text]:focus, input[type=search]:focus, select:focus, textarea:focus{
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+
+  .search{ flex: 1 1 220px; }
+  .sort{ flex: 0 0 auto; }
+
+  .btn{
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover{ background: var(--card-hover); }
+  .btn-primary{
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #201205;
+  }
+  .btn-primary:hover{ background: var(--amber-dark); border-color: var(--amber-dark); }
+  .btn-ghost{
+    background: transparent;
+  }
+  .btn-danger:hover{ background: rgba(225,82,75,0.15); border-color: var(--urgente); color: var(--urgente); }
+  .btn-sm{ padding: 6px 10px; font-size: 12px; }
+
+  /* Stat pills */
+  .stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom: 20px;
+  }
+  .pill{
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  /* Cards */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .card{
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 16px 14px;
+    position: relative;
+    border-left: 4px solid var(--muted);
+    transition: transform .12s ease, background .12s ease;
+  }
+  .card:hover{ background: var(--card-hover); }
+
+  .card-title{
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    padding-right: 60px;
+  }
+  .card-desc{
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0 0 12px;
+    white-space: pre-wrap;
+  }
+
+  .badge{
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 5px;
+    display:inline-block;
+  }
+
+  .card-footer{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-top: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .status-select{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+
+  .card-actions{
+    position:absolute;
+    top: 12px;
+    right: 12px;
+    display:flex;
+    gap: 4px;
+  }
+  .icon-btn{
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 15px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height:1;
+  }
+  .icon-btn:hover{ background: var(--line); color: var(--text); }
+
+  .empty{
+    text-align:center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty .big{
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  /* Modal form */
+  .overlay{
+    position: fixed;
+    inset:0;
+    background: rgba(10,12,16,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.open{ display:flex; }
+
+  .modal{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px;
+    width: 100%;
+    max-width: 440px;
+  }
+  .modal h2{
+    font-family: var(--font-display);
+    margin: 0 0 18px;
+    font-size: 20px;
+  }
+  .field{ margin-bottom: 14px; }
+  .field label{
+    display:block;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .field input, .field select, .field textarea{ width:100%; }
+  .field textarea{ resize: vertical; min-height: 70px; }
+
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top: 20px;
+  }
+
+  .hint{
+    font-size: 11.5px;
+    color: var(--muted);
+    margin: -8px 0 16px;
+  }
+
+  #fileInput{ display:none; }
+
+  .toast{
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    opacity: 0;
+    pointer-events:none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 60;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(-6px); }
+
+  @media (max-width: 560px){
+    header{ padding: 28px 14px 0; }
+    main{ padding: 20px 14px 28px; border-radius: 0 10px 10px 10px; }
+    .brand h1{ font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>My<span>Tasks</span></h1>
+    <span class="tag">painel pessoal</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabAtividades" onclick="setTab('atividades')">
+      Atividades <span class="count" id="countAtividades">0</span>
+    </button>
+    <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
+      Pendências <span class="count" id="countPendencias">0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
+    <select class="sort" id="sortSelect" onchange="render()">
+      <option value="criterio">Ordenar: critério</option>
+      <option value="recente">Ordenar: mais recente</option>
+      <option value="titulo">Ordenar: título (A-Z)</option>
+    </select>
+    <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
+    <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+    <button class="btn" onclick="document.getElementById('fileInput').click()">Importar JSON</button>
+    <input type="file" id="fileInput" accept="application/json" onchange="importJSON(event)">
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="emptyState" style="display:none">
+    <div class="big" id="emptyTitle">Nada por aqui ainda</div>
+    <div id="emptySub">Clique em "+ Nova" para começar.</div>
+  </div>
+
+</main>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeForm()">
+  <div class="modal">
+    <h2 id="modalTitle">Nova Atividade</h2>
+    <div class="field">
+      <label>Título</label>
+      <input type="text" id="fTitulo" placeholder="Digite o título">
+    </div>
+    <div class="field">
+      <label>Descrição</label>
+      <textarea id="fDescricao" placeholder="Descreva com detalhes"></textarea>
+    </div>
+    <div class="field">
+      <label>Critério</label>
+      <select id="fCriterio">
+        <option value="BAIXO">Baixo</option>
+        <option value="MEDIO">Médio</option>
+        <option value="ALTO">Alto</option>
+        <option value="URGENTE">Urgente</option>
+      </select>
+    </div>
+    <div class="field" id="statusField">
+      <label>Status</label>
+      <select id="fStatus">
+        <option value="NÃO INICIADO">Não iniciado</option>
+        <option value="EM ANDAMENTO">Em andamento</option>
+        <option value="FINALIZADA">Finalizada</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveForm()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------- state ----------
+  // Kept in memory only (this file has no server / no browser storage).
+  // Use "Exportar JSON" / "Importar JSON" to persist between sessions —
+  // the format matches Atividades.json / Pendencia.json used by MENU.py,
+  // so files exported here can be read there and vice-versa.
+
+  let state = {
+    atividades: [],   // {id, titulo, descricao, criterio}
+    pendencias: [],   // {id, titulo, descricao, criterio, status}
+    tab: 'atividades',
+    editingId: null
+  };
+
+  const CRITERIO_META = {
+    BAIXO:   {label:'Baixo',   color:'var(--baixo)'},
+    MEDIO:   {label:'Médio',   color:'var(--medio)'},
+    ALTO:    {label:'Alto',    color:'var(--alto)'},
+    URGENTE: {label:'Urgente', color:'var(--urgente)'}
+  };
+  const CRITERIO_ORDER = ['URGENTE','ALTO','MEDIO','BAIXO'];
+
+  const STATUS_META = {
+    'NÃO INICIADO': {label:'Não iniciado', color:'var(--ni)'},
+    'EM ANDAMENTO': {label:'Em andamento', color:'var(--andamento)'},
+    'FINALIZADA':   {label:'Finalizada',   color:'var(--finalizada)'}
+  };
+
+  function uid(){ return 'id' + Math.random().toString(36).slice(2, 10); }
+
+  // ---------- tabs ----------
+  function setTab(tab){
+    state.tab = tab;
+    document.getElementById('tabAtividades').classList.toggle('active', tab==='atividades');
+    document.getElementById('tabPendencias').classList.toggle('active', tab==='pendencias');
+    document.getElementById('addBtn').textContent = tab==='atividades' ? '+ Nova Atividade' : '+ Nova Pendência';
+    document.getElementById('searchInput').placeholder = 'Buscar por título ou descrição...';
+    render();
+  }
+
+  // ---------- render ----------
+  function render(){
+    const list = state.tab === 'atividades' ? state.atividades : state.pendencias;
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    const sortMode = document.getElementById('sortSelect').value;
+
+    let items = list.filter(i =>
+      i.titulo.toLowerCase().includes(query) || i.descricao.toLowerCase().includes(query)
+    );
+
+    if (sortMode === 'criterio'){
+      items.sort((a,b) => CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio));
+    } else if (sortMode === 'titulo'){
+      items.sort((a,b) => a.titulo.localeCompare(b.titulo));
+    } else {
+      items.sort((a,b) => b._ts - a._ts);
+    }
+
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
+    document.getElementById('emptyTitle').textContent = query
+      ? 'Nenhum resultado'
+      : (state.tab === 'atividades' ? 'Nenhuma atividade cadastrada' : 'Nenhuma pendência cadastrada');
+    document.getElementById('emptySub').textContent = query
+      ? 'Tente outro termo de busca.'
+      : 'Clique em "+ Nova" para começar.';
+
+    items.forEach(item => grid.appendChild(buildCard(item)));
+
+    document.getElementById('countAtividades').textContent = state.atividades.length;
+    document.getElementById('countPendencias').textContent = state.pendencias.length;
+
+    renderStats();
+  }
+
+  function buildCard(item){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.borderLeftColor = CRITERIO_META[item.criterio].color;
+
+    const criterioBadge = `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`;
+
+    let footerRight = '';
+    if (state.tab === 'pendencias'){
+      const opts = Object.keys(STATUS_META).map(s =>
+        `<option value="${s}" ${s===item.status?'selected':''}>${STATUS_META[s].label}</option>`
+      ).join('');
+      footerRight = `<select class="status-select" style="color:${STATUS_META[item.status].color}; border-color:${STATUS_META[item.status].color}55" onchange="changeStatus('${item.id}', this.value)">${opts}</select>`;
+    }
+
+    card.innerHTML = `
+      <div class="card-actions">
+        <button class="icon-btn" title="Editar" onclick="openForm('${item.id}')">✎</button>
+        <button class="icon-btn" title="Excluir" onclick="askDelete('${item.id}', this)">✕</button>
+      </div>
+      <div class="card-title">${escapeHTML(item.titulo)}</div>
+      <div class="card-desc">${escapeHTML(item.descricao) || '<em>Sem descrição</em>'}</div>
+      <div class="card-footer">
+        ${criterioBadge}
+        ${footerRight}
+      </div>
+    `;
+    return card;
+  }
+
+  function renderStats(){
+    const box = document.getElementById('stats');
+    box.innerHTML = '';
+    if (state.tab === 'atividades'){
+      CRITERIO_ORDER.forEach(c => {
+        const n = state.atividades.filter(a => a.criterio === c).length;
+        box.innerHTML += `<span class="pill"><span class="dot" style="background:${CRITERIO_META[c].color}"></span>${CRITERIO_META[c].label}: ${n}</span>`;
+      });
+    } else {
+      Object.keys(STATUS_META).forEach(s => {
+        const n = state.pendencias.filter(p => p.status === s).length;
+        box.innerHTML += `<span class="pill"><span class="dot" style="background:${STATUS_META[s].color}"></span>${STATUS_META[s].label}: ${n}</span>`;
+      });
+    }
+  }
+
+  function escapeHTML(str){
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+
+  // ---------- status change ----------
+  function changeStatus(id, newStatus){
+    const item = state.pendencias.find(p => p.id === id);
+    if (item){ item.status = newStatus; render(); showToast('Status atualizado'); }
+  }
+
+  // ---------- delete (inline confirm, no native dialogs) ----------
+  function askDelete(id, btn){
+    if (btn.dataset.confirm === '1'){
+      const list = state.tab === 'atividades' ? state.atividades : state.pendencias;
+      const idx = list.findIndex(i => i.id === id);
+      if (idx > -1){ list.splice(idx, 1); render(); showToast('Removido'); }
+      return;
+    }
+    btn.dataset.confirm = '1';
+    btn.textContent = '⚠';
+    btn.title = 'Clique novamente para confirmar exclusão';
+    setTimeout(() => { btn.dataset.confirm = '0'; btn.textContent = '✕'; btn.title='Excluir'; }, 2500);
+  }
+
+  // ---------- form ----------
+  function openForm(id){
+    state.editingId = id || null;
+    const isPendencia = state.tab === 'pendencias';
+    document.getElementById('statusField').style.display = isPendencia ? 'block' : 'none';
+
+    if (id){
+      const list = isPendencia ? state.pendencias : state.atividades;
+      const item = list.find(i => i.id === id);
+      document.getElementById('modalTitle').textContent = isPendencia ? 'Editar Pendência' : 'Editar Atividade';
+      document.getElementById('fTitulo').value = item.titulo;
+      document.getElementById('fDescricao').value = item.descricao;
+      document.getElementById('fCriterio').value = item.criterio;
+      if (isPendencia) document.getElementById('fStatus').value = item.status;
+    } else {
+      document.getElementById('modalTitle').textContent = isPendencia ? 'Nova Pendência' : 'Nova Atividade';
+      document.getElementById('fTitulo').value = '';
+      document.getElementById('fDescricao').value = '';
+      document.getElementById('fCriterio').value = 'BAIXO';
+      document.getElementById('fStatus').value = 'NÃO INICIADO';
+    }
+
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('fTitulo').focus();
+  }
+
+  function closeForm(){
+    document.getElementById('overlay').classList.remove('open');
+    state.editingId = null;
+  }
+
+  function saveForm(){
+    const titulo = document.getElementById('fTitulo').value.trim();
+    if (!titulo){ document.getElementById('fTitulo').focus(); return; }
+    const descricao = document.getElementById('fDescricao').value.trim();
+    const criterio = document.getElementById('fCriterio').value;
+    const isPendencia = state.tab === 'pendencias';
+    const status = document.getElementById('fStatus').value;
+
+    const list = isPendencia ? state.pendencias : state.atividades;
+
+    if (state.editingId){
+      const item = list.find(i => i.id === state.editingId);
+      item.titulo = titulo; item.descricao = descricao; item.criterio = criterio;
+      if (isPendencia) item.status = status;
+    } else {
+      const novo = { id: uid(), titulo, descricao, criterio, _ts: Date.now() };
+      if (isPendencia) novo.status = status;
+      list.push(novo);
+    }
+
+    closeForm();
+    render();
+    showToast('Salvo com sucesso');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeForm();
+  });
+
+  // ---------- import / export (JSON, compatible with MENU.py's format) ----------
+  function exportJSON(){
+    const data = {
+      atividades: state.atividades.map(a => [a.titulo, a.descricao, a.criterio]),
+      pendencias: state.pendencias.map(p => [p.titulo, p.descricao, p.criterio, p.status])
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mytasks_dados.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Arquivo exportado');
+  }
+
+  function importJSON(event){
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        applyImported(parsed);
+        showToast('Dados importados');
+      } catch (err) {
+        showToast('Arquivo inválido');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function applyImported(parsed){
+    // Accepts either:
+    // 1) { atividades: [...], pendencias: [...] }  (this app's export format)
+    // 2) a bare array, matching a single Atividades.json or Pendencia.json from MENU.py
+    let ativRaw = null, pendRaw = null;
+
+    if (Array.isArray(parsed)){
+      // guess which file this is based on item shape (4 fields = pendencia)
+      if (parsed.length === 0){ ativRaw = []; }
+      else if (parsed[0].length === 4){ pendRaw = parsed; }
+      else { ativRaw = parsed; }
+    } else if (parsed && typeof parsed === 'object'){
+      ativRaw = parsed.atividades || null;
+      pendRaw = parsed.pendencias || null;
+    }
+
+    if (ativRaw){
+      state.atividades = ativRaw.map(row => ({
+        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', _ts: Date.now()
+      }));
+    }
+    if (pendRaw){
+      state.pendencias = pendRaw.map(row => ({
+        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', status: row[3] || 'NÃO INICIADO', _ts: Date.now()
+      }));
+    }
+    render();
+  }
+
+  // ---------- toast ----------
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  // ---------- init ----------
+  render();
+</script>
+
+</body>
+</html>
