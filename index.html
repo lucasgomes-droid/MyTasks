@@ -43,10 +43,72 @@
     padding-bottom: 60px;
   }
 
+  /* ---------- Login screen ---------- */
+  #loginScreen{
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction: column;
+    text-align:center;
+    padding: 20px;
+  }
+  #loginScreen .brand h1{
+    font-family: var(--font-display);
+    font-size: 44px;
+    letter-spacing: -1px;
+    margin: 0 0 6px;
+  }
+  #loginScreen .brand h1 span{ color: var(--amber); }
+  #loginScreen p{
+    color: var(--muted);
+    max-width: 360px;
+    margin: 0 0 32px;
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+  .gh-btn{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    background: #ECEFF4;
+    color: #171B24;
+    border: none;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .gh-btn:hover{ background: #fff; }
+  .gh-btn svg{ width: 20px; height: 20px; }
+  #loginError{
+    color: var(--urgente);
+    font-size: 13px;
+    margin-top: 16px;
+    min-height: 18px;
+  }
+  #loginStatus{
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 16px;
+  }
+
+  #app{ display:none; }
+  #app.ready{ display:block; }
+
   header{
     max-width: 980px;
     margin: 0 auto;
-    padding: 40px 24px 0;
+    padding: 32px 24px 0;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-bottom: 6px;
   }
 
   .brand{
@@ -74,11 +136,54 @@
     border-radius: 4px;
   }
 
+  .user-chip{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 8px 6px 6px;
+  }
+  .user-chip img{
+    width: 26px; height: 26px; border-radius: 50%;
+  }
+  .user-chip span{
+    font-size: 13px;
+    color: var(--text);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .user-chip button{
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font-body);
+    padding: 4px 8px;
+    border-radius: 999px;
+  }
+  .user-chip button:hover{ background: var(--line); color: var(--text); }
+
+  .sync-note{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .sync-note .dot-live{
+    width:6px; height:6px; border-radius:50%; background: var(--finalizada);
+    display:inline-block; margin-right:6px;
+  }
+
   /* Tabs styled like folder tabs on an index-card box */
   .tabs{
     display:flex;
     gap: 6px;
-    margin-top: 28px;
+    margin-top: 22px;
   }
   .tab{
     font-family: var(--font-display);
@@ -169,7 +274,6 @@
   .btn-ghost{
     background: transparent;
   }
-  .btn-danger:hover{ background: rgba(225,82,75,0.15); border-color: var(--urgente); color: var(--urgente); }
   .btn-sm{ padding: 6px 10px; font-size: 12px; }
 
   /* Stat pills */
@@ -327,12 +431,6 @@
     margin-top: 20px;
   }
 
-  .hint{
-    font-size: 11.5px;
-    color: var(--muted);
-    margin: -8px 0 16px;
-  }
-
   #fileInput{ display:none; }
 
   .toast{
@@ -354,54 +452,78 @@
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(-6px); }
 
   @media (max-width: 560px){
-    header{ padding: 28px 14px 0; }
+    header{ padding: 24px 14px 0; }
     main{ padding: 20px 14px 28px; border-radius: 0 10px 10px 10px; }
     .brand h1{ font-size: 26px; }
+    .topbar{ flex-direction: column; align-items:flex-start; gap: 14px; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <h1>My<span>Tasks</span></h1>
-    <span class="tag">painel pessoal</span>
-  </div>
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="brand"><h1>My<span>Tasks</span></h1></div>
+  <p>Suas atividades e pendências, salvas na nuvem e sincronizadas em qualquer dispositivo. Entre com sua conta do GitHub para continuar.</p>
+  <button class="gh-btn" id="loginBtn">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    Entrar com GitHub
+  </button>
+  <div id="loginStatus"></div>
+  <div id="loginError"></div>
+</div>
 
-  <div class="tabs">
-    <button class="tab active" id="tabAtividades" onclick="setTab('atividades')">
-      Atividades <span class="count" id="countAtividades">0</span>
-    </button>
-    <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
-      Pendências <span class="count" id="countPendencias">0</span>
-    </button>
-  </div>
-</header>
+<!-- ============ APP ============ -->
+<div id="app">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <h1>My<span>Tasks</span></h1>
+        <span class="tag">painel pessoal</span>
+      </div>
+      <div class="user-chip">
+        <img id="userAvatar" src="" alt="">
+        <span id="userName"></span>
+        <button onclick="logout()">Sair</button>
+      </div>
+    </div>
+    <div class="sync-note"><span class="dot-live"></span><span id="syncText">sincronizado na nuvem</span></div>
 
-<main>
+    <div class="tabs">
+      <button class="tab active" id="tabAtividades" onclick="setTab('atividades')">
+        Atividades <span class="count" id="countAtividades">0</span>
+      </button>
+      <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
+        Pendências <span class="count" id="countPendencias">0</span>
+      </button>
+    </div>
+  </header>
 
-  <div class="stats" id="stats"></div>
+  <main>
 
-  <div class="toolbar">
-    <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
-    <select class="sort" id="sortSelect" onchange="render()">
-      <option value="criterio">Ordenar: critério</option>
-      <option value="recente">Ordenar: mais recente</option>
-      <option value="titulo">Ordenar: título (A-Z)</option>
-    </select>
-    <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
-    <button class="btn" onclick="exportJSON()">Exportar JSON</button>
-    <button class="btn" onclick="document.getElementById('fileInput').click()">Importar JSON</button>
-    <input type="file" id="fileInput" accept="application/json" onchange="importJSON(event)">
-  </div>
+    <div class="stats" id="stats"></div>
 
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="emptyState" style="display:none">
-    <div class="big" id="emptyTitle">Nada por aqui ainda</div>
-    <div id="emptySub">Clique em "+ Nova" para começar.</div>
-  </div>
+    <div class="toolbar">
+      <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
+      <select class="sort" id="sortSelect" onchange="render()">
+        <option value="criterio">Ordenar: critério</option>
+        <option value="recente">Ordenar: mais recente</option>
+        <option value="titulo">Ordenar: título (A-Z)</option>
+      </select>
+      <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
+      <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+      <button class="btn" onclick="document.getElementById('fileInput').click()">Importar JSON</button>
+      <input type="file" id="fileInput" accept="application/json" onchange="importJSON(event)">
+    </div>
 
-</main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyState" style="display:none">
+      <div class="big" id="emptyTitle">Nada por aqui ainda</div>
+      <div id="emptySub">Clique em "+ Nova" para começar.</div>
+    </div>
+
+  </main>
+</div>
 
 <!-- Modal -->
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeForm()">
@@ -441,19 +563,111 @@
 
 <div class="toast" id="toast"></div>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, GithubAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtJWm5pRiPUdXYrlGqVmGBxx3cPoEBBFQ",
+    authDomain: "my-tasks-fa415.firebaseapp.com",
+    projectId: "my-tasks-fa415",
+    storageBucket: "my-tasks-fa415.firebasestorage.app",
+    messagingSenderId: "164502992036",
+    appId: "1:164502992036:web:493cf74c1409a71a82a231",
+    measurementId: "G-5EEFBQVKX0"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const auth = getAuth(fbApp);
+  const db = getFirestore(fbApp);
+
+  let currentUser = null;
+  let unsubscribeDoc = null;
+  let suppressNextSave = false; // avoid re-saving data we just received from Firestore
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const provider = new GithubAuthProvider();
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('loginStatus').textContent = 'Abrindo login do GitHub...';
+    signInWithPopup(auth, provider).catch(err => {
+      document.getElementById('loginStatus').textContent = '';
+      document.getElementById('loginError').textContent = 'Não foi possível entrar: ' + (err.code || err.message);
+    });
+  });
+
+  window.logout = function(){
+    signOut(auth);
+  };
+
+  onAuthStateChanged(auth, (user) => {
+    if (unsubscribeDoc){ unsubscribeDoc(); unsubscribeDoc = null; }
+
+    if (user){
+      currentUser = user;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').classList.add('ready');
+      document.getElementById('userAvatar').src = user.photoURL || '';
+      document.getElementById('userName').textContent = user.displayName || user.email || 'Usuário';
+
+      const userDocRef = doc(db, 'users', user.uid);
+      unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
+        suppressNextSave = true;
+        if (snap.exists()){
+          const data = snap.data();
+          window.__state.atividades = (data.atividades || []).map(hydrate);
+          window.__state.pendencias = (data.pendencias || []).map(hydrate);
+        } else {
+          window.__state.atividades = [];
+          window.__state.pendencias = [];
+        }
+        window.__render();
+        document.getElementById('syncText').textContent = 'sincronizado na nuvem';
+      }, (err) => {
+        document.getElementById('syncText').textContent = 'erro ao sincronizar: verifique as regras do Firestore';
+      });
+
+    } else {
+      currentUser = null;
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('app').classList.remove('ready');
+      document.getElementById('loginStatus').textContent = '';
+    }
+  });
+
+  function hydrate(item){
+    return Object.assign({ id: window.__uid(), _ts: Date.now() }, item);
+  }
+
+  window.__saveToCloud = function(){
+    if (suppressNextSave){ suppressNextSave = false; return; }
+    if (!currentUser) return;
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    document.getElementById('syncText').textContent = 'salvando...';
+    setDoc(userDocRef, {
+      atividades: window.__state.atividades.map(a => ({ titulo: a.titulo, descricao: a.descricao, criterio: a.criterio })),
+      pendencias: window.__state.pendencias.map(p => ({ titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status }))
+    }).then(() => {
+      document.getElementById('syncText').textContent = 'sincronizado na nuvem';
+    }).catch(() => {
+      document.getElementById('syncText').textContent = 'falha ao salvar — tente novamente';
+    });
+  };
+</script>
+
 <script>
   // ---------- state ----------
-  // Kept in memory only (this file has no server / no browser storage).
-  // Use "Exportar JSON" / "Importar JSON" to persist between sessions —
-  // the format matches Atividades.json / Pendencia.json used by MENU.py,
-  // so files exported here can be read there and vice-versa.
-
   let state = {
     atividades: [],   // {id, titulo, descricao, criterio}
     pendencias: [],   // {id, titulo, descricao, criterio, status}
     tab: 'atividades',
     editingId: null
   };
+  window.__state = state;
 
   const CRITERIO_META = {
     BAIXO:   {label:'Baixo',   color:'var(--baixo)'},
@@ -470,6 +684,7 @@
   };
 
   function uid(){ return 'id' + Math.random().toString(36).slice(2, 10); }
+  window.__uid = uid;
 
   // ---------- tabs ----------
   function setTab(tab){
@@ -477,9 +692,9 @@
     document.getElementById('tabAtividades').classList.toggle('active', tab==='atividades');
     document.getElementById('tabPendencias').classList.toggle('active', tab==='pendencias');
     document.getElementById('addBtn').textContent = tab==='atividades' ? '+ Nova Atividade' : '+ Nova Pendência';
-    document.getElementById('searchInput').placeholder = 'Buscar por título ou descrição...';
     render();
   }
+  window.setTab = setTab;
 
   // ---------- render ----------
   function render(){
@@ -488,7 +703,7 @@
     const sortMode = document.getElementById('sortSelect').value;
 
     let items = list.filter(i =>
-      i.titulo.toLowerCase().includes(query) || i.descricao.toLowerCase().includes(query)
+      i.titulo.toLowerCase().includes(query) || (i.descricao || '').toLowerCase().includes(query)
     );
 
     if (sortMode === 'criterio'){
@@ -496,7 +711,7 @@
     } else if (sortMode === 'titulo'){
       items.sort((a,b) => a.titulo.localeCompare(b.titulo));
     } else {
-      items.sort((a,b) => b._ts - a._ts);
+      items.sort((a,b) => (b._ts||0) - (a._ts||0));
     }
 
     const grid = document.getElementById('grid');
@@ -517,6 +732,7 @@
 
     renderStats();
   }
+  window.__render = render;
 
   function buildCard(item){
     const card = document.createElement('div');
@@ -573,15 +789,16 @@
   // ---------- status change ----------
   function changeStatus(id, newStatus){
     const item = state.pendencias.find(p => p.id === id);
-    if (item){ item.status = newStatus; render(); showToast('Status atualizado'); }
+    if (item){ item.status = newStatus; render(); persist(); showToast('Status atualizado'); }
   }
+  window.changeStatus = changeStatus;
 
   // ---------- delete (inline confirm, no native dialogs) ----------
   function askDelete(id, btn){
     if (btn.dataset.confirm === '1'){
       const list = state.tab === 'atividades' ? state.atividades : state.pendencias;
       const idx = list.findIndex(i => i.id === id);
-      if (idx > -1){ list.splice(idx, 1); render(); showToast('Removido'); }
+      if (idx > -1){ list.splice(idx, 1); render(); persist(); showToast('Removido'); }
       return;
     }
     btn.dataset.confirm = '1';
@@ -589,6 +806,7 @@
     btn.title = 'Clique novamente para confirmar exclusão';
     setTimeout(() => { btn.dataset.confirm = '0'; btn.textContent = '✕'; btn.title='Excluir'; }, 2500);
   }
+  window.askDelete = askDelete;
 
   // ---------- form ----------
   function openForm(id){
@@ -615,11 +833,13 @@
     document.getElementById('overlay').classList.add('open');
     document.getElementById('fTitulo').focus();
   }
+  window.openForm = openForm;
 
   function closeForm(){
     document.getElementById('overlay').classList.remove('open');
     state.editingId = null;
   }
+  window.closeForm = closeForm;
 
   function saveForm(){
     const titulo = document.getElementById('fTitulo').value.trim();
@@ -643,12 +863,18 @@
 
     closeForm();
     render();
+    persist();
     showToast('Salvo com sucesso');
   }
+  window.saveForm = saveForm;
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeForm();
   });
+
+  function persist(){
+    if (window.__saveToCloud) window.__saveToCloud();
+  }
 
   // ---------- import / export (JSON, compatible with MENU.py's format) ----------
   function exportJSON(){
@@ -667,6 +893,7 @@
     URL.revokeObjectURL(url);
     showToast('Arquivo exportado');
   }
+  window.exportJSON = exportJSON;
 
   function importJSON(event){
     const file = event.target.files[0];
@@ -684,15 +911,12 @@
     };
     reader.readAsText(file);
   }
+  window.importJSON = importJSON;
 
   function applyImported(parsed){
-    // Accepts either:
-    // 1) { atividades: [...], pendencias: [...] }  (this app's export format)
-    // 2) a bare array, matching a single Atividades.json or Pendencia.json from MENU.py
     let ativRaw = null, pendRaw = null;
 
     if (Array.isArray(parsed)){
-      // guess which file this is based on item shape (4 fields = pendencia)
       if (parsed.length === 0){ ativRaw = []; }
       else if (parsed[0].length === 4){ pendRaw = parsed; }
       else { ativRaw = parsed; }
@@ -712,6 +936,7 @@
       }));
     }
     render();
+    persist();
   }
 
   // ---------- toast ----------
@@ -723,9 +948,6 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
   }
-
-  // ---------- init ----------
-  render();
 </script>
 
 </body>
