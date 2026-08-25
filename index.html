@@ -496,6 +496,9 @@
       <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
         Pendências <span class="count" id="countPendencias">0</span>
       </button>
+      <button class="tab" id="tabFinalizadas" onclick="setTab('finalizadas')">
+        Finalizadas <span class="count" id="countFinalizadas">0</span>
+      </button>
     </div>
   </header>
 
@@ -509,6 +512,13 @@
         <option value="criterio">Ordenar: critério</option>
         <option value="recente">Ordenar: mais recente</option>
         <option value="titulo">Ordenar: título (A-Z)</option>
+      </select>
+      <select class="sort" id="criterioFilter" onchange="render()">
+        <option value="">Critério: todos</option>
+        <option value="URGENTE">Urgente</option>
+        <option value="ALTO">Alto</option>
+        <option value="MEDIO">Médio</option>
+        <option value="BAIXO">Baixo</option>
       </select>
       <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
       <button class="btn" onclick="exportJSON()">Exportar JSON</button>
@@ -691,20 +701,43 @@
     state.tab = tab;
     document.getElementById('tabAtividades').classList.toggle('active', tab==='atividades');
     document.getElementById('tabPendencias').classList.toggle('active', tab==='pendencias');
-    document.getElementById('addBtn').textContent = tab==='atividades' ? '+ Nova Atividade' : '+ Nova Pendência';
+    document.getElementById('tabFinalizadas').classList.toggle('active', tab==='finalizadas');
+
+    const addBtn = document.getElementById('addBtn');
+    if (tab === 'atividades'){ addBtn.textContent = '+ Nova Atividade'; addBtn.style.display = 'inline-block'; }
+    else if (tab === 'pendencias'){ addBtn.textContent = '+ Nova Pendência'; addBtn.style.display = 'inline-block'; }
+    else { addBtn.style.display = 'none'; }
+
+    document.getElementById('criterioFilter').value = '';
     render();
   }
   window.setTab = setTab;
 
+  // ---------- helpers for the two "pendencia" views sharing one array ----------
+  function isPendenciaTab(){ return state.tab === 'pendencias' || state.tab === 'finalizadas'; }
+  function getUnderlyingList(){ return state.tab === 'atividades' ? state.atividades : state.pendencias; }
+
   // ---------- render ----------
   function render(){
-    const list = state.tab === 'atividades' ? state.atividades : state.pendencias;
+    let items;
+    if (state.tab === 'atividades'){
+      items = state.atividades.slice();
+    } else if (state.tab === 'pendencias'){
+      items = state.pendencias.filter(p => p.status !== 'FINALIZADA');
+    } else {
+      items = state.pendencias.filter(p => p.status === 'FINALIZADA');
+    }
+
     const query = document.getElementById('searchInput').value.trim().toLowerCase();
     const sortMode = document.getElementById('sortSelect').value;
+    const criterioFilter = document.getElementById('criterioFilter').value;
 
-    let items = list.filter(i =>
+    items = items.filter(i =>
       i.titulo.toLowerCase().includes(query) || (i.descricao || '').toLowerCase().includes(query)
     );
+    if (criterioFilter){
+      items = items.filter(i => i.criterio === criterioFilter);
+    }
 
     if (sortMode === 'criterio'){
       items.sort((a,b) => CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio));
@@ -718,17 +751,27 @@
     grid.innerHTML = '';
 
     document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
-    document.getElementById('emptyTitle').textContent = query
-      ? 'Nenhum resultado'
-      : (state.tab === 'atividades' ? 'Nenhuma atividade cadastrada' : 'Nenhuma pendência cadastrada');
-    document.getElementById('emptySub').textContent = query
-      ? 'Tente outro termo de busca.'
-      : 'Clique em "+ Nova" para começar.';
+    const noFilterActive = !query && !criterioFilter;
+    let emptyTitleText;
+    if (!noFilterActive){
+      emptyTitleText = 'Nenhum resultado';
+    } else if (state.tab === 'atividades'){
+      emptyTitleText = 'Nenhuma atividade cadastrada';
+    } else if (state.tab === 'pendencias'){
+      emptyTitleText = 'Nenhuma pendência em aberto';
+    } else {
+      emptyTitleText = 'Nenhuma pendência finalizada ainda';
+    }
+    document.getElementById('emptyTitle').textContent = emptyTitleText;
+    document.getElementById('emptySub').textContent = noFilterActive
+      ? (state.tab === 'finalizadas' ? 'Itens marcados como "Finalizada" aparecem aqui.' : 'Clique em "+ Nova" para começar.')
+      : 'Tente outro termo de busca ou critério.';
 
     items.forEach(item => grid.appendChild(buildCard(item)));
 
     document.getElementById('countAtividades').textContent = state.atividades.length;
-    document.getElementById('countPendencias').textContent = state.pendencias.length;
+    document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
+    document.getElementById('countFinalizadas').textContent = state.pendencias.filter(p => p.status === 'FINALIZADA').length;
 
     renderStats();
   }
@@ -742,7 +785,7 @@
     const criterioBadge = `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`;
 
     let footerRight = '';
-    if (state.tab === 'pendencias'){
+    if (isPendenciaTab()){
       const opts = Object.keys(STATUS_META).map(s =>
         `<option value="${s}" ${s===item.status?'selected':''}>${STATUS_META[s].label}</option>`
       ).join('');
@@ -772,10 +815,16 @@
         const n = state.atividades.filter(a => a.criterio === c).length;
         box.innerHTML += `<span class="pill"><span class="dot" style="background:${CRITERIO_META[c].color}"></span>${CRITERIO_META[c].label}: ${n}</span>`;
       });
-    } else {
-      Object.keys(STATUS_META).forEach(s => {
+    } else if (state.tab === 'pendencias'){
+      ['NÃO INICIADO','EM ANDAMENTO'].forEach(s => {
         const n = state.pendencias.filter(p => p.status === s).length;
         box.innerHTML += `<span class="pill"><span class="dot" style="background:${STATUS_META[s].color}"></span>${STATUS_META[s].label}: ${n}</span>`;
+      });
+    } else {
+      const finalizadas = state.pendencias.filter(p => p.status === 'FINALIZADA');
+      CRITERIO_ORDER.forEach(c => {
+        const n = finalizadas.filter(p => p.criterio === c).length;
+        box.innerHTML += `<span class="pill"><span class="dot" style="background:${CRITERIO_META[c].color}"></span>${CRITERIO_META[c].label}: ${n}</span>`;
       });
     }
   }
@@ -796,7 +845,7 @@
   // ---------- delete (inline confirm, no native dialogs) ----------
   function askDelete(id, btn){
     if (btn.dataset.confirm === '1'){
-      const list = state.tab === 'atividades' ? state.atividades : state.pendencias;
+      const list = getUnderlyingList();
       const idx = list.findIndex(i => i.id === id);
       if (idx > -1){ list.splice(idx, 1); render(); persist(); showToast('Removido'); }
       return;
@@ -811,11 +860,11 @@
   // ---------- form ----------
   function openForm(id){
     state.editingId = id || null;
-    const isPendencia = state.tab === 'pendencias';
+    const isPendencia = isPendenciaTab();
     document.getElementById('statusField').style.display = isPendencia ? 'block' : 'none';
 
     if (id){
-      const list = isPendencia ? state.pendencias : state.atividades;
+      const list = getUnderlyingList();
       const item = list.find(i => i.id === id);
       document.getElementById('modalTitle').textContent = isPendencia ? 'Editar Pendência' : 'Editar Atividade';
       document.getElementById('fTitulo').value = item.titulo;
@@ -846,10 +895,10 @@
     if (!titulo){ document.getElementById('fTitulo').focus(); return; }
     const descricao = document.getElementById('fDescricao').value.trim();
     const criterio = document.getElementById('fCriterio').value;
-    const isPendencia = state.tab === 'pendencias';
+    const isPendencia = isPendenciaTab();
     const status = document.getElementById('fStatus').value;
 
-    const list = isPendencia ? state.pendencias : state.atividades;
+    const list = getUnderlyingList();
 
     if (state.editingId){
       const item = list.find(i => i.id === state.editingId);
