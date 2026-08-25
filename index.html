@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MyTasks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%85%3C/text%3E%3C/svg%3E">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root{
     --bg: #171B24;
@@ -245,9 +246,32 @@
   .toolbar{
     display:flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     align-items:center;
+    justify-content: space-between;
     margin-bottom: 22px;
+  }
+  .search-wrap{
+    position: relative;
+    flex: 1 1 240px;
+  }
+  .search-wrap .search-icon{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: .5;
+    pointer-events: none;
+  }
+  .search-wrap input#searchInput{
+    width: 100%;
+    padding-left: 34px;
+  }
+  .filter-group, .action-group{
+    display:flex;
+    gap: 8px;
+    flex: 0 0 auto;
   }
 
   input[type=text], input[type=search], input[type=date], select, textarea{
@@ -263,9 +287,6 @@
     outline: 2px solid var(--amber);
     outline-offset: 1px;
   }
-
-  .search{ flex: 1 1 220px; }
-  .sort{ flex: 0 0 auto; }
 
   .btn{
     font-family: var(--font-body);
@@ -587,8 +608,6 @@
     margin-top: 20px;
   }
 
-  #fileInput{ display:none; }
-
   .toast{
     position: fixed;
     bottom: 24px;
@@ -679,25 +698,29 @@
     <div class="stats" id="stats"></div>
 
     <div class="toolbar">
-      <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
-      <select class="sort" id="sortSelect" onchange="render()">
-        <option value="criterio">Ordenar: critério</option>
-        <option value="prazo">Ordenar: prazo</option>
-        <option value="recente">Ordenar: mais recente</option>
-        <option value="titulo">Ordenar: título (A-Z)</option>
-      </select>
-      <select class="sort" id="criterioFilter" onchange="render()">
-        <option value="">Critério: todos</option>
-        <option value="URGENTE">Urgente</option>
-        <option value="ALTO">Alto</option>
-        <option value="MEDIO">Médio</option>
-        <option value="BAIXO">Baixo</option>
-      </select>
-      <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
-      <button class="btn" onclick="exportJSON()">Exportar JSON</button>
-      <button class="btn" onclick="exportCSV()">Exportar CSV</button>
-      <button class="btn" onclick="document.getElementById('fileInput').click()">Importar JSON</button>
-      <input type="file" id="fileInput" accept="application/json" onchange="importJSON(event)">
+      <div class="search-wrap" title="Buscar por título ou descrição">
+        <span class="search-icon">🔎</span>
+        <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
+      </div>
+      <div class="filter-group">
+        <select class="sort" id="sortSelect" onchange="render()" title="Ordem em que os cards aparecem">
+          <option value="criterio">Ordenar: critério</option>
+          <option value="prazo">Ordenar: prazo</option>
+          <option value="recente">Ordenar: mais recente</option>
+          <option value="titulo">Ordenar: título (A-Z)</option>
+        </select>
+        <select class="sort" id="criterioFilter" onchange="render()" title="Mostrar só um critério de urgência">
+          <option value="">Critério: todos</option>
+          <option value="URGENTE">Urgente</option>
+          <option value="ALTO">Alto</option>
+          <option value="MEDIO">Médio</option>
+          <option value="BAIXO">Baixo</option>
+        </select>
+      </div>
+      <div class="action-group">
+        <button class="btn btn-primary" id="addBtn" onclick="openForm()" title="Criar um novo item, do zero">+ Nova</button>
+        <button class="btn" id="importAgendaBtn" onclick="openImportAgenda()" title="Traz eventos da sua Google Agenda como novas atividades">📅 Agenda Google</button>
+      </div>
     </div>
 
     <div class="grid" id="grid"></div>
@@ -772,6 +795,30 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeForm()">Cancelar</button>
       <button class="btn btn-primary" onclick="saveForm()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import from Google Calendar -->
+<div class="overlay" id="importOverlay" onclick="if(event.target===this) closeImportAgenda()">
+  <div class="modal">
+    <h2>Importar da Google Agenda</h2>
+    <div class="field-row">
+      <div class="field">
+        <label>De</label>
+        <input type="date" id="fImportDe">
+      </div>
+      <div class="field">
+        <label>Até</label>
+        <input type="date" id="fImportAte">
+      </div>
+    </div>
+    <div class="field-hint">
+      Cada evento do período vira uma Atividade (prazo = data do evento). Precisa conectar sua conta Google na primeira vez; eventos já importados antes não são duplicados.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeImportAgenda()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarImportarAgenda()">Conectar e importar</button>
     </div>
   </div>
 </div>
@@ -863,7 +910,7 @@
   });
 
   function hydrate(item){
-    const base = { id: window.__uid(), _ts: Date.now(), prazo: '', checklist: [], recorrencia: null };
+    const base = { id: window.__uid(), _ts: Date.now(), prazo: '', checklist: [], recorrencia: null, googleEventId: null };
     return Object.assign(base, item);
   }
 
@@ -878,10 +925,10 @@
       document.getElementById('syncText').textContent = 'salvando...';
       setDoc(userDocRef, {
         atividades: window.__state.atividades.map(a => ({
-          titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || [], recorrencia: a.recorrencia || null
+          titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || [], recorrencia: a.recorrencia || null, googleEventId: a.googleEventId || null
         })),
         pendencias: window.__state.pendencias.map(p => ({
-          titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null
+          titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null, googleEventId: p.googleEventId || null
         }))
       }).then(() => {
         document.getElementById('syncText').textContent = 'sincronizado na nuvem';
@@ -1036,6 +1083,7 @@
           prazo: a.prazo,
           checklist: a.checklist || [],
           recorrencia: a.recorrencia || null,
+          googleEventId: a.googleEventId || null,
           _ts: Date.now()
         });
         movidas++;
@@ -1079,6 +1127,9 @@
     if (tab === 'atividades'){ addBtn.textContent = '+ Nova Atividade'; addBtn.style.display = 'inline-block'; }
     else if (tab === 'pendencias'){ addBtn.textContent = '+ Nova Pendência'; addBtn.style.display = 'inline-block'; }
     else { addBtn.style.display = 'none'; }
+
+    // só faz sentido em Atividades: eventos importados sempre entram como Atividade
+    document.getElementById('importAgendaBtn').style.display = (tab === 'atividades') ? 'inline-block' : 'none';
 
     document.getElementById('criterioFilter').value = '';
     render();
@@ -1467,101 +1518,137 @@
     if (window.__saveToCloud) window.__saveToCloud(immediate);
   }
 
-  // ---------- import / export ----------
-  function exportJSON(){
-    const data = {
-      atividades: state.atividades.map(a => ({
-        titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '',
-        checklist: a.checklist || [], recorrencia: a.recorrencia || null
-      })),
-      pendencias: state.pendencias.map(p => ({
-        titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '',
-        checklist: p.checklist || [], recorrencia: p.recorrencia || null
-      }))
-    };
-    downloadBlob(JSON.stringify(data, null, 2), 'application/json', 'mytasks_dados.json');
-    showToast('Arquivo exportado');
-  }
-  window.exportJSON = exportJSON;
+  // ---------- importar da Google Agenda ----------
+  // Cole aqui o Client ID OAuth (tipo "Aplicativo da Web") criado no Google Cloud Console,
+  // com a Google Calendar API habilitada e a origem https://lucasgomes-droid.github.io
+  // cadastrada em "Origens JavaScript autorizadas". Veja o passo a passo enviado junto.
+  const GOOGLE_CLIENT_ID = 'COLE_AQUI_SEU_CLIENT_ID.apps.googleusercontent.com';
+  const GOOGLE_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
 
-  function csvEscape(v){
-    const s = String(v == null ? '' : v);
-    if (/[",\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-    return s;
-  }
-  function exportCSV(){
-    const rows = [['tipo','titulo','descricao','criterio','status','prazo','repete']];
-    state.atividades.forEach(a => rows.push(['atividade', a.titulo, a.descricao, a.criterio, '', a.prazo || '', formatRecorrencia(a.recorrencia)]));
-    state.pendencias.forEach(p => rows.push(['pendencia', p.titulo, p.descricao, p.criterio, p.status, p.prazo || '', formatRecorrencia(p.recorrencia)]));
-    const csv = rows.map(r => r.map(csvEscape).join(';')).join('\n');
-    downloadBlob('\uFEFF' + csv, 'text/csv;charset=utf-8', 'mytasks_dados.csv');
-    showToast('CSV exportado');
-  }
-  window.exportCSV = exportCSV;
+  let googleTokenClient = null;
+  let googleAccessToken = null;
 
-  function downloadBlob(content, mime, filename){
-    const blob = new Blob([content], {type: mime});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+  function initGoogleTokenClient(){
+    if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) return null;
+    if (googleTokenClient) return googleTokenClient;
+    googleTokenClient = window.google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: GOOGLE_SCOPE,
+      callback: '' // definido a cada chamada, em confirmarImportarAgenda
+    });
+    return googleTokenClient;
   }
 
-  function importJSON(event){
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        applyImported(parsed);
-        showToast('Dados importados');
-      } catch (err) {
-        showToast('Arquivo inválido');
+  function openImportAgenda(){
+    const hoje = todayStr();
+    const em30 = new Date(); em30.setDate(em30.getDate() + 30);
+    document.getElementById('fImportDe').value = hoje;
+    document.getElementById('fImportAte').value = dateToStr(em30);
+    document.getElementById('importOverlay').classList.add('open');
+  }
+  window.openImportAgenda = openImportAgenda;
+
+  function closeImportAgenda(){
+    document.getElementById('importOverlay').classList.remove('open');
+  }
+  window.closeImportAgenda = closeImportAgenda;
+
+  function confirmarImportarAgenda(){
+    const de = document.getElementById('fImportDe').value;
+    const ate = document.getElementById('fImportAte').value;
+    if (!de || !ate){ showToast('Defina o período'); return; }
+    if (de > ate){ showToast('A data "De" não pode ser depois da data "Até"'); return; }
+    if (GOOGLE_CLIENT_ID.indexOf('COLE_AQUI') === 0){
+      showToast('Configure o GOOGLE_CLIENT_ID no código antes de usar (veja instruções)');
+      return;
+    }
+    const client = initGoogleTokenClient();
+    if (!client){
+      showToast('Não foi possível carregar o login do Google — verifique sua conexão e tente de novo');
+      return;
+    }
+    client.callback = (resp) => {
+      if (!resp || resp.error){
+        showToast('Não foi possível conectar com o Google' + (resp && resp.error ? ' (' + resp.error + ')' : ''));
+        return;
       }
-      event.target.value = '';
+      googleAccessToken = resp.access_token;
+      importarEventosDoPeriodo(de, ate);
     };
-    reader.readAsText(file);
+    client.requestAccessToken({ prompt: googleAccessToken ? '' : 'consent' });
   }
-  window.importJSON = importJSON;
+  window.confirmarImportarAgenda = confirmarImportarAgenda;
 
-  // aceita tanto linhas no formato antigo (arrays posicionais, sem prazo/recorrência)
-  // quanto objetos completos (formato atual do "Exportar JSON").
-  function normalizarItemImportado(row, isPendencia){
-    if (Array.isArray(row)){
-      const item = {
-        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO',
-        _ts: Date.now(), prazo: '', checklist: [], recorrencia: null
-      };
-      if (isPendencia) item.status = row[3] || 'NÃO INICIADO';
-      return item;
-    }
-    const item = {
-      id: uid(), titulo: row.titulo || '', descricao: row.descricao || '', criterio: row.criterio || 'BAIXO',
-      _ts: Date.now(), prazo: row.prazo || '', checklist: row.checklist || [], recorrencia: row.recorrencia || null
-    };
-    if (isPendencia) item.status = row.status || 'NÃO INICIADO';
-    return item;
+  // busca todos os eventos do período, paginando quando necessário
+  async function buscarEventosGoogle(timeMin, timeMax){
+    let eventos = [];
+    let pageToken = '';
+    do {
+      const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
+        + '?timeMin=' + encodeURIComponent(timeMin)
+        + '&timeMax=' + encodeURIComponent(timeMax)
+        + '&singleEvents=true&orderBy=startTime&maxResults=250'
+        + (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : '');
+      const res = await fetch(url, { headers: { Authorization: 'Bearer ' + googleAccessToken } });
+      if (!res.ok){
+        const err = new Error('http_' + res.status);
+        err.status = res.status;
+        throw err;
+      }
+      const data = await res.json();
+      eventos = eventos.concat(data.items || []);
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return eventos;
   }
 
-  function applyImported(parsed){
-    let ativRaw = null, pendRaw = null;
+  async function importarEventosDoPeriodo(deStr, ateStr){
+    closeImportAgenda();
+    showToast('Buscando eventos da agenda...');
+    try {
+      const timeMin = new Date(deStr + 'T00:00:00').toISOString();
+      const timeMax = new Date(ateStr + 'T23:59:59').toISOString();
+      const eventos = await buscarEventosGoogle(timeMin, timeMax);
 
-    if (Array.isArray(parsed)){
-      if (parsed.length === 0){ ativRaw = []; }
-      else if (parsed[0].length === 4){ pendRaw = parsed; }
-      else { ativRaw = parsed; }
-    } else if (parsed && typeof parsed === 'object'){
-      ativRaw = parsed.atividades || null;
-      pendRaw = parsed.pendencias || null;
+      const jaImportados = new Set(
+        state.atividades.concat(state.pendencias)
+          .filter(i => i.googleEventId)
+          .map(i => i.googleEventId)
+      );
+
+      let novos = 0, ignorados = 0;
+      eventos.forEach(ev => {
+        if (!ev.id || ev.status === 'cancelled' || jaImportados.has(ev.id)){ ignorados++; return; }
+        const dataEvento = ev.start && (ev.start.date || (ev.start.dateTime ? ev.start.dateTime.slice(0, 10) : ''));
+        if (!dataEvento){ ignorados++; return; }
+        state.atividades.push({
+          id: uid(),
+          titulo: ev.summary || '(sem título)',
+          descricao: ev.description || '',
+          criterio: 'MEDIO',
+          prazo: dataEvento,
+          checklist: [],
+          recorrencia: null,
+          googleEventId: ev.id,
+          _ts: Date.now()
+        });
+        novos++;
+      });
+
+      if (novos > 0){ render(); persist(true); }
+      showToast(
+        novos === 0
+          ? 'Nenhum evento novo pra importar nesse período'
+          : novos + ' evento(s) importado(s) da agenda' + (ignorados ? ' (' + ignorados + ' já existiam ou foram ignorados)' : '')
+      );
+    } catch (err) {
+      if (err && err.status === 401){
+        googleAccessToken = null;
+        showToast('Sua sessão do Google expirou — clique em importar de novo');
+      } else {
+        showToast('Erro ao importar da agenda: ' + (err && err.message ? err.message : 'desconhecido'));
+      }
     }
-
-    if (ativRaw) state.atividades = ativRaw.map(row => normalizarItemImportado(row, false));
-    if (pendRaw) state.pendencias = pendRaw.map(row => normalizarItemImportado(row, true));
-
-    render();
-    persist(true);
   }
 
   // ---------- toast ----------
