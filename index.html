@@ -24,6 +24,7 @@
     --ni: #6B7385;
     --andamento: #5B8DEF;
     --finalizada: #4CAF7D;
+    --atrasada: #E1524B;
 
     --font-display: "Avenir Next", "Segoe UI Semibold", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --font-body: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -179,7 +180,6 @@
     display:inline-block; margin-right:6px;
   }
 
-  /* Tabs styled like folder tabs on an index-card box */
   .tabs{
     display:flex;
     gap: 6px;
@@ -235,7 +235,7 @@
     margin-bottom: 22px;
   }
 
-  input[type=text], input[type=search], select, textarea{
+  input[type=text], input[type=search], input[type=date], select, textarea{
     background: var(--bg-soft);
     border: 1px solid var(--line);
     color: var(--text);
@@ -244,7 +244,7 @@
     font-family: var(--font-body);
     font-size: 14px;
   }
-  input[type=text]:focus, input[type=search]:focus, select:focus, textarea:focus{
+  input[type=text]:focus, input[type=search]:focus, input[type=date]:focus, select:focus, textarea:focus{
     outline: 2px solid var(--amber);
     outline-offset: 1px;
   }
@@ -276,7 +276,6 @@
   }
   .btn-sm{ padding: 6px 10px; font-size: 12px; }
 
-  /* Stat pills */
   .stats{
     display:flex;
     flex-wrap:wrap;
@@ -296,7 +295,6 @@
   }
   .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
 
-  /* Cards */
   .grid{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -321,6 +319,12 @@
     margin: 0 0 6px;
     padding-right: 60px;
   }
+  .card-title mark, .card-desc mark{
+    background: rgba(245,166,91,0.35);
+    color: var(--text);
+    border-radius: 3px;
+    padding: 0 1px;
+  }
   .card-desc{
     font-size: 13.5px;
     color: var(--muted);
@@ -337,6 +341,24 @@
     padding: 4px 8px;
     border-radius: 5px;
     display:inline-block;
+  }
+  .badge-atrasada{
+    background: rgba(225,82,75,0.16);
+    color: var(--atrasada);
+  }
+  .badge-prazo{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .card-meta-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
   }
 
   .card-footer{
@@ -373,6 +395,62 @@
   }
   .icon-btn:hover{ background: var(--line); color: var(--text); }
 
+  /* Checklist */
+  .checklist-toggle{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 5px 10px;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    gap: 6px;
+  }
+  .checklist-toggle:hover{ color: var(--text); border-color: var(--amber); }
+  .checklist-toggle .bar{
+    width: 40px; height: 4px; border-radius: 2px; background: var(--line); overflow:hidden;
+  }
+  .checklist-toggle .bar > span{ display:block; height:100%; background: var(--finalizada); }
+
+  .checklist-panel{
+    display:none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .checklist-panel.open{ display:block; }
+  .checklist-item{
+    display:flex;
+    align-items:flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .checklist-item input[type=checkbox]{
+    margin-top: 3px;
+    accent-color: var(--amber);
+    cursor:pointer;
+  }
+  .checklist-item .txt{ flex:1; word-break: break-word; }
+  .checklist-item .txt.done{ color: var(--muted); text-decoration: line-through; }
+  .checklist-item .rm{
+    background:transparent; border:none; color: var(--muted); cursor:pointer; font-size: 12px; padding: 2px 4px;
+  }
+  .checklist-item .rm:hover{ color: var(--urgente); }
+  .checklist-add{
+    display:flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .checklist-add input{
+    flex:1;
+    font-size: 12.5px;
+    padding: 7px 10px;
+  }
+
   .empty{
     text-align:center;
     padding: 60px 20px;
@@ -385,7 +463,6 @@
     margin-bottom: 6px;
   }
 
-  /* Modal form */
   .overlay{
     position: fixed;
     inset:0;
@@ -395,6 +472,7 @@
     justify-content:center;
     padding: 20px;
     z-index: 50;
+    overflow-y: auto;
   }
   .overlay.open{ display:flex; }
 
@@ -405,6 +483,7 @@
     padding: 26px;
     width: 100%;
     max-width: 440px;
+    margin: auto;
   }
   .modal h2{
     font-family: var(--font-display);
@@ -423,6 +502,8 @@
   }
   .field input, .field select, .field textarea{ width:100%; }
   .field textarea{ resize: vertical; min-height: 70px; }
+  .field-row{ display:flex; gap: 10px; }
+  .field-row .field{ flex:1; }
 
   .modal-actions{
     display:flex;
@@ -441,21 +522,37 @@
     background: var(--card);
     border: 1px solid var(--line);
     color: var(--text);
-    padding: 12px 18px;
+    padding: 10px 10px 10px 16px;
     border-radius: 8px;
     font-size: 13.5px;
     opacity: 0;
     pointer-events:none;
     transition: opacity .2s ease, transform .2s ease;
     z-index: 60;
+    display:flex;
+    align-items:center;
+    gap: 12px;
   }
-  .toast.show{ opacity:1; transform: translateX(-50%) translateY(-6px); }
+  .toast.show{ opacity:1; pointer-events:auto; transform: translateX(-50%) translateY(-6px); }
+  .toast button{
+    background: var(--amber);
+    color: #201205;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-body);
+    white-space: nowrap;
+  }
 
   @media (max-width: 560px){
     header{ padding: 24px 14px 0; }
     main{ padding: 20px 14px 28px; border-radius: 0 10px 10px 10px; }
     .brand h1{ font-size: 26px; }
     .topbar{ flex-direction: column; align-items:flex-start; gap: 14px; }
+    .field-row{ flex-direction: column; }
   }
 </style>
 </head>
@@ -510,6 +607,7 @@
       <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
       <select class="sort" id="sortSelect" onchange="render()">
         <option value="criterio">Ordenar: critério</option>
+        <option value="prazo">Ordenar: prazo</option>
         <option value="recente">Ordenar: mais recente</option>
         <option value="titulo">Ordenar: título (A-Z)</option>
       </select>
@@ -522,6 +620,7 @@
       </select>
       <button class="btn btn-primary" id="addBtn" onclick="openForm()">+ Nova</button>
       <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+      <button class="btn" onclick="exportCSV()">Exportar CSV</button>
       <button class="btn" onclick="document.getElementById('fileInput').click()">Importar JSON</button>
       <input type="file" id="fileInput" accept="application/json" onchange="importJSON(event)">
     </div>
@@ -547,22 +646,28 @@
       <label>Descrição</label>
       <textarea id="fDescricao" placeholder="Descreva com detalhes"></textarea>
     </div>
-    <div class="field">
-      <label>Critério</label>
-      <select id="fCriterio">
-        <option value="BAIXO">Baixo</option>
-        <option value="MEDIO">Médio</option>
-        <option value="ALTO">Alto</option>
-        <option value="URGENTE">Urgente</option>
-      </select>
+    <div class="field-row">
+      <div class="field">
+        <label>Critério</label>
+        <select id="fCriterio">
+          <option value="BAIXO">Baixo</option>
+          <option value="MEDIO">Médio</option>
+          <option value="ALTO">Alto</option>
+          <option value="URGENTE">Urgente</option>
+        </select>
+      </div>
+      <div class="field" id="statusField">
+        <label>Status</label>
+        <select id="fStatus">
+          <option value="NÃO INICIADO">Não iniciado</option>
+          <option value="EM ANDAMENTO">Em andamento</option>
+          <option value="FINALIZADA">Finalizada</option>
+        </select>
+      </div>
     </div>
-    <div class="field" id="statusField">
-      <label>Status</label>
-      <select id="fStatus">
-        <option value="NÃO INICIADO">Não iniciado</option>
-        <option value="EM ANDAMENTO">Em andamento</option>
-        <option value="FINALIZADA">Finalizada</option>
-      </select>
+    <div class="field">
+      <label>Prazo (opcional)</label>
+      <input type="date" id="fPrazo">
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeForm()">Cancelar</button>
@@ -571,7 +676,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -598,7 +703,7 @@
 
   let currentUser = null;
   let unsubscribeDoc = null;
-  let suppressNextSave = false; // avoid re-saving data we just received from Firestore
+  let suppressNextSave = false;
 
   document.getElementById('loginBtn').addEventListener('click', () => {
     const provider = new GithubAuthProvider();
@@ -610,9 +715,7 @@
     });
   });
 
-  window.logout = function(){
-    signOut(auth);
-  };
+  window.logout = function(){ signOut(auth); };
 
   onAuthStateChanged(auth, (user) => {
     if (unsubscribeDoc){ unsubscribeDoc(); unsubscribeDoc = null; }
@@ -650,32 +753,45 @@
   });
 
   function hydrate(item){
-    return Object.assign({ id: window.__uid(), _ts: Date.now() }, item);
+    const base = { id: window.__uid(), _ts: Date.now(), prazo: '', checklist: [] };
+    return Object.assign(base, item);
   }
 
-  window.__saveToCloud = function(){
+  let saveTimer = null;
+  window.__saveToCloud = function(immediate){
     if (suppressNextSave){ suppressNextSave = false; return; }
     if (!currentUser) return;
-    const userDocRef = doc(db, 'users', currentUser.uid);
-    document.getElementById('syncText').textContent = 'salvando...';
-    setDoc(userDocRef, {
-      atividades: window.__state.atividades.map(a => ({ titulo: a.titulo, descricao: a.descricao, criterio: a.criterio })),
-      pendencias: window.__state.pendencias.map(p => ({ titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status }))
-    }).then(() => {
-      document.getElementById('syncText').textContent = 'sincronizado na nuvem';
-    }).catch(() => {
-      document.getElementById('syncText').textContent = 'falha ao salvar — tente novamente';
-    });
+
+    clearTimeout(saveTimer);
+    const doSave = () => {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      document.getElementById('syncText').textContent = 'salvando...';
+      setDoc(userDocRef, {
+        atividades: window.__state.atividades.map(a => ({
+          titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || []
+        })),
+        pendencias: window.__state.pendencias.map(p => ({
+          titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || []
+        }))
+      }).then(() => {
+        document.getElementById('syncText').textContent = 'sincronizado na nuvem';
+      }).catch(() => {
+        document.getElementById('syncText').textContent = 'falha ao salvar — tente novamente';
+      });
+    };
+
+    if (immediate){ doSave(); } else { saveTimer = setTimeout(doSave, 600); }
   };
 </script>
 
 <script>
   // ---------- state ----------
   let state = {
-    atividades: [],   // {id, titulo, descricao, criterio}
-    pendencias: [],   // {id, titulo, descricao, criterio, status}
+    atividades: [],
+    pendencias: [],
     tab: 'atividades',
-    editingId: null
+    editingId: null,
+    openChecklists: {}   // id -> true/false, remembers which cards have the checklist expanded
   };
   window.__state = state;
 
@@ -696,6 +812,22 @@
   function uid(){ return 'id' + Math.random().toString(36).slice(2, 10); }
   window.__uid = uid;
 
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function isOverdue(item){
+    return item.prazo && item.prazo < todayStr() && item.status !== 'FINALIZADA';
+  }
+  function formatPrazo(p){
+    const [y,m,d] = p.split('-');
+    return d + '/' + m + '/' + y;
+  }
+
+  // ---------- helpers ----------
+  function isPendenciaTab(){ return state.tab === 'pendencias' || state.tab === 'finalizadas'; }
+  function getUnderlyingList(){ return state.tab === 'atividades' ? state.atividades : state.pendencias; }
+
   // ---------- tabs ----------
   function setTab(tab){
     state.tab = tab;
@@ -712,10 +844,6 @@
     render();
   }
   window.setTab = setTab;
-
-  // ---------- helpers for the two "pendencia" views sharing one array ----------
-  function isPendenciaTab(){ return state.tab === 'pendencias' || state.tab === 'finalizadas'; }
-  function getUnderlyingList(){ return state.tab === 'atividades' ? state.atividades : state.pendencias; }
 
   // ---------- render ----------
   function render(){
@@ -743,6 +871,13 @@
       items.sort((a,b) => CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio));
     } else if (sortMode === 'titulo'){
       items.sort((a,b) => a.titulo.localeCompare(b.titulo));
+    } else if (sortMode === 'prazo'){
+      items.sort((a,b) => {
+        if (!a.prazo && !b.prazo) return 0;
+        if (!a.prazo) return 1;
+        if (!b.prazo) return -1;
+        return a.prazo.localeCompare(b.prazo);
+      });
     } else {
       items.sort((a,b) => (b._ts||0) - (a._ts||0));
     }
@@ -767,7 +902,7 @@
       ? (state.tab === 'finalizadas' ? 'Itens marcados como "Finalizada" aparecem aqui.' : 'Clique em "+ Nova" para começar.')
       : 'Tente outro termo de busca ou critério.';
 
-    items.forEach(item => grid.appendChild(buildCard(item)));
+    items.forEach(item => grid.appendChild(buildCard(item, query)));
 
     document.getElementById('countAtividades').textContent = state.atividades.length;
     document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
@@ -777,12 +912,28 @@
   }
   window.__render = render;
 
-  function buildCard(item){
+  function escapeHTML(str){
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  }
+  function escapeRegex(str){ return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function highlight(str, query){
+    const safe = escapeHTML(str);
+    if (!query) return safe;
+    const re = new RegExp(escapeRegex(escapeHTML(query)), 'ig');
+    return safe.replace(re, m => '<mark>' + m + '</mark>');
+  }
+
+  function buildCard(item, query){
     const card = document.createElement('div');
     card.className = 'card';
-    card.style.borderLeftColor = CRITERIO_META[item.criterio].color;
+    card.dataset.id = item.id;
+    card.style.borderLeftColor = isOverdue(item) ? 'var(--atrasada)' : CRITERIO_META[item.criterio].color;
 
     const criterioBadge = `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`;
+    const overdueBadge = isOverdue(item) ? `<span class="badge badge-atrasada">Atrasada</span>` : '';
+    const prazoBadge = item.prazo ? `<span class="badge badge-prazo">${isOverdue(item) ? '⚠' : '📅'} ${formatPrazo(item.prazo)}</span>` : '';
 
     let footerRight = '';
     if (isPendenciaTab()){
@@ -792,16 +943,43 @@
       footerRight = `<select class="status-select" style="color:${STATUS_META[item.status].color}; border-color:${STATUS_META[item.status].color}55" onchange="changeStatus('${item.id}', this.value)">${opts}</select>`;
     }
 
+    const checklist = item.checklist || [];
+    const doneCount = checklist.filter(c => c.feito).length;
+    const isOpen = !!state.openChecklists[item.id];
+    const pct = checklist.length ? Math.round((doneCount / checklist.length) * 100) : 0;
+
+    const checklistToggle = `
+      <button class="checklist-toggle" onclick="toggleChecklist('${item.id}')">
+        ☑ ${doneCount}/${checklist.length}
+        <span class="bar"><span style="width:${pct}%"></span></span>
+      </button>`;
+
+    const checklistItemsHtml = checklist.map(c => `
+      <div class="checklist-item">
+        <input type="checkbox" ${c.feito ? 'checked' : ''} onchange="toggleChecklistItem('${item.id}','${c.id}')">
+        <span class="txt ${c.feito ? 'done' : ''}">${escapeHTML(c.texto)}</span>
+        <button class="rm" onclick="removeChecklistItem('${item.id}','${c.id}')" title="Remover">✕</button>
+      </div>
+    `).join('');
+
     card.innerHTML = `
       <div class="card-actions">
         <button class="icon-btn" title="Editar" onclick="openForm('${item.id}')">✎</button>
-        <button class="icon-btn" title="Excluir" onclick="askDelete('${item.id}', this)">✕</button>
+        <button class="icon-btn" title="Excluir" onclick="deleteItem('${item.id}')">✕</button>
       </div>
-      <div class="card-title">${escapeHTML(item.titulo)}</div>
-      <div class="card-desc">${escapeHTML(item.descricao) || '<em>Sem descrição</em>'}</div>
+      <div class="card-title">${highlight(item.titulo, query)}</div>
+      <div class="card-desc">${item.descricao ? highlight(item.descricao, query) : '<em>Sem descrição</em>'}</div>
+      <div class="card-meta-row">${criterioBadge}${overdueBadge}${prazoBadge}</div>
       <div class="card-footer">
-        ${criterioBadge}
+        ${checklistToggle}
         ${footerRight}
+      </div>
+      <div class="checklist-panel ${isOpen ? 'open' : ''}" id="checklist-${item.id}">
+        ${checklistItemsHtml}
+        <div class="checklist-add">
+          <input type="text" placeholder="Adicionar item..." onkeydown="if(event.key==='Enter'){addChecklistItem('${item.id}', this); event.preventDefault();}">
+          <button class="btn btn-sm" onclick="addChecklistItem('${item.id}', this.previousElementSibling)">+</button>
+        </div>
       </div>
     `;
     return card;
@@ -820,6 +998,8 @@
         const n = state.pendencias.filter(p => p.status === s).length;
         box.innerHTML += `<span class="pill"><span class="dot" style="background:${STATUS_META[s].color}"></span>${STATUS_META[s].label}: ${n}</span>`;
       });
+      const overdueCount = state.pendencias.filter(p => isOverdue(p)).length;
+      box.innerHTML += `<span class="pill"><span class="dot" style="background:var(--atrasada)"></span>Atrasadas: ${overdueCount}</span>`;
     } else {
       const finalizadas = state.pendencias.filter(p => p.status === 'FINALIZADA');
       CRITERIO_ORDER.forEach(c => {
@@ -829,11 +1009,49 @@
     }
   }
 
-  function escapeHTML(str){
-    const d = document.createElement('div');
-    d.textContent = str || '';
-    return d.innerHTML;
+  // ---------- checklist ----------
+  function toggleChecklist(id){
+    state.openChecklists[id] = !state.openChecklists[id];
+    const panel = document.getElementById('checklist-' + id);
+    if (panel) panel.classList.toggle('open', state.openChecklists[id]);
   }
+  window.toggleChecklist = toggleChecklist;
+
+  function findItem(id){
+    return state.atividades.find(i => i.id === id) || state.pendencias.find(i => i.id === id);
+  }
+
+  function addChecklistItem(itemId, inputEl){
+    const texto = inputEl.value.trim();
+    if (!texto) return;
+    const item = findItem(itemId);
+    if (!item) return;
+    if (!item.checklist) item.checklist = [];
+    item.checklist.push({ id: uid(), texto, feito: false });
+    inputEl.value = '';
+    state.openChecklists[itemId] = true;
+    render();
+    persist();
+  }
+  window.addChecklistItem = addChecklistItem;
+
+  function toggleChecklistItem(itemId, checkId){
+    const item = findItem(itemId);
+    if (!item) return;
+    const c = (item.checklist || []).find(c => c.id === checkId);
+    if (c){ c.feito = !c.feito; state.openChecklists[itemId] = true; render(); persist(); }
+  }
+  window.toggleChecklistItem = toggleChecklistItem;
+
+  function removeChecklistItem(itemId, checkId){
+    const item = findItem(itemId);
+    if (!item) return;
+    item.checklist = (item.checklist || []).filter(c => c.id !== checkId);
+    state.openChecklists[itemId] = true;
+    render();
+    persist();
+  }
+  window.removeChecklistItem = removeChecklistItem;
 
   // ---------- status change ----------
   function changeStatus(id, newStatus){
@@ -842,20 +1060,28 @@
   }
   window.changeStatus = changeStatus;
 
-  // ---------- delete (inline confirm, no native dialogs) ----------
-  function askDelete(id, btn){
-    if (btn.dataset.confirm === '1'){
-      const list = getUnderlyingList();
-      const idx = list.findIndex(i => i.id === id);
-      if (idx > -1){ list.splice(idx, 1); render(); persist(); showToast('Removido'); }
-      return;
-    }
-    btn.dataset.confirm = '1';
-    btn.textContent = '⚠';
-    btn.title = 'Clique novamente para confirmar exclusão';
-    setTimeout(() => { btn.dataset.confirm = '0'; btn.textContent = '✕'; btn.title='Excluir'; }, 2500);
+  // ---------- delete with undo ----------
+  let lastDeleted = null;
+  function deleteItem(id){
+    const list = getUnderlyingList();
+    const idx = list.findIndex(i => i.id === id);
+    if (idx === -1) return;
+    lastDeleted = { list, item: list[idx], index: idx };
+    list.splice(idx, 1);
+    render();
+    showToast('Item removido', 'Desfazer', undoDelete);
+    persist();
   }
-  window.askDelete = askDelete;
+  window.deleteItem = deleteItem;
+
+  function undoDelete(){
+    if (!lastDeleted) return;
+    lastDeleted.list.splice(lastDeleted.index, 0, lastDeleted.item);
+    lastDeleted = null;
+    render();
+    persist();
+    showToast('Restaurado');
+  }
 
   // ---------- form ----------
   function openForm(id){
@@ -870,12 +1096,14 @@
       document.getElementById('fTitulo').value = item.titulo;
       document.getElementById('fDescricao').value = item.descricao;
       document.getElementById('fCriterio').value = item.criterio;
+      document.getElementById('fPrazo').value = item.prazo || '';
       if (isPendencia) document.getElementById('fStatus').value = item.status;
     } else {
       document.getElementById('modalTitle').textContent = isPendencia ? 'Nova Pendência' : 'Nova Atividade';
       document.getElementById('fTitulo').value = '';
       document.getElementById('fDescricao').value = '';
       document.getElementById('fCriterio').value = 'BAIXO';
+      document.getElementById('fPrazo').value = '';
       document.getElementById('fStatus').value = 'NÃO INICIADO';
     }
 
@@ -895,6 +1123,7 @@
     if (!titulo){ document.getElementById('fTitulo').focus(); return; }
     const descricao = document.getElementById('fDescricao').value.trim();
     const criterio = document.getElementById('fCriterio').value;
+    const prazo = document.getElementById('fPrazo').value;
     const isPendencia = isPendenciaTab();
     const status = document.getElementById('fStatus').value;
 
@@ -902,17 +1131,17 @@
 
     if (state.editingId){
       const item = list.find(i => i.id === state.editingId);
-      item.titulo = titulo; item.descricao = descricao; item.criterio = criterio;
+      item.titulo = titulo; item.descricao = descricao; item.criterio = criterio; item.prazo = prazo;
       if (isPendencia) item.status = status;
     } else {
-      const novo = { id: uid(), titulo, descricao, criterio, _ts: Date.now() };
+      const novo = { id: uid(), titulo, descricao, criterio, prazo, _ts: Date.now(), checklist: [] };
       if (isPendencia) novo.status = status;
       list.push(novo);
     }
 
     closeForm();
     render();
-    persist();
+    persist(true);
     showToast('Salvo com sucesso');
   }
   window.saveForm = saveForm;
@@ -921,28 +1150,44 @@
     if (e.key === 'Escape') closeForm();
   });
 
-  function persist(){
-    if (window.__saveToCloud) window.__saveToCloud();
+  function persist(immediate){
+    if (window.__saveToCloud) window.__saveToCloud(immediate);
   }
 
-  // ---------- import / export (JSON, compatible with MENU.py's format) ----------
+  // ---------- import / export ----------
   function exportJSON(){
     const data = {
       atividades: state.atividades.map(a => [a.titulo, a.descricao, a.criterio]),
       pendencias: state.pendencias.map(p => [p.titulo, p.descricao, p.criterio, p.status])
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mytasks_dados.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    downloadBlob(JSON.stringify(data, null, 2), 'application/json', 'mytasks_dados.json');
     showToast('Arquivo exportado');
   }
   window.exportJSON = exportJSON;
+
+  function csvEscape(v){
+    const s = String(v == null ? '' : v);
+    if (/[",\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function exportCSV(){
+    const rows = [['tipo','titulo','descricao','criterio','status','prazo']];
+    state.atividades.forEach(a => rows.push(['atividade', a.titulo, a.descricao, a.criterio, '', a.prazo || '']));
+    state.pendencias.forEach(p => rows.push(['pendencia', p.titulo, p.descricao, p.criterio, p.status, p.prazo || '']));
+    const csv = rows.map(r => r.map(csvEscape).join(';')).join('\n');
+    downloadBlob('\uFEFF' + csv, 'text/csv;charset=utf-8', 'mytasks_dados.csv');
+    showToast('CSV exportado');
+  }
+  window.exportCSV = exportCSV;
+
+  function downloadBlob(content, mime, filename){
+    const blob = new Blob([content], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   function importJSON(event){
     const file = event.target.files[0];
@@ -976,27 +1221,42 @@
 
     if (ativRaw){
       state.atividades = ativRaw.map(row => ({
-        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', _ts: Date.now()
+        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', _ts: Date.now(), prazo: '', checklist: []
       }));
     }
     if (pendRaw){
       state.pendencias = pendRaw.map(row => ({
-        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', status: row[3] || 'NÃO INICIADO', _ts: Date.now()
+        id: uid(), titulo: row[0] || '', descricao: row[1] || '', criterio: row[2] || 'BAIXO', status: row[3] || 'NÃO INICIADO', _ts: Date.now(), prazo: '', checklist: []
       }));
     }
     render();
-    persist();
+    persist(true);
   }
 
   // ---------- toast ----------
   let toastTimer;
-  function showToast(msg){
+  function showToast(msg, actionLabel, actionFn){
     const t = document.getElementById('toast');
-    t.textContent = msg;
+    const msgEl = document.getElementById('toastMsg');
+    msgEl.textContent = msg;
+
+    const oldBtn = t.querySelector('button');
+    if (oldBtn) oldBtn.remove();
+
+    if (actionLabel && actionFn){
+      const btn = document.createElement('button');
+      btn.textContent = actionLabel;
+      btn.onclick = () => { actionFn(); t.classList.remove('show'); clearTimeout(toastTimer); };
+      t.appendChild(btn);
+    }
+
     t.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    toastTimer = setTimeout(() => t.classList.remove('show'), actionLabel ? 4500 : 1800);
   }
+
+  // ---------- init ----------
+  render();
 </script>
 
 </body>
