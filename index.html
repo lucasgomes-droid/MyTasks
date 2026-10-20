@@ -814,13 +814,155 @@
     white-space: nowrap;
   }
 
+
+  /* ---------- Aba Hoje ---------- */
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .today-date{
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+  .today-layout{
+    display:grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(0, 2.4fr);
+    gap: 18px;
+    align-items: start;
+  }
+  .today-panel{
+    background: var(--col-bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    min-width: 0;
+  }
+  .panel-label{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .cat-list{ display:flex; flex-direction: column; gap: 4px; }
+  .cat{
+    display:flex; align-items:center; gap: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .cat:hover{ background: var(--bg-soft); }
+  .cat.active{
+    background: color-mix(in srgb, var(--c) 14%, transparent);
+    border-color: color-mix(in srgb, var(--c) 45%, transparent);
+  }
+  .cat .dot{ width: 9px; height: 9px; }
+  .cat-name{ flex: 1; }
+  .cat-n{ font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .today-progress{ margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .today-progress:empty{ display:none; }
+  .prog-text{ font-size: 13px; color: var(--muted); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .prog-text strong{ color: var(--text); }
+  .prog-bar{ height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .prog-bar span{ display:block; height: 100%; background: var(--finalizada); border-radius: 999px; transition: width .3s ease; }
+
+  .task-list{ list-style: none; margin: 0; padding: 0; display:flex; flex-direction: column; gap: 6px; }
+  .task{
+    display:flex; align-items:center; gap: 12px;
+    padding: 10px 10px 10px 12px;
+    border-radius: 10px;
+    background: var(--card-raised);
+    border: 1px solid var(--line);
+    transition: background .15s ease, opacity .2s ease;
+  }
+  .task:hover{ background: var(--card-raised-hover); }
+  .task-check{
+    width: 20px; height: 20px; flex: 0 0 auto;
+    accent-color: var(--finalizada);
+    cursor: pointer;
+    margin: 0;
+  }
+  .task-main{ flex: 1; min-width: 0; display:flex; flex-wrap: wrap; align-items:center; gap: 6px 10px; }
+  .task-title{ font-size: 15.5px; cursor: pointer; word-break: break-word; }
+  .task.done{ opacity: .6; }
+  .task.done .task-title{ text-decoration: line-through; color: var(--muted); }
+  .task-tags{ display:flex; flex-wrap: wrap; gap: 6px; }
+  .chip{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    color: var(--c, var(--muted));
+    background: color-mix(in srgb, var(--c, var(--muted)) 16%, transparent);
+    white-space: nowrap;
+  }
+  .chip-late{ --c: var(--atrasada); }
+  .chip-rec{ --c: var(--recorrente); }
+  .chip-plain{ --c: var(--muted); }
+  .task-btn{
+    flex: 0 0 auto;
+    width: 34px; height: 34px;
+    display:grid; place-items:center;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .task-btn:hover{ color: var(--text); background: var(--line); }
+  .task-del:hover{ color: var(--urgente); border-color: color-mix(in srgb, var(--urgente) 50%, var(--line)); }
+  .today-empty{
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    color: var(--muted);
+    text-align: center;
+    padding: 26px 14px;
+    font-size: 14px;
+  }
+  .quick-add{
+    display:flex; align-items:flex-end; gap: 10px;
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .quick-add input{ flex: 1; min-width: 0; padding: 12px 14px; font-size: 15px; }
+  .qa-crit{ display:flex; flex-direction: column; gap: 4px; }
+  .qa-crit label{ font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .qa-crit select{ padding: 11px 10px; }
+  .qa-btn{
+    width: 46px; height: 44px; flex: 0 0 auto;
+    background: var(--amber); color: #201205;
+    border: none; border-radius: 8px;
+    font-size: 24px; font-weight: 700; line-height: 1;
+    cursor: pointer;
+  }
+  .qa-btn:hover{ background: var(--amber-dark); }
+  .task-btn:focus-visible, .qa-btn:focus-visible, .cat:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  @media (max-width: 760px){
+    .today-layout{ grid-template-columns: 1fr; }
+    .cat-list{ flex-direction: row; flex-wrap: wrap; }
+    .cat{ padding: 7px 10px; font-size: 14px; border-color: var(--line); }
+    .quick-add{ flex-wrap: wrap; }
+    .quick-add input{ flex: 1 1 100%; }
+    .qa-crit{ flex: 1; }
+  }
+
   @media (max-width: 560px){
     header{ padding: 24px 14px 0; }
     main{ padding: 20px 14px 28px; border-radius: 0 10px 10px 10px; }
     .brand h1{ font-size: 26px; }
     .topbar{ flex-direction: column; align-items:flex-start; gap: 14px; }
     .field-row{ flex-direction: column; }
-    .tab{ padding: 10px 12px 8px; font-size: 14px; flex: 1 1 0; min-width: 0; }
+    .tabs{ gap: 4px; }
+    .tab{ padding: 10px 4px 8px; font-size: 13px; flex: 1 1 0; min-width: 0; }
     .tab .count{ margin-left: 4px; }
     .column{ flex: 0 0 84vw; max-width: 84vw; }
     .column.collapsed{ flex: 0 0 52px; max-width: 52px; }
@@ -859,7 +1001,10 @@
     <div class="sync-note"><span class="dot-live"></span><span id="syncText">sincronizado na nuvem</span></div>
 
     <div class="tabs">
-      <button class="tab active" id="tabAtividades" onclick="setTab('atividades')">
+      <button class="tab active" id="tabHoje" onclick="setTab('hoje')">
+        Hoje <span class="count" id="countHoje">0</span>
+      </button>
+      <button class="tab" id="tabAtividades" onclick="setTab('atividades')">
         Atividades <span class="count" id="countAtividades">0</span>
       </button>
       <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
@@ -873,6 +1018,38 @@
 
   <main>
 
+    <!-- ============ HOJE (lista do dia) ============ -->
+    <section id="todayView">
+      <div class="today-date" id="todayDate"></div>
+      <div class="today-layout">
+        <aside class="today-panel today-cats">
+          <h2 class="panel-label">Critérios</h2>
+          <div class="cat-list" id="catList"></div>
+          <div class="today-progress" id="todayProgress"></div>
+        </aside>
+        <div class="today-panel today-tasks">
+          <h2 class="panel-label" id="todayListTitle">Tarefas de hoje</h2>
+          <ul class="task-list" id="taskList"></ul>
+          <div class="today-empty" id="todayEmpty" hidden></div>
+          <form class="quick-add" id="quickAdd" autocomplete="off">
+            <label class="sr-only" for="qaTitulo">Nova tarefa</label>
+            <input type="text" id="qaTitulo" placeholder="Digite uma nova tarefa para hoje" maxlength="200">
+            <div class="qa-crit">
+              <label for="qaCriterio">Critério</label>
+              <select id="qaCriterio">
+                <option value="URGENTE">Urgente</option>
+                <option value="ALTO">Alto</option>
+                <option value="MEDIO" selected>Médio</option>
+                <option value="BAIXO">Baixo</option>
+              </select>
+            </div>
+            <button type="submit" class="qa-btn" title="Adicionar tarefa" aria-label="Adicionar tarefa">+</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div id="boardView" hidden>
     <div class="stats" id="stats"></div>
 
     <div class="toolbar">
@@ -912,6 +1089,7 @@
       <div class="emoji" id="emptyEmoji">🗂️</div>
       <div class="big" id="emptyTitle">Nada por aqui ainda</div>
       <div id="emptySub">Clique em "+ Nova" para começar.</div>
+    </div>
     </div>
 
   </main>
@@ -1114,7 +1292,8 @@
         })),
         pendencias: window.__state.pendencias.map(p => ({
           id: p.id, titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null, googleEventId: p.googleEventId || null,
-          ordem: typeof p.ordem === 'number' ? p.ordem : null, _ts: p._ts || Date.now()
+          ordem: typeof p.ordem === 'number' ? p.ordem : null, _ts: p._ts || Date.now(),
+          concluidaEm: p.concluidaEm || null, proximaId: p.proximaId || null, daAtividade: !!p.daAtividade
         }))
       }).then(() => {
         document.getElementById('syncText').textContent = 'sincronizado na nuvem';
@@ -1228,7 +1407,10 @@
   }
 
   // gera a próxima ocorrência de uma pendência recorrente concluída, de volta em Atividades
+  // (chamada sempre que um item vira FINALIZADA: também registra o dia da conclusão,
+  // usado pela aba Hoje para mostrar o que foi concluído no dia)
   function gerarProximaAtividade(item){
+    item.concluidaEm = todayStr();
     if (!item.recorrencia || item.recorrencia.tipo === 'nenhuma') return null;
     const hoje = todayStr();
     // ancora sempre no prazo original (preserva o dia da semana/mês combinado) e avança
@@ -1254,6 +1436,7 @@
       _ts: Date.now()
     };
     state.atividades.push(nova);
+    item.proximaId = nova.id;
     showToast('Repete em ' + formatPrazo(proxima) + ' — nova atividade criada');
     return nova;
   }
@@ -1313,6 +1496,10 @@
   // ---------- tabs ----------
   function setTab(tab){
     state.tab = tab;
+    lsSet('mt_tab', tab);
+    document.getElementById('tabHoje').classList.toggle('active', tab==='hoje');
+    document.getElementById('todayView').hidden = tab !== 'hoje';
+    document.getElementById('boardView').hidden = tab === 'hoje';
     document.getElementById('tabAtividades').classList.toggle('active', tab==='atividades');
     document.getElementById('tabPendencias').classList.toggle('active', tab==='pendencias');
     document.getElementById('tabFinalizadas').classList.toggle('active', tab==='finalizadas');
@@ -1414,6 +1601,15 @@
     // uma sincronização que chega no meio de um arrasto espera o card ser solto
     if (drag.active){ renderPending = true; return; }
     renderPending = false;
+
+    document.getElementById('countHoje').textContent = getTodayItems().filter(i => i.status !== 'FINALIZADA').length;
+    if (state.tab === 'hoje'){
+      document.getElementById('countAtividades').textContent = state.atividades.length;
+      document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
+      document.getElementById('countFinalizadas').textContent = state.pendencias.filter(p => p.status === 'FINALIZADA').length;
+      renderToday();
+      return;
+    }
 
     const query = document.getElementById('searchInput').value.trim().toLowerCase();
     const sortMode = document.getElementById('sortSelect').value;
@@ -1984,7 +2180,7 @@
   // ---------- delete with undo ----------
   let lastDeleted = null;
   function deleteItem(id){
-    const list = getUnderlyingList();
+    const list = state.atividades.some(i => i.id === id) ? state.atividades : state.pendencias;
     const idx = list.findIndex(i => i.id === id);
     if (idx === -1) return;
     lastDeleted = { list, item: list[idx], index: idx };
@@ -2031,12 +2227,14 @@
 
   function openForm(id){
     state.editingId = id || null;
-    const isPendencia = isPendenciaTab();
+    const editItem = id ? findItem(id) : null;
+    if (id && !editItem) return;
+    const isPendencia = editItem ? state.pendencias.includes(editItem) : isPendenciaTab();
+    state.editingIsPendencia = isPendencia;
     document.getElementById('statusField').style.display = isPendencia ? 'block' : 'none';
 
     if (id){
-      const list = getUnderlyingList();
-      const item = list.find(i => i.id === id);
+      const item = editItem;
       document.getElementById('modalTitle').textContent = isPendencia ? 'Editar Pendência' : 'Editar Atividade';
       document.getElementById('fTitulo').value = item.titulo;
       document.getElementById('fDescricao').value = item.descricao;
@@ -2092,7 +2290,7 @@
     const descricao = document.getElementById('fDescricao').value.trim();
     const criterio = document.getElementById('fCriterio').value;
     const prazo = document.getElementById('fPrazo').value;
-    const isPendencia = isPendenciaTab();
+    const isPendencia = !!state.editingIsPendencia;
     const status = document.getElementById('fStatus').value;
 
     const recorrencia = buildRecorrenciaFromForm();
@@ -2101,10 +2299,11 @@
       return;
     }
 
-    const list = getUnderlyingList();
+    const list = isPendencia ? state.pendencias : state.atividades;
 
     if (state.editingId){
       const item = list.find(i => i.id === state.editingId);
+      if (!item){ closeForm(); return; }
       const statusAnterior = item.status;
       item.titulo = titulo; item.descricao = descricao; item.criterio = criterio; item.prazo = prazo;
       item.recorrencia = recorrencia;
@@ -2299,8 +2498,176 @@
   }
   window.__showToast = showToast;
 
+  // ---------- aba Hoje: lista do dia ----------
+  // Entra na lista: atividades com prazo hoje, pendências em aberto que venceram até hoje
+  // e tudo o que foi concluído hoje (aparece riscado, como uma lista de papel).
+  state.todayFiltro = '';
+
+  function getTodayItems(){
+    const hoje = todayStr();
+    const ativ = state.atividades.filter(i => i.prazo === hoje);
+    const pend = state.pendencias.filter(i =>
+      (i.status !== 'FINALIZADA' && i.prazo && i.prazo <= hoje) ||
+      (i.status === 'FINALIZADA' && i.concluidaEm === hoje)
+    );
+    return ativ.concat(pend);
+  }
+
+  function isDone(item){ return item.status === 'FINALIZADA'; }
+
+  const TRASH_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+  const EDIT_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
+  function renderToday(){
+    const dataHoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('todayDate').textContent = dataHoje.charAt(0).toUpperCase() + dataHoje.slice(1);
+
+    const all = getTodayItems();
+    const filtro = state.todayFiltro;
+
+    // painel de critérios (filtra a lista ao clicar)
+    const abertas = all.filter(i => !isDone(i));
+    const cats = [{ key: '', label: 'Todas', color: 'var(--amber)' }]
+      .concat(CRITERIO_ORDER.map(c => ({ key: c, label: CRITERIO_META[c].label, color: CRITERIO_META[c].color })));
+    document.getElementById('catList').innerHTML = cats.map(c => {
+      const n = c.key ? abertas.filter(i => i.criterio === c.key).length : abertas.length;
+      return `<button type="button" class="cat ${filtro === c.key ? 'active' : ''}" style="--c:${c.color}" onclick="setTodayFiltro('${c.key}')">
+        <span class="dot" style="background:${c.color}"></span>
+        <span class="cat-name">${c.label}</span>
+        <span class="cat-n">${n}</span>
+      </button>`;
+    }).join('');
+
+    // progresso do dia
+    const feitas = all.length - abertas.length;
+    const pct = all.length ? Math.round(feitas / all.length * 100) : 0;
+    document.getElementById('todayProgress').innerHTML = all.length
+      ? `<div class="prog-text"><strong>${feitas}</strong> de ${all.length} concluídas</div>
+         <div class="prog-bar"><span style="width:${pct}%"></span></div>`
+      : '';
+
+    let items = filtro ? all.filter(i => i.criterio === filtro) : all;
+    items.sort((a, b) =>
+      (isDone(a) - isDone(b)) ||
+      (CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio)) ||
+      ((a._ts || 0) - (b._ts || 0))
+    );
+
+    document.getElementById('todayListTitle').textContent = filtro
+      ? 'Tarefas de hoje · ' + CRITERIO_META[filtro].label
+      : 'Tarefas de hoje';
+
+    const list = document.getElementById('taskList');
+    list.innerHTML = items.map(item => {
+      const done = isDone(item);
+      const meta = CRITERIO_META[item.criterio];
+      const atrasada = !done && item.prazo && item.prazo < todayStr();
+      const ck = item.checklist || [];
+      const ckDone = ck.filter(c => c.feito).length;
+      const rec = formatRecorrencia(item.recorrencia);
+      return `<li class="task ${done ? 'done' : ''}" data-id="${item.id}">
+        <input type="checkbox" class="task-check" id="chk-${item.id}" ${done ? 'checked' : ''} onchange="toggleToday('${item.id}', this.checked)">
+        <div class="task-main">
+          <label for="chk-${item.id}" class="task-title">${escapeHTML(item.titulo)}</label>
+          <div class="task-tags">
+            <span class="chip" style="--c:${meta.color}">${meta.label}</span>
+            ${atrasada ? `<span class="chip chip-late">Atrasada · ${formatPrazo(item.prazo)}</span>` : ''}
+            ${rec ? `<span class="chip chip-rec" title="Repete: ${rec}">🔁 ${rec}</span>` : ''}
+            ${ck.length ? `<span class="chip chip-plain">☑ ${ckDone}/${ck.length}</span>` : ''}
+          </div>
+        </div>
+        <button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="openForm('${item.id}')">${EDIT_SVG}</button>
+        <button type="button" class="task-btn task-del" title="Excluir" aria-label="Excluir ${escapeHTML(item.titulo)}" onclick="deleteItem('${item.id}')">${TRASH_SVG}</button>
+      </li>`;
+    }).join('');
+
+    const empty = document.getElementById('todayEmpty');
+    empty.hidden = items.length > 0;
+    empty.textContent = filtro
+      ? 'Nenhuma tarefa ' + CRITERIO_META[filtro].label.toLowerCase() + ' para hoje.'
+      : 'Nada para hoje ainda. Escreva uma tarefa abaixo e aperte Enter.';
+  }
+
+  function setTodayFiltro(c){
+    state.todayFiltro = c;
+    if (c) document.getElementById('qaCriterio').value = c;
+    render();
+  }
+  window.setTodayFiltro = setTodayFiltro;
+
+  // marcar/desmarcar a caixinha
+  function toggleToday(id, checked){
+    const hoje = todayStr();
+    if (checked){
+      const ai = state.atividades.findIndex(i => i.id === id);
+      if (ai !== -1){
+        // atividade concluída vira pendência finalizada (lembrando de onde veio, para poder desmarcar)
+        const a = state.atividades.splice(ai, 1)[0];
+        a.status = 'FINALIZADA';
+        a.daAtividade = true;
+        a.ordem = nextOrdem(state.pendencias);
+        state.pendencias.push(a);
+        gerarProximaAtividade(a);
+      } else {
+        const p = state.pendencias.find(i => i.id === id);
+        if (!p || p.status === 'FINALIZADA') return;
+        p.status = 'FINALIZADA';
+        gerarProximaAtividade(p);
+      }
+    } else {
+      const pi = state.pendencias.findIndex(i => i.id === id);
+      if (pi === -1) return;
+      const p = state.pendencias[pi];
+      // desfaz a próxima ocorrência criada pela recorrência, para não duplicar ao marcar de novo
+      if (p.proximaId){
+        state.atividades = state.atividades.filter(i => i.id !== p.proximaId);
+        p.proximaId = null;
+      }
+      p.concluidaEm = null;
+      if (p.daAtividade && (!p.prazo || p.prazo >= hoje)){
+        state.pendencias.splice(pi, 1);
+        delete p.status;
+        delete p.daAtividade;
+        p.ordem = nextOrdem(state.atividades);
+        state.atividades.push(p);
+      } else {
+        p.status = 'NÃO INICIADO';
+        p.daAtividade = false;
+      }
+    }
+    render();
+    persist(true);
+  }
+  window.toggleToday = toggleToday;
+
+  // adicionar rápido: vira uma atividade com prazo hoje
+  document.getElementById('quickAdd').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = document.getElementById('qaTitulo');
+    const titulo = input.value.trim();
+    if (!titulo){ input.focus(); return; }
+    state.atividades.push({
+      id: uid(),
+      titulo,
+      descricao: '',
+      criterio: document.getElementById('qaCriterio').value,
+      prazo: todayStr(),
+      checklist: [],
+      recorrencia: null,
+      ordem: nextOrdem(state.atividades),
+      _ts: Date.now()
+    });
+    input.value = '';
+    input.focus();
+    render();
+    persist(true);
+  });
+
   // ---------- init ----------
-  setGroupBy(state.groupBy === 'status' ? 'status' : 'criterio');
+  state.groupBy = state.groupBy === 'status' ? 'status' : 'criterio';
+  document.getElementById('groupCriterio').classList.toggle('active', state.groupBy === 'criterio');
+  document.getElementById('groupStatus').classList.toggle('active', state.groupBy === 'status');
+  setTab(['hoje','atividades','pendencias','finalizadas'].includes(lsGet('mt_tab','hoje')) ? lsGet('mt_tab','hoje') : 'hoje');
 </script>
 
 </body>
