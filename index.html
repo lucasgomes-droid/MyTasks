@@ -13,6 +13,9 @@
     --card: #1F2530;
     --card-hover: #252C39;
     --line: #2C3342;
+    --col-bg: #171B24;
+    --card-raised: #242A37;
+    --card-raised-hover: #2A3140;
     --text: #ECEFF4;
     --muted: #8B93A7;
     --amber: #F5A65B;
@@ -107,7 +110,7 @@
   #app.ready{ display:block; }
 
   header{
-    max-width: 980px;
+    max-width: 1360px;
     margin: 0 auto;
     padding: 32px 24px 0;
   }
@@ -235,7 +238,7 @@
   .tab:not(.active):hover{ color: var(--text); }
 
   main{
-    max-width: 980px;
+    max-width: 1360px;
     margin: 0 auto;
     background: var(--card);
     border: 1px solid var(--line);
@@ -331,39 +334,176 @@
   }
   .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
 
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* ---------- Quadro (estilo Trello) ---------- */
+  .board{
+    display:flex;
     gap: 14px;
+    align-items:flex-start;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+  .board::-webkit-scrollbar{ height: 10px; }
+  .board::-webkit-scrollbar-thumb{ background: var(--line); border-radius: 999px; }
+
+  .column{
+    flex: 1 0 270px;
+    max-width: 380px;
+    min-width: 0;
+    background: var(--col-bg);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--col-color, var(--muted));
+    border-radius: 12px;
+    display:flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .column.drag-over{
+    background: color-mix(in srgb, var(--col-color) 7%, var(--col-bg));
+    border-color: color-mix(in srgb, var(--col-color) 55%, var(--line));
+    border-top-color: var(--col-color);
+  }
+  .column.collapsed{
+    flex: 0 0 52px;
+    max-width: 52px;
+  }
+  .col-head{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    padding: 12px 10px 10px 14px;
+  }
+  .col-head .dot{ width:9px; height:9px; flex: 0 0 auto; }
+  .col-title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .2px;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .col-count{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .column.collapsed .col-head{
+    flex-direction: column;
+    padding: 12px 0;
+    gap: 12px;
+  }
+  .column.collapsed .col-title{
+    writing-mode: vertical-rl;
+    flex: none;
+    overflow: visible;
+  }
+  .column.collapsed .col-body,
+  .column.collapsed .col-add,
+  .column.collapsed .col-head .add-in-col{ display:none; }
+
+  .col-body{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px 10px 10px;
+    min-height: 70px;
+  }
+  .col-empty{
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 12.5px;
+    text-align:center;
+    padding: 18px 10px;
+  }
+  .col-body:has(.placeholder) .col-empty{ display:none; }
+  .col-add{
+    margin: 0 10px 10px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    text-align:left;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor:pointer;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+  }
+  .col-add:hover{ background: var(--bg-soft); color: var(--text); }
+
+  .placeholder{
+    border: 2px dashed color-mix(in srgb, var(--col-color, var(--amber)) 70%, transparent);
+    background: color-mix(in srgb, var(--col-color, var(--amber)) 8%, transparent);
+    border-radius: 10px;
+    flex: 0 0 auto;
   }
 
   .card{
-    background: var(--bg-soft);
+    background: var(--card-raised);
     border: 1px solid var(--line);
     border-radius: 10px;
-    padding: 16px 16px 14px;
+    padding: 12px 12px 10px;
     position: relative;
     border-left: 4px solid var(--muted);
     box-shadow: var(--shadow-card);
-    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
-    animation: card-in .28s ease both;
+    transition: background .15s ease, box-shadow .15s ease;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
+  .card.is-new{ animation: card-in .28s ease both; }
   .card:hover{
-    background: var(--card-hover);
-    transform: translateY(-2px);
+    background: var(--card-raised-hover);
     box-shadow: var(--shadow-card-hover);
   }
+  .card:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .card .card-actions{ opacity: 0; transition: opacity .12s ease; }
+  .card:hover .card-actions, .card:focus-within .card-actions{ opacity: 1; }
+  @media (hover: none){ .card .card-actions{ opacity: 1; } }
+  .card.pressing{ background: var(--card-raised-hover); }
   @keyframes card-in{
     from{ opacity:0; transform: translateY(6px); }
     to{ opacity:1; transform: translateY(0); }
   }
 
+  .drag-ghost{
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+    pointer-events: none;
+    margin: 0;
+    cursor: grabbing;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    transform-origin: 30% 20%;
+    opacity: .96;
+  }
+  body.dragging, body.dragging *{ cursor: grabbing !important; }
+  body.dragging{ user-select: none; -webkit-user-select: none; }
+
+  .tab.drop-target{
+    color: var(--text);
+    outline: 2px dashed var(--amber);
+    outline-offset: -4px;
+  }
+
   .card-title{
     font-family: var(--font-display);
-    font-size: 16px;
+    font-size: 14.5px;
     font-weight: 700;
-    margin: 0 0 6px;
-    padding-right: 60px;
+    margin: 0 0 4px;
+    padding-right: 52px;
+    line-height: 1.35;
+    word-break: break-word;
   }
   .card-title mark, .card-desc mark{
     background: rgba(245,166,91,0.35);
@@ -372,11 +512,44 @@
     padding: 0 1px;
   }
   .card-desc{
-    font-size: 13.5px;
+    font-size: 12.5px;
     color: var(--muted);
-    line-height: 1.5;
-    margin: 0 0 12px;
+    line-height: 1.45;
+    margin: 0 0 10px;
     white-space: pre-wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+  .card-desc:empty{ display:none; }
+
+  .view-group{
+    display:flex;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .view-group button{
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .view-group button.active{ background: var(--card-raised-hover); color: var(--text); }
+  .view-group button:hover{ color: var(--text); }
+  .board-hint{
+    font-size: 12px;
+    color: var(--muted);
+    margin: -8px 0 14px;
   }
 
   .badge{
@@ -431,8 +604,8 @@
 
   .card-actions{
     position:absolute;
-    top: 12px;
-    right: 12px;
+    top: 7px;
+    right: 7px;
     display:flex;
     gap: 4px;
   }
@@ -647,6 +820,11 @@
     .brand h1{ font-size: 26px; }
     .topbar{ flex-direction: column; align-items:flex-start; gap: 14px; }
     .field-row{ flex-direction: column; }
+    .tab{ padding: 10px 12px 8px; font-size: 14px; flex: 1 1 0; min-width: 0; }
+    .tab .count{ margin-left: 4px; }
+    .column{ flex: 0 0 84vw; max-width: 84vw; }
+    .column.collapsed{ flex: 0 0 52px; max-width: 52px; }
+    .board{ margin: 0 -14px; padding: 0 14px 12px; scroll-padding: 0 14px; }
   }
 </style>
 </head>
@@ -702,8 +880,13 @@
         <span class="search-icon">🔎</span>
         <input type="search" class="search" id="searchInput" placeholder="Buscar por título ou descrição..." oninput="render()">
       </div>
+      <div class="view-group" id="groupByGroup" title="Como as colunas do quadro são separadas" style="display:none">
+        <button type="button" id="groupCriterio" class="active" onclick="setGroupBy('criterio')">Por critério</button>
+        <button type="button" id="groupStatus" onclick="setGroupBy('status')">Por status</button>
+      </div>
       <div class="filter-group">
-        <select class="sort" id="sortSelect" onchange="render()" title="Ordem em que os cards aparecem">
+        <select class="sort" id="sortSelect" onchange="render()" title="Ordem dos cards dentro de cada coluna">
+          <option value="manual">Ordenar: manual (arrastar)</option>
           <option value="criterio">Ordenar: critério</option>
           <option value="prazo">Ordenar: prazo</option>
           <option value="recente">Ordenar: mais recente</option>
@@ -723,7 +906,8 @@
       </div>
     </div>
 
-    <div class="grid" id="grid"></div>
+    <div class="board-hint" id="boardHint">Arraste os cards entre as colunas para mudar o critério. Solte numa aba (Atividades, Pendências, Finalizadas) para mover o card para lá. No celular, segure o card por um instante antes de arrastar.</div>
+    <div class="board" id="board"></div>
     <div class="empty" id="emptyState" style="display:none">
       <div class="emoji" id="emptyEmoji">🗂️</div>
       <div class="big" id="emptyTitle">Nada por aqui ainda</div>
@@ -876,7 +1060,9 @@
 
       const userDocRef = doc(db, 'users', user.uid);
       unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
-        suppressNextSave = true;
+        // não suprime o próximo salvamento: render() nunca salva sozinho, e a supressão
+        // antiga fazia a primeira alteração depois de cada sincronização não ir para a nuvem.
+        suppressNextSave = false;
         if (snap.exists()){
           const data = snap.data();
           window.__state.atividades = (data.atividades || []).map(hydrate);
@@ -889,9 +1075,7 @@
         window.__render();
         document.getElementById('syncText').textContent = 'sincronizado na nuvem';
         if (movidas > 0){
-          // a migração alterou o estado que acabou de vir da nuvem — grava de volta,
-          // ignorando a supressão que existe pra não re-salvar o que só acabamos de carregar
-          suppressNextSave = false;
+          // a migração alterou o estado que acabou de vir da nuvem — grava de volta
           window.__saveToCloud(true);
           if (window.__showToast) window.__showToast(movidas === 1 ? '1 atividade vencida foi para Pendências' : movidas + ' atividades vencidas foram para Pendências');
         }
@@ -925,10 +1109,12 @@
       document.getElementById('syncText').textContent = 'salvando...';
       setDoc(userDocRef, {
         atividades: window.__state.atividades.map(a => ({
-          titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || [], recorrencia: a.recorrencia || null, googleEventId: a.googleEventId || null
+          id: a.id, titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || [], recorrencia: a.recorrencia || null, googleEventId: a.googleEventId || null,
+          ordem: typeof a.ordem === 'number' ? a.ordem : null, _ts: a._ts || Date.now()
         })),
         pendencias: window.__state.pendencias.map(p => ({
-          titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null, googleEventId: p.googleEventId || null
+          id: p.id, titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null, googleEventId: p.googleEventId || null,
+          ordem: typeof p.ordem === 'number' ? p.ordem : null, _ts: p._ts || Date.now()
         }))
       }).then(() => {
         document.getElementById('syncText').textContent = 'sincronizado na nuvem';
@@ -948,8 +1134,14 @@
     pendencias: [],
     tab: 'atividades',
     editingId: null,
-    openChecklists: {}   // id -> true/false, remembers which cards have the checklist expanded
+    formPreset: null,    // critério/status pré-escolhidos ao criar pelo "+" de uma coluna
+    openChecklists: {},  // id -> true/false, remembers which cards have the checklist expanded
+    groupBy: lsGet('mt_groupBy', 'criterio'),            // só vale na aba Pendências
+    collapsed: JSON.parse(lsGet('mt_collapsed', '{}'))   // colunas recolhidas
   };
+
+  function lsGet(k, def){ try { const v = localStorage.getItem(k); return v === null ? def : v; } catch(e){ return def; } }
+  function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
   window.__state = state;
 
   const CRITERIO_META = {
@@ -1058,6 +1250,7 @@
       prazo: proxima,
       checklist: novaChecklist,
       recorrencia: item.recorrencia,
+      ordem: nextOrdem(state.atividades),
       _ts: Date.now()
     };
     state.atividades.push(nova);
@@ -1084,6 +1277,7 @@
           checklist: a.checklist || [],
           recorrencia: a.recorrencia || null,
           googleEventId: a.googleEventId || null,
+          ordem: nextOrdem(state.pendencias),
           _ts: Date.now()
         });
         movidas++;
@@ -1131,34 +1325,73 @@
     // só faz sentido em Atividades: eventos importados sempre entram como Atividade
     document.getElementById('importAgendaBtn').style.display = (tab === 'atividades') ? 'inline-block' : 'none';
 
+    // agrupar por status só existe nas Pendências (Atividades não têm status)
+    document.getElementById('groupByGroup').style.display = (tab === 'pendencias') ? 'flex' : 'none';
+
     document.getElementById('criterioFilter').value = '';
     render();
   }
   window.setTab = setTab;
 
-  // ---------- render ----------
-  function render(){
-    let items;
-    if (state.tab === 'atividades'){
-      items = state.atividades.slice();
-    } else if (state.tab === 'pendencias'){
-      items = state.pendencias.filter(p => p.status !== 'FINALIZADA');
-    } else {
-      items = state.pendencias.filter(p => p.status === 'FINALIZADA');
+  function setGroupBy(g){
+    state.groupBy = g;
+    lsSet('mt_groupBy', g);
+    document.getElementById('groupCriterio').classList.toggle('active', g === 'criterio');
+    document.getElementById('groupStatus').classList.toggle('active', g === 'status');
+    render();
+  }
+  window.setGroupBy = setGroupBy;
+
+  function currentGroupBy(){
+    return (state.tab === 'pendencias' && state.groupBy === 'status') ? 'status' : 'criterio';
+  }
+
+  function nextOrdem(list){
+    let max = 0;
+    list.forEach(i => { if (typeof i.ordem === 'number' && i.ordem > max) max = i.ordem; });
+    return max + 10;
+  }
+
+  function toggleCollapse(key){
+    const k = currentGroupBy() + ':' + key;
+    state.collapsed[k] = !state.collapsed[k];
+    lsSet('mt_collapsed', JSON.stringify(state.collapsed));
+    render();
+  }
+  window.toggleCollapse = toggleCollapse;
+
+  function addInColumn(key){
+    state.formPreset = currentGroupBy() === 'status' ? { status: key } : { criterio: key };
+    openForm();
+  }
+  window.addInColumn = addInColumn;
+
+  // ---------- render (quadro estilo Trello) ----------
+  function getTabItems(){
+    if (state.tab === 'atividades') return state.atividades.slice();
+    if (state.tab === 'pendencias'){
+      // agrupado por status, a coluna "Finalizada" também aparece, para arrastar até ela
+      return currentGroupBy() === 'status'
+        ? state.pendencias.slice()
+        : state.pendencias.filter(p => p.status !== 'FINALIZADA');
     }
+    return state.pendencias.filter(p => p.status === 'FINALIZADA');
+  }
 
-    const query = document.getElementById('searchInput').value.trim().toLowerCase();
-    const sortMode = document.getElementById('sortSelect').value;
-    const criterioFilter = document.getElementById('criterioFilter').value;
-
-    items = items.filter(i =>
-      i.titulo.toLowerCase().includes(query) || (i.descricao || '').toLowerCase().includes(query)
-    );
-    if (criterioFilter){
-      items = items.filter(i => i.criterio === criterioFilter);
+  function getColumns(){
+    if (currentGroupBy() === 'status'){
+      return Object.keys(STATUS_META).map(s => ({ key: s, label: STATUS_META[s].label, color: STATUS_META[s].color }));
     }
+    return CRITERIO_ORDER.map(c => ({ key: c, label: CRITERIO_META[c].label, color: CRITERIO_META[c].color }));
+  }
 
-    if (sortMode === 'criterio'){
+  // itens sem ordem manual (antigos) ficam no fim, pela data de criação
+  function ordemOf(i){ return typeof i.ordem === 'number' ? i.ordem : 1e15 + (i._ts || 0); }
+
+  function sortItems(items, sortMode){
+    if (sortMode === 'manual'){
+      items.sort((a,b) => (ordemOf(a) - ordemOf(b)) || ((a._ts||0) - (b._ts||0)));
+    } else if (sortMode === 'criterio'){
       items.sort((a,b) => CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio));
     } else if (sortMode === 'titulo'){
       items.sort((a,b) => a.titulo.localeCompare(b.titulo));
@@ -1172,28 +1405,75 @@
     } else {
       items.sort((a,b) => (b._ts||0) - (a._ts||0));
     }
+  }
 
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
+  const seenIds = new Set();
+  let renderPending = false;
 
-    document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
+  function render(){
+    // uma sincronização que chega no meio de um arrasto espera o card ser solto
+    if (drag.active){ renderPending = true; return; }
+    renderPending = false;
+
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    const sortMode = document.getElementById('sortSelect').value;
+    const criterioFilter = document.getElementById('criterioFilter').value;
+
+    let items = getTabItems().filter(i =>
+      i.titulo.toLowerCase().includes(query) || (i.descricao || '').toLowerCase().includes(query)
+    );
+    if (criterioFilter) items = items.filter(i => i.criterio === criterioFilter);
+    sortItems(items, sortMode);
+
+    const groupBy = currentGroupBy();
+    const field = groupBy === 'status' ? 'status' : 'criterio';
+    const canAdd = state.tab !== 'finalizadas';
+    const addLabel = state.tab === 'atividades' ? 'atividade' : 'pendência';
+
+    const board = document.getElementById('board');
+    const scrollLeft = board.scrollLeft;
+    board.innerHTML = '';
+
+    getColumns().forEach(col => {
+      const colItems = items.filter(i => i[field] === col.key);
+      const collapsed = !!state.collapsed[groupBy + ':' + col.key];
+
+      const el = document.createElement('section');
+      el.className = 'column' + (collapsed ? ' collapsed' : '');
+      el.dataset.key = col.key;
+      el.style.setProperty('--col-color', col.color);
+      el.innerHTML = `
+        <div class="col-head">
+          <span class="dot" style="background:${col.color}"></span>
+          <span class="col-title">${col.label}</span>
+          <span class="col-count">${colItems.length}</span>
+          ${canAdd ? `<button class="icon-btn add-in-col" title="Adicionar em ${col.label}" onclick="addInColumn('${col.key}')">+</button>` : ''}
+          <button class="icon-btn" title="${collapsed ? 'Expandir' : 'Recolher'} coluna" onclick="toggleCollapse('${col.key}')">${collapsed ? '»' : '«'}</button>
+        </div>
+        <div class="col-body"></div>
+        ${canAdd ? `<button class="col-add" onclick="addInColumn('${col.key}')">+ Adicionar ${addLabel}</button>` : ''}
+      `;
+      const body = el.querySelector('.col-body');
+      if (!colItems.length){
+        body.innerHTML = `<div class="col-empty">${state.tab === 'finalizadas' ? 'Nada finalizado aqui' : 'Solte cards aqui'}</div>`;
+      }
+      colItems.forEach(item => body.appendChild(buildCard(item, query, groupBy)));
+      board.appendChild(el);
+    });
+    board.scrollLeft = scrollLeft;
+
     const noFilterActive = !query && !criterioFilter;
-    let emptyTitleText;
-    if (!noFilterActive){
-      emptyTitleText = 'Nenhum resultado';
-    } else if (state.tab === 'atividades'){
-      emptyTitleText = 'Nenhuma atividade cadastrada';
-    } else if (state.tab === 'pendencias'){
-      emptyTitleText = 'Nenhuma pendência em aberto';
-    } else {
-      emptyTitleText = 'Nenhuma pendência finalizada ainda';
-    }
-    document.getElementById('emptyTitle').textContent = emptyTitleText;
-    document.getElementById('emptySub').textContent = noFilterActive
-      ? (state.tab === 'finalizadas' ? 'Itens marcados como "Finalizada" aparecem aqui.' : 'Clique em "+ Nova" para começar.')
-      : 'Tente outro termo de busca ou critério.';
+    const showEmpty = !noFilterActive && items.length === 0;
+    document.getElementById('emptyState').style.display = showEmpty ? 'block' : 'none';
+    document.getElementById('emptyTitle').textContent = 'Nenhum resultado';
+    document.getElementById('emptySub').textContent = 'Tente outro termo de busca ou critério.';
 
-    items.forEach(item => grid.appendChild(buildCard(item, query)));
+    document.getElementById('boardHint').textContent = state.tab === 'finalizadas'
+      ? 'Arraste um card para a aba Pendências para reabrir, ou para Atividades para voltar ao início.'
+      : (groupBy === 'status'
+          ? 'Arraste os cards entre as colunas para mudar o status. Soltar em "Finalizada" conclui a pendência.'
+          : 'Arraste os cards entre as colunas para mudar o critério, ou solte numa aba para mover o card para lá.')
+        + ' No celular, segure o card por um instante antes de arrastar.';
 
     document.getElementById('countAtividades').textContent = state.atividades.length;
     document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
@@ -1202,6 +1482,7 @@
     renderStats();
   }
   window.__render = render;
+  window.render = render;
 
   function escapeHTML(str){
     const d = document.createElement('div');
@@ -1216,24 +1497,34 @@
     return safe.replace(re, m => '<mark>' + m + '</mark>');
   }
 
-  function buildCard(item, query){
+  function buildCard(item, query, groupBy){
     const card = document.createElement('div');
     card.className = 'card';
+    if (!seenIds.has(item.id)){
+      card.classList.add('is-new');
+      seenIds.add(item.id);
+    }
     card.dataset.id = item.id;
+    card.tabIndex = 0;
+    card.setAttribute('aria-label', item.titulo + ' — Enter para editar');
     card.style.borderLeftColor = isOverdue(item) ? 'var(--atrasada)' : CRITERIO_META[item.criterio].color;
 
-    const criterioBadge = `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`;
+    // na separação por critério a própria coluna já diz o critério; o selo só aparece por status
+    const criterioBadge = groupBy === 'status'
+      ? `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`
+      : '';
     const overdueBadge = isOverdue(item) ? `<span class="badge badge-atrasada">Atrasada</span>` : '';
     const prazoBadge = item.prazo ? `<span class="badge badge-prazo">${isOverdue(item) ? '⚠' : '📅'} ${formatPrazo(item.prazo)}</span>` : '';
     const recorrenciaLabel = formatRecorrencia(item.recorrencia);
     const recorrenciaBadge = recorrenciaLabel ? `<span class="badge badge-recorrente">🔁 ${recorrenciaLabel}</span>` : '';
+    const metaRow = criterioBadge + overdueBadge + prazoBadge + recorrenciaBadge;
 
     let footerRight = '';
-    if (isPendenciaTab()){
+    if (isPendenciaTab() && item.status){
       const opts = Object.keys(STATUS_META).map(s =>
         `<option value="${s}" ${s===item.status?'selected':''}>${STATUS_META[s].label}</option>`
       ).join('');
-      footerRight = `<select class="status-select" style="color:${STATUS_META[item.status].color}; border-color:${STATUS_META[item.status].color}55" onchange="changeStatus('${item.id}', this.value)">${opts}</select>`;
+      footerRight = `<select class="status-select" title="Status" style="color:${STATUS_META[item.status].color}; border-color:${STATUS_META[item.status].color}55" onchange="changeStatus('${item.id}', this.value)">${opts}</select>`;
     }
 
     const checklist = item.checklist || [];
@@ -1242,7 +1533,7 @@
     const pct = checklist.length ? Math.round((doneCount / checklist.length) * 100) : 0;
 
     const checklistToggle = `
-      <button class="checklist-toggle" onclick="toggleChecklist('${item.id}')">
+      <button class="checklist-toggle" onclick="toggleChecklist('${item.id}')" title="Checklist">
         ☑ ${doneCount}/${checklist.length}
         <span class="bar"><span style="width:${pct}%"></span></span>
       </button>`;
@@ -1261,8 +1552,8 @@
         <button class="icon-btn" title="Excluir" onclick="deleteItem('${item.id}')">✕</button>
       </div>
       <div class="card-title">${highlight(item.titulo, query)}</div>
-      <div class="card-desc">${item.descricao ? highlight(item.descricao, query) : '<em>Sem descrição</em>'}</div>
-      <div class="card-meta-row">${criterioBadge}${overdueBadge}${prazoBadge}${recorrenciaBadge}</div>
+      <div class="card-desc">${item.descricao ? highlight(item.descricao, query) : ''}</div>
+      ${metaRow ? `<div class="card-meta-row">${metaRow}</div>` : ''}
       <div class="card-footer">
         ${checklistToggle}
         ${footerRight}
@@ -1276,6 +1567,333 @@
       </div>
     `;
     return card;
+  }
+
+  // ---------- arrastar e soltar (mouse e toque) ----------
+  // Feito com pointer events, não com o drag-and-drop nativo do HTML, para funcionar
+  // também no celular. No toque, o arrasto começa depois de segurar o card um instante,
+  // assim deslizar o dedo continua rolando a página normalmente.
+  const NO_DRAG = 'button, input, select, textarea, a, label, .checklist-panel';
+  const LONG_PRESS_MS = 260;
+  const TAB_KEYS = { tabAtividades: 'atividades', tabPendencias: 'pendencias', tabFinalizadas: 'finalizadas' };
+
+  const drag = {
+    active: false, pending: null, timer: null,
+    id: null, pointerId: null, srcCard: null, ghost: null, placeholder: null,
+    offsetX: 0, offsetY: 0, x: 0, y: 0, raf: 0,
+    overCol: null, overTab: null
+  };
+
+  document.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || drag.active) return;
+    const card = e.target.closest('.board .card');
+    if (!card || e.target.closest(NO_DRAG)) return;
+    drag.pending = { card, x: e.clientX, y: e.clientY, pointerId: e.pointerId, type: e.pointerType };
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (e.pointerType !== 'mouse'){
+      clearTimeout(drag.timer);
+      drag.timer = setTimeout(() => {
+        if (!drag.pending) return;
+        card.classList.add('pressing');
+        try { if (navigator.vibrate) navigator.vibrate(12); } catch(_){}
+        startDrag();
+      }, LONG_PRESS_MS);
+    }
+  });
+
+  document.addEventListener('pointermove', e => {
+    if (drag.active){
+      if (e.pointerId !== drag.pointerId) return;
+      drag.x = e.clientX; drag.y = e.clientY;
+      positionGhost();
+      updateTarget();
+      return;
+    }
+    if (drag.pending && e.pointerId === drag.pending.pointerId){
+      drag.x = e.clientX; drag.y = e.clientY;
+      const dist = Math.hypot(e.clientX - drag.pending.x, e.clientY - drag.pending.y);
+      if (drag.pending.type === 'mouse'){
+        if (dist > 5) startDrag();
+      } else if (dist > 10){
+        cancelPending(); // o dedo se mexeu antes do tempo: é rolagem, não arrasto
+      }
+    }
+  });
+
+  document.addEventListener('pointerup', e => {
+    if (drag.active && e.pointerId === drag.pointerId){ finishDrag(); return; }
+    if (drag.pending && e.pointerId === drag.pending.pointerId){
+      const card = drag.pending.card;
+      cancelPending();
+      // um clique simples no card abre a edição, como no Trello
+      if (card.contains(e.target) && !e.target.closest(NO_DRAG)) openForm(card.dataset.id);
+    }
+  });
+
+  document.addEventListener('pointercancel', () => {
+    if (drag.active) cancelDrag(); else cancelPending();
+  });
+
+  // enquanto arrasta no celular, o dedo não deve rolar a página
+  document.addEventListener('touchmove', e => { if (drag.active) e.preventDefault(); }, { passive: false });
+  document.addEventListener('contextmenu', e => {
+    if (drag.active || (drag.pending && e.target.closest('.board .card'))) e.preventDefault();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const card = e.target.closest && e.target.closest('.board .card');
+    if (card && e.target === card) openForm(card.dataset.id);
+  });
+
+  function cancelPending(){
+    clearTimeout(drag.timer);
+    if (drag.pending) drag.pending.card.classList.remove('pressing');
+    drag.pending = null;
+  }
+
+  function startDrag(){
+    const p = drag.pending;
+    clearTimeout(drag.timer);
+    if (!p) return;
+    const card = p.card;
+    const rect = card.getBoundingClientRect();
+
+    drag.active = true;
+    drag.pending = null;
+    drag.id = card.dataset.id;
+    drag.pointerId = p.pointerId;
+    drag.srcCard = card;
+    drag.offsetX = p.x - rect.left;
+    drag.offsetY = p.y - rect.top;
+
+    const ghost = card.cloneNode(true);
+    ghost.classList.remove('is-new', 'pressing');
+    ghost.classList.add('drag-ghost');
+    ghost.removeAttribute('tabindex');
+    ghost.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    ghost.style.width = rect.width + 'px';
+    document.body.appendChild(ghost);
+    drag.ghost = ghost;
+
+    const ph = document.createElement('div');
+    ph.className = 'placeholder';
+    ph.style.height = rect.height + 'px';
+    card.parentNode.insertBefore(ph, card);
+    card.style.display = 'none';
+    card.classList.remove('pressing');
+    drag.placeholder = ph;
+
+    setOverCol(card.closest('.column'));
+    document.body.classList.add('dragging');
+    positionGhost();
+    drag.raf = requestAnimationFrame(autoScroll);
+  }
+
+  function positionGhost(){
+    if (!drag.ghost) return;
+    drag.ghost.style.transform =
+      `translate(${drag.x - drag.offsetX}px, ${drag.y - drag.offsetY}px) rotate(2.5deg)`;
+  }
+
+  function setOverCol(col){
+    if (drag.overCol === col) return;
+    if (drag.overCol) drag.overCol.classList.remove('drag-over');
+    drag.overCol = col;
+    if (col) col.classList.add('drag-over');
+  }
+
+  function setOverTab(tab){
+    if (drag.overTab === tab) return;
+    if (drag.overTab) drag.overTab.classList.remove('drop-target');
+    drag.overTab = tab;
+    if (tab) tab.classList.add('drop-target');
+  }
+
+  function columnAt(x, y){
+    const board = document.getElementById('board');
+    const br = board.getBoundingClientRect();
+    if (y < br.top - 30) return null;
+    let best = null;
+    board.querySelectorAll('.column').forEach(c => {
+      const r = c.getBoundingClientRect();
+      if (x >= r.left - 7 && x <= r.right + 7) best = c;
+    });
+    return best;
+  }
+
+  // o primeiro irmão seguinte que é um card de verdade (ignora o card escondido e o aviso de vazio)
+  function nextRealSibling(el){
+    let n = el.nextElementSibling;
+    while (n && (n === drag.srcCard || n.classList.contains('col-empty'))) n = n.nextElementSibling;
+    return n;
+  }
+
+  function updateTarget(){
+    const el = document.elementFromPoint(drag.x, drag.y);
+
+    // soltar numa aba move o card para aquela lista
+    const tab = el && el.closest('.tab');
+    const tabKey = tab && TAB_KEYS[tab.id];
+    setOverTab(tabKey && tabKey !== state.tab ? tab : null);
+    if (drag.overTab){ setOverCol(null); return; }
+
+    const col = (el && el.closest('.board .column')) || columnAt(drag.x, drag.y);
+    if (!col) return; // fora do quadro: mantém a última posição válida
+    setOverCol(col);
+    if (col.classList.contains('collapsed')) return; // coluna recolhida: entra no fim
+
+    const body = col.querySelector('.col-body');
+    const ph = drag.placeholder;
+    let before = null;
+    for (const c of body.querySelectorAll('.card')){
+      if (c === drag.srcCard) continue;
+      const r = c.getBoundingClientRect();
+      if (drag.y < r.top + r.height / 2){ before = c; break; }
+    }
+    if (before){
+      if (ph.parentNode !== body || nextRealSibling(ph) !== before) body.insertBefore(ph, before);
+    } else if (ph.parentNode !== body || nextRealSibling(ph) !== null){
+      body.appendChild(ph);
+    }
+  }
+
+  // rola o quadro para os lados e a página para cima/baixo quando o card chega perto da borda
+  function autoScroll(){
+    if (!drag.active) return;
+    const board = document.getElementById('board');
+    const r = board.getBoundingClientRect();
+    const edge = 70, max = 22;
+    let dx = 0, dy = 0;
+    if (drag.x < r.left + edge) dx = -Math.min(max, Math.ceil((r.left + edge - drag.x) / 3));
+    else if (drag.x > r.right - edge) dx = Math.min(max, Math.ceil((drag.x - (r.right - edge)) / 3));
+    if (drag.y < edge) dy = -Math.min(max, Math.ceil((edge - drag.y) / 3));
+    else if (drag.y > window.innerHeight - edge) dy = Math.min(max, Math.ceil((drag.y - (window.innerHeight - edge)) / 3));
+    const beforeLeft = board.scrollLeft, beforeTop = window.scrollY;
+    if (dx) board.scrollLeft += dx;
+    if (dy) window.scrollBy(0, dy);
+    if (board.scrollLeft !== beforeLeft || window.scrollY !== beforeTop) updateTarget();
+    drag.raf = requestAnimationFrame(autoScroll);
+  }
+
+  function cleanupDrag(){
+    cancelAnimationFrame(drag.raf);
+    if (drag.ghost) drag.ghost.remove();
+    if (drag.placeholder) drag.placeholder.remove();
+    if (drag.srcCard) drag.srcCard.style.display = '';
+    setOverCol(null);
+    setOverTab(null);
+    document.body.classList.remove('dragging');
+    drag.active = false;
+    drag.ghost = drag.placeholder = drag.srcCard = null;
+    drag.pointerId = null;
+  }
+
+  function cancelDrag(){
+    cleanupDrag();
+    drag.id = null;
+    render();
+  }
+
+  function finishDrag(){
+    const id = drag.id;
+    const tab = drag.overTab;
+    const col = drag.overCol;
+    let key = null, orderIds = null;
+
+    if (!tab && col){
+      key = col.dataset.key;
+      if (!col.classList.contains('collapsed') && drag.placeholder.parentNode){
+        orderIds = [...drag.placeholder.parentNode.children]
+          .filter(n => n === drag.placeholder || (n.classList.contains('card') && n !== drag.srcCard))
+          .map(n => n === drag.placeholder ? id : n.dataset.id);
+      }
+    }
+
+    cleanupDrag();
+    drag.id = null;
+
+    if (tab) moveToTab(id, TAB_KEYS[tab.id]);
+    else if (key) dropInColumn(id, key, orderIds);
+    render();
+  }
+
+  function dropInColumn(id, key, orderIds){
+    const item = findItem(id);
+    if (!item) return;
+    const field = currentGroupBy() === 'status' ? 'status' : 'criterio';
+    const anterior = item[field];
+    const mudouColuna = anterior !== key;
+    const list = getUnderlyingList();
+    const sortSel = document.getElementById('sortSelect');
+    let toastMsg = null;
+
+    if (mudouColuna){
+      item[field] = key;
+      if (field === 'status'){
+        toastMsg = 'Status: ' + STATUS_META[key].label;
+        if (key === 'FINALIZADA' && anterior !== 'FINALIZADA' && item.recorrencia && item.recorrencia.tipo !== 'nenhuma'){
+          toastMsg = null; // gerarProximaAtividade já avisa
+        }
+        if (key === 'FINALIZADA' && anterior !== 'FINALIZADA') gerarProximaAtividade(item);
+      } else {
+        toastMsg = 'Critério: ' + CRITERIO_META[key].label;
+      }
+    }
+
+    // a posição dentro da coluna vira a ordem manual. Se outra ordenação estava ativa,
+    // só reordenar dentro da mesma coluna liga a ordem manual (senão a soltura seria ignorada).
+    let reordenou = false;
+    const usarPosicao = orderIds && (sortSel.value === 'manual' || !mudouColuna);
+    if (usarPosicao){
+      orderIds.forEach((oid, idx) => {
+        const it = list.find(i => i.id === oid);
+        if (it && it.ordem !== (idx + 1) * 10){ it.ordem = (idx + 1) * 10; reordenou = true; }
+      });
+      if (sortSel.value !== 'manual' && reordenou){
+        sortSel.value = 'manual';
+        toastMsg = 'Ordem manual ativada';
+      }
+    }
+
+    if (mudouColuna || reordenou){
+      persist();
+      if (toastMsg) showToast(toastMsg);
+    }
+  }
+
+  function moveToTab(id, destino){
+    if (state.tab === 'atividades'){
+      const idx = state.atividades.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      const a = state.atividades.splice(idx, 1)[0];
+      a.status = destino === 'finalizadas' ? 'FINALIZADA' : 'NÃO INICIADO';
+      a.ordem = nextOrdem(state.pendencias);
+      state.pendencias.push(a);
+      if (a.status === 'FINALIZADA') gerarProximaAtividade(a);
+      showToast(destino === 'finalizadas' ? 'Movida para Finalizadas' : 'Movida para Pendências');
+    } else {
+      const idx = state.pendencias.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      const p = state.pendencias[idx];
+      if (destino === 'atividades'){
+        state.pendencias.splice(idx, 1);
+        delete p.status;
+        p.ordem = nextOrdem(state.atividades);
+        state.atividades.push(p);
+        showToast('Movida para Atividades');
+      } else if (destino === 'finalizadas'){
+        if (p.status !== 'FINALIZADA'){
+          p.status = 'FINALIZADA';
+          const recorrente = p.recorrencia && p.recorrencia.tipo !== 'nenhuma';
+          gerarProximaAtividade(p);
+          if (!recorrente) showToast('Pendência finalizada');
+        }
+      } else if (destino === 'pendencias'){
+        if (p.status === 'FINALIZADA'){ p.status = 'NÃO INICIADO'; showToast('Pendência reaberta'); }
+      }
+    }
+    persist(true);
   }
 
   function renderStats(){
@@ -1430,9 +2048,11 @@
       document.getElementById('modalTitle').textContent = isPendencia ? 'Nova Pendência' : 'Nova Atividade';
       document.getElementById('fTitulo').value = '';
       document.getElementById('fDescricao').value = '';
-      document.getElementById('fCriterio').value = 'BAIXO';
+      const preset = state.formPreset || {};
+      document.getElementById('fCriterio').value = preset.criterio || 'BAIXO';
       document.getElementById('fPrazo').value = '';
-      document.getElementById('fStatus').value = 'NÃO INICIADO';
+      document.getElementById('fStatus').value = preset.status || 'NÃO INICIADO';
+      state.formPreset = null;
       setRecorrenciaForm(null);
     }
 
@@ -1493,7 +2113,7 @@
         if (status === 'FINALIZADA' && statusAnterior !== 'FINALIZADA') gerarProximaAtividade(item);
       }
     } else {
-      const novo = { id: uid(), titulo, descricao, criterio, prazo, _ts: Date.now(), checklist: [], recorrencia };
+      const novo = { id: uid(), titulo, descricao, criterio, prazo, _ts: Date.now(), checklist: [], recorrencia, ordem: nextOrdem(list) };
       if (isPendencia){
         novo.status = status;
         list.push(novo);
@@ -1511,7 +2131,11 @@
   window.saveForm = saveForm;
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeForm();
+    if (e.key === 'Escape'){
+      if (drag.active){ cancelDrag(); return; }
+      closeForm();
+      closeImportAgenda();
+    }
   });
 
   function persist(immediate){
@@ -1630,6 +2254,7 @@
           checklist: [],
           recorrencia: null,
           googleEventId: ev.id,
+          ordem: nextOrdem(state.atividades),
           _ts: Date.now()
         });
         novos++;
@@ -1675,7 +2300,7 @@
   window.__showToast = showToast;
 
   // ---------- init ----------
-  render();
+  setGroupBy(state.groupBy === 'status' ? 'status' : 'criterio');
 </script>
 
 </body>
