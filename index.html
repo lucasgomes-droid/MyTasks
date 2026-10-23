@@ -1324,6 +1324,12 @@
     .task-time, .task-time.none{ width: 36px; }
     .task-time.none:empty{ display: none; }
   }
+
+  .sec-label{ display:flex; align-items: baseline; gap: 8px; margin: 26px 0 4px; font-size: 11px; color: var(--muted); }
+  .sec-label:first-child{ margin-top: 0; }
+  .sec-label .n{ font-family: var(--font-mono); letter-spacing: 0; color: var(--muted); opacity: .8; }
+  .sec-label .right{ margin-left: auto; font-size: 12px; }
+  .sec-empty{ font-size: 13px; color: var(--muted); padding: 10px 6px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent); }
 </style>
 </head>
 <body>
@@ -1453,7 +1459,7 @@
           <option value="MEDIO">Média</option>
           <option value="BAIXO">Baixa</option>
         </select>
-        <select class="sort" id="categoriaFilter" onchange="render()" title="Mostrar só uma categoria"></select>
+        <select class="sort" id="categoriaFilter" onchange="render()" title="Mostrar só uma categoria" hidden></select>
         <select class="sort" id="origemFilter" onchange="render()" title="Mostrar só uma origem" hidden>
           <option value="">Origem: todas</option>
           <option value="manual">Adicionadas por você</option>
@@ -1498,7 +1504,7 @@
           <option value="URGENTE">Urgente</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field" hidden>
         <label for="fCategoria">Categoria</label>
         <select id="fCategoria"></select>
       </div>
@@ -3878,11 +3884,6 @@ service cloud.firestore {
         ${cals}
       </section>
       <section class="cfg-sec">
-        <h3>Categorias</h3>
-        ${cats || '<div class="field-hint">Nenhuma categoria.</div>'}
-        <div class="btn-row"><button class="btn btn-sm" type="button" onclick="adicionarCategoria()">+ Nova categoria</button></div>
-      </section>
-      <section class="cfg-sec">
         <h3>Preferências</h3>
         <div class="field-row">
           <div class="field">
@@ -4065,11 +4066,8 @@ service cloud.firestore {
     }
     if (item.status === 'EM ANDAMENTO' && !isDone(item)) partes.push('<span class="m-doing">Em andamento</span>');
     if (item.naoRealizada) partes.push('<span class="m-late">Não realizada</span>');
-    partes.push(critMeta(item.criterio).label);
-    const cat = categoriaDe(item.categoria);
-    if (cat) partes.push(escapeHTML(cat.nome));
-    if (item.rotinaId) partes.push('Rotina');
-    if (item.googleEventId) partes.push('Google Agenda' + (item.googleCalendarNome ? ' · ' + escapeHTML(item.googleCalendarNome) : ''));
+    if (!item.googleEventId) partes.push(critMeta(item.criterio).label);
+    if (o.mostrarTipo) partes.push(item.googleEventId ? 'Reunião' : item.rotinaId ? 'Rotina' : 'Demanda adicional');
     if (item.prazoEntrega) partes.push('Entrega ' + formatPrazo(item.prazoEntrega).slice(0,5));
     const ck = item.checklist || [];
     if (ck.length) partes.push('Checklist ' + ck.filter(c => c.feito).length + '/' + ck.length);
@@ -4196,14 +4194,25 @@ service cloud.firestore {
       titulo = 'Concluídas hoje';
       if (feitas.length) html += lista(feitas);
     } else {
-      const rotAntigas = anteriores.filter(i => i.rotinaId && !state.recem[i.id]).length;
-      if (anteriores.length){
-        html += `<div class="sec-label late">De dias anteriores<span class="right">`
-          + (rotAntigas ? `<button class="linkish" onclick="dispensarRotinasAntigas()" title="Registra as ocorrências de rotina de dias passados como não realizadas">dispensar rotinas (${rotAntigas})</button>` : '')
-          + `</span></div>` + lista(anteriores);
-        if (doDia.length) html += '<div class="sec-label">Hoje</div>';
-      }
-      if (doDia.length) html += lista(doDia);
+      // Três blocos: Reuniões (Google Agenda), Rotina e Demandas adicionais.
+      // Dentro de cada bloco, o que ficou de dias anteriores vem primeiro.
+      const emOrdem = arr => anteriores.filter(i => arr.includes(i)).concat(doDia.filter(i => arr.includes(i)));
+      const reunioes = emOrdem(ativos.filter(i => i.googleEventId));
+      const rotina = emOrdem(ativos.filter(i => i.rotinaId));
+      const demandas = emOrdem(ativos.filter(i => !i.googleEventId && !i.rotinaId));
+      const rotAntigas = rotina.filter(i => anteriores.includes(i) && !state.recem[i.id]).length;
+      const bloco = (nome, arr, direita, vazio) => {
+        html += `<div class="sec-label">${nome}<span class="n">${arr.length}</span><span class="right">${direita || ''}</span></div>`;
+        html += arr.length ? lista(arr) : `<div class="sec-empty">${vazio}</div>`;
+      };
+      bloco('Reuniões', reunioes,
+        googleClientId() ? `<button class="linkish" onclick="sincronizarGoogle({manual:true})">sincronizar</button>` : `<button class="linkish" onclick="openConfig()">conectar Google Agenda</button>`,
+        'Nenhuma reunião pendente hoje.');
+      bloco('Rotina', rotina,
+        (rotAntigas ? `<button class="linkish" onclick="dispensarRotinasAntigas()" title="Registra as rotinas de dias passados como não realizadas">dispensar dias anteriores (${rotAntigas})</button> · ` : '')
+          + `<button class="linkish" onclick="setTab('rotina')">gerenciar</button>`,
+        state.rotinas.length ? 'Rotina de hoje concluída.' : 'Nenhuma rotina cadastrada.');
+      bloco('Demandas adicionais', demandas, '', 'Nenhuma demanda pendente. Use o campo acima para adicionar.');
       if (st === 'todas' && feitas.length){
         html += `<button type="button" class="done-toggle" onclick="state.todayMostrarFeitas=!state.todayMostrarFeitas; render()">${state.todayMostrarFeitas ? 'Ocultar' : 'Mostrar'} concluídas (${feitas.length})</button>`;
         if (state.todayMostrarFeitas) html += '<div style="margin-top:8px">' + lista(feitas) + '</div>';
@@ -4215,8 +4224,8 @@ service cloud.firestore {
 
     const empty = document.getElementById('todayEmpty');
     const tudoFeito = st === 'todas' && !ativos.length && feitas.length;
-    empty.hidden = !!html && !tudoFeito;
-    if (tudoFeito) empty.textContent = 'Tudo concluído por hoje.';
+    empty.hidden = !!html || !tudoFeito;
+    if (tudoFeito && !html) empty.textContent = 'Tudo concluído por hoje.';
     else if (!html) empty.textContent = st === 'concluidas' ? 'Nada concluído hoje ainda.'
       : st === 'atrasadas' ? 'Nenhuma atividade atrasada.'
       : 'Nenhuma tarefa para hoje. Adicione uma no campo acima.';
@@ -4579,7 +4588,6 @@ service cloud.firestore {
           <h3>${escapeHTML(r.titulo)}</h3>
           <div class="task-tags" style="margin-top:6px">
             <span class="chip" style="--c:${meta.color}">${meta.label}</span>
-            ${cat ? `<span class="chip" style="--c:${escapeHTML(cat.cor)}">${escapeHTML(cat.nome)}</span>` : ''}
             ${r.horaInicio ? `<span class="chip chip-plain">${r.horaInicio}${r.horaFim ? '–' + r.horaFim : ''}</span>` : '<span class="chip chip-plain">sem horário</span>'}
             ${(r.checklist || []).length ? `<span class="chip chip-plain">checklist ${(r.checklist || []).length}</span>` : ''}
           </div>
@@ -4632,8 +4640,8 @@ service cloud.firestore {
       <button type="button" class="btn btn-sm btn-ghost" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">Filtros</button>
       <span class="filtros-extra" hidden>
       <select id="${prefixo}Crit" onchange="render()" aria-label="Prioridade"><option value="">Prioridade: todas</option>${CRITERIO_ORDER.map(c => `<option value="${c}">${CRITERIO_META[c].label}</option>`).join('')}</select>
-      <select id="${prefixo}Cat" onchange="render()" aria-label="Categoria"></select>
-      <select id="${prefixo}Ori" onchange="render()" aria-label="Origem"><option value="">Origem: todas</option><option value="manual">Adicionadas por você</option><option value="rotina">Rotina</option><option value="google">Google Agenda</option></select>
+      <select id="${prefixo}Cat" onchange="render()" aria-label="Categoria" hidden></select>
+      <select id="${prefixo}Ori" onchange="render()" aria-label="Tipo"><option value="">Tipo: todos</option><option value="google">Reuniões</option><option value="rotina">Rotina</option><option value="manual">Demandas adicionais</option></select>
       </span>`;
   }
   function lerFiltros(prefixo){
@@ -4672,11 +4680,11 @@ service cloud.firestore {
       total += itens.length;
       html += `<div class="day-group"><h3>${escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))}
         <button class="linkish" style="font-size:12px;margin-left:auto;font-weight:400" onclick="state.cronoDia='${d}'; setTab('cronograma')">horários</button></h3>
-        <ul class="task-list">${itens.map(i => linhaTarefa(i)).join('')}</ul></div>`;
+        <ul class="task-list">${itens.map(i => linhaTarefa(i, { mostrarTipo: true })).join('')}</ul></div>`;
     }
     const semData = state.atividades.filter(i => !i.prazo && passaFiltros(i, f)).sort(ordenarDoDia);
     if (semData.length){
-      html += `<div class="day-group"><h3>Sem data</h3><ul class="task-list">${semData.map(i => linhaTarefa(i)).join('')}</ul></div>`;
+      html += `<div class="day-group"><h3>Sem data</h3><ul class="task-list">${semData.map(i => linhaTarefa(i, { mostrarTipo: true })).join('')}</ul></div>`;
     }
     document.getElementById('proxLista').innerHTML = html || '<div class="today-empty">Nada programado para os próximos ' + state.proxDias + ' dias.</div>';
   }
@@ -4726,7 +4734,7 @@ service cloud.firestore {
     itens.forEach(i => { const d = i.concluidaEm || 'sem data'; (grupos[d] = grupos[d] || []).push(i); });
     const html = Object.keys(grupos).map(d => `
       <div class="day-group"><h3>${d === 'sem data' ? 'Sem data registrada' : escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))}</h3>
-      <ul class="task-list">${grupos[d].map(i => linhaTarefa(i, { mostrarData: true })).join('')}</ul></div>`).join('');
+      <ul class="task-list">${grupos[d].map(i => linhaTarefa(i, { mostrarData: true, mostrarTipo: true })).join('')}</ul></div>`).join('');
     document.getElementById('concLista').innerHTML = html || '<div class="today-empty">Nada concluído nesse período.</div>';
   }
 
