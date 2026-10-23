@@ -968,6 +968,242 @@
     .column.collapsed{ flex: 0 0 52px; max-width: 52px; }
     .board{ margin: 0 -14px; padding: 0 14px 12px; scroll-padding: 0 14px; }
   }
+
+  /* =====================================================================
+     Painel diário — acréscimos (cronograma, rotina, indicadores, Google)
+     ===================================================================== */
+  [hidden]{ display:none !important; }
+  .top-actions{ display:flex; align-items:center; gap: 10px; flex-wrap: wrap; }
+  .sync-note{ display:flex; flex-wrap: wrap; gap: 4px 18px; }
+  .sync-note .dot-live.saving{ background: var(--medio); animation: none; }
+  .sync-note .dot-live.err{ background: var(--urgente); animation: none; }
+  .sync-note .g-err{ color: var(--urgente); }
+  .sync-note button.linkish, .linkish{
+    background: none; border: none; color: var(--amber); cursor: pointer; font: inherit; padding: 0;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .modal{ max-width: 540px; padding: 22px; }
+  .modal.small{ max-width: 400px; }
+  .modal.wide{ max-width: 680px; }
+  .overlay{ align-items: flex-start; }
+  .modal-actions .left{ margin-right: auto; }
+  .btn-danger{ color: var(--urgente); }
+  .btn:disabled{ opacity: .5; cursor: default; }
+  input[type=time], input[type=number], input[type=month]{
+    background: var(--bg-soft); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 14px;
+  }
+  input[type=date], input[type=time], input[type=month]{ color-scheme: dark; }
+  input[type=time]:focus, input[type=number]:focus, input[type=month]:focus{ outline: 2px solid var(--amber); outline-offset: 1px; }
+  .field input:disabled, .field select:disabled{ opacity: .6; }
+
+  /* indicadores do dia */
+  .kpis{
+    display:grid; grid-template-columns: repeat(4, minmax(0,1fr)) minmax(0,1.7fr);
+    gap: 10px; margin-top: 18px;
+  }
+  .kpi{
+    background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 14px; text-align: left; color: var(--text); cursor: pointer;
+    display:flex; flex-direction: column; gap: 2px; min-width: 0; font-family: var(--font-body);
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .kpi:hover{ background: var(--card-hover); }
+  .kpi.active{ border-color: var(--amber); background: color-mix(in srgb, var(--amber) 8%, var(--bg-soft)); }
+  .kpi:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .kpi .n{ font-family: var(--font-display); font-size: 25px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .kpi .l{ font-size: 12px; color: var(--muted); }
+  .kpi.k-late .n{ color: var(--atrasada); }
+  .kpi.k-done .n{ color: var(--finalizada); }
+  .kpi.k-prog .l b{ color: var(--text); }
+  .kpi.k-prog .n{ color: var(--amber); }
+  .kpi.k-prog .bar{ height: 7px; border-radius: 999px; background: var(--line); overflow: hidden; margin-top: 7px; }
+  .kpi.k-prog .bar span{ display:block; height:100%; background: var(--finalizada); border-radius: 999px; transition: width .35s ease; }
+
+  .tabs{ overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ white-space: nowrap; flex: 0 0 auto; }
+  .tab .count.alert{ color: var(--atrasada); }
+
+  .banner{
+    max-width: 1360px; margin: 14px auto 0; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.55;
+    background: color-mix(in srgb, var(--urgente) 12%, var(--bg-soft)); border: 1px solid color-mix(in srgb, var(--urgente) 50%, var(--line));
+  }
+  .banner pre{ background: var(--bg); padding: 10px; border-radius: 8px; overflow:auto; font-size: 12px; }
+
+  /* Hoje */
+  .today-head{ display:flex; justify-content: space-between; align-items: baseline; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .today-head .today-date{ margin: 0; }
+  .legend{ font-size: 12px; color: var(--muted); display:flex; gap: 6px; align-items:center; flex-wrap: wrap; }
+  #todayView .quick-add{ margin: 0 0 6px; padding-top: 0; border-top: none; flex-wrap: wrap; }
+  #todayView .quick-add input[type=text]{ flex: 1 1 280px; }
+  #todayView .qa-crit input[type=time]{ padding: 10px 8px; }
+  .qa-hint{ font-size: 11.5px; color: var(--muted); margin: 0 0 16px; }
+  .agenda-label{ margin-top: 22px !important; }
+  .agenda-list{ list-style: none; margin: 0; padding: 0; }
+  .agenda-item{
+    display:grid; grid-template-columns: 46px 1fr; gap: 8px; padding: 7px 0; cursor: pointer;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); font-size: 13.5px;
+  }
+  .agenda-item:last-child{ border-bottom: none; }
+  .agenda-item .t{ font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .agenda-item .ttl{ border-left: 3px solid var(--c, var(--muted)); padding-left: 8px; word-break: break-word; }
+  .agenda-item.done .ttl{ text-decoration: line-through; color: var(--muted); }
+  .agenda-item.past:not(.done) .t{ color: var(--atrasada); }
+  .now-line{ display:flex; align-items:center; gap: 8px; color: var(--amber); font-family: var(--font-mono); font-size: 11px; margin: 4px 0; }
+  .now-line::after{ content:""; flex:1; height: 2px; background: var(--amber); border-radius: 2px; }
+  .agenda-empty{ font-size: 13px; color: var(--muted); }
+  .sec-label{
+    display:flex; align-items:center; gap: 8px; margin: 18px 0 8px;
+    font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted);
+  }
+  .sec-label:first-child{ margin-top: 0; }
+  .sec-label.late{ color: var(--atrasada); }
+  .sec-label .right{ margin-left: auto; text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 400; }
+  .done-toggle{
+    width: 100%; margin-top: 14px; background: transparent; border: 1px dashed var(--line); color: var(--muted);
+    border-radius: 10px; padding: 9px; cursor: pointer; font-size: 13px;
+  }
+  .done-toggle:hover{ color: var(--text); border-color: var(--muted); }
+
+  /* linha de tarefa (Hoje, cronograma, próximos, concluídas) */
+  .task{ border-left: 4px solid var(--pc, var(--line)); padding: 8px 8px 8px 10px; gap: 10px; }
+  .task.o-google{ background: color-mix(in srgb, var(--google) 8%, var(--card-raised)); }
+  .task.doing{ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--andamento) 60%, transparent); }
+  .task.just-done{ animation: done-flash 1.5s ease forwards; }
+  .task.just-done .task-title{ text-decoration: line-through; color: var(--muted); }
+  @keyframes done-flash{
+    0%{ background: color-mix(in srgb, var(--finalizada) 24%, var(--card-raised)); }
+    100%{ opacity: .4; }
+  }
+  .task.prevista{ opacity: .55; border-style: dashed; }
+  .task-time{
+    flex: 0 0 auto; width: 44px; font-family: var(--font-mono); font-size: 12.5px;
+    font-variant-numeric: tabular-nums; line-height: 1.15;
+  }
+  .task-time small{ display:block; color: var(--muted); font-size: 11px; }
+  .task-time.none{ color: var(--muted); }
+  .task-main{ flex-direction: column; align-items: flex-start; gap: 4px; }
+  .task-title{ background: none; border: none; color: var(--text); padding: 0; text-align: left; font-family: var(--font-body); font-weight: 600; font-size: 15px; }
+  .chip-google{ --c: var(--google); }
+  .chip-doing{ --c: var(--andamento); }
+  button.chip{ border: none; cursor: pointer; }
+  .task-btn.play:hover{ color: var(--andamento); }
+  .done-time{ font-family: var(--font-mono); font-size: 11.5px; color: var(--finalizada); flex: 0 0 auto; }
+
+  /* Cronograma */
+  .view-head{ display:flex; justify-content: space-between; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .view-title{ font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0; }
+  .view-sub{ color: var(--muted); font-size: 13px; margin: 3px 0 0; }
+  .day-nav{ display:flex; align-items:center; gap: 6px; flex-wrap: wrap; }
+  .sched-layout{ display:grid; grid-template-columns: minmax(230px, 1fr) minmax(0, 2.4fr); gap: 18px; align-items: start; }
+  .timeline{ border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--col-bg); }
+  .slot{ display:grid; grid-template-columns: 60px 1fr; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+  .slot:first-child{ border-top: none; }
+  .slot .h{ font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding: 11px 0 0 12px; border-right: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+  .zone{ list-style: none; margin: 0; padding: 6px 8px; display:flex; flex-direction: column; gap: 6px; min-height: 48px; border-radius: 0; }
+  .slot.now{ background: color-mix(in srgb, var(--amber) 6%, transparent); }
+  .slot.now .h{ color: var(--amber); font-weight: 700; }
+  .slot.past .h{ opacity: .55; }
+  .semhora{ min-height: 80px; border-radius: 10px; padding: 6px; }
+  .zone.drop-over, .semhora.drop-over{ background: color-mix(in srgb, var(--amber) 9%, transparent); outline: 2px dashed color-mix(in srgb, var(--amber) 60%, transparent); outline-offset: -2px; }
+  .zitem[data-drag]{ cursor: grab; }
+  .zplaceholder{ border: 2px dashed color-mix(in srgb, var(--amber) 70%, transparent); background: color-mix(in srgb, var(--amber) 8%, transparent); border-radius: 10px; list-style: none; }
+  body.zdragging, body.zdragging *{ cursor: grabbing !important; }
+  body.zdragging{ user-select: none; -webkit-user-select: none; }
+
+  /* Próximos / Concluídas */
+  .filter-row{ display:flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .filter-row input[type=search]{ flex: 1 1 220px; }
+  .day-group{ margin-bottom: 18px; }
+  .day-group h3{ font-family: var(--font-display); font-size: 15px; margin: 0 0 8px; display:flex; gap: 10px; align-items: baseline; }
+  .day-group h3 small{ font-family: var(--font-mono); font-weight: 400; font-size: 11.5px; color: var(--muted); }
+  .arch-box{ margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+  /* Rotina */
+  .rot-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 12px; }
+  .rot-card{
+    background: var(--card-raised); border: 1px solid var(--line); border-left: 4px solid var(--pc, var(--recorrente));
+    border-radius: 12px; padding: 14px; display:flex; flex-direction: column; gap: 10px;
+  }
+  .rot-card.paused{ opacity: .6; }
+  .rot-card h3{ font-family: var(--font-display); font-size: 15.5px; margin: 0; word-break: break-word; }
+  .rot-days{ display:flex; gap: 4px; flex-wrap: wrap; }
+  .rot-days span{ font-family: var(--font-mono); font-size: 10.5px; padding: 3px 7px; border-radius: 999px; background: var(--bg-soft); color: var(--muted); border: 1px solid var(--line); }
+  .rot-days span.on{ background: color-mix(in srgb, var(--recorrente) 20%, transparent); color: var(--text); border-color: color-mix(in srgb, var(--recorrente) 50%, var(--line)); }
+  .rot-today{ font-size: 13px; color: var(--muted); }
+  .rot-today b{ color: var(--text); font-weight: 600; }
+  .heat{ display:flex; gap: 3px; flex-wrap: wrap; }
+  .heat i{ width: 16px; height: 16px; border-radius: 4px; border: 1px dashed var(--line); display:block; }
+  .heat i.ok{ background: var(--finalizada); border: none; }
+  .heat i.miss{ background: color-mix(in srgb, var(--atrasada) 75%, transparent); border: none; }
+  .heat i.open{ background: color-mix(in srgb, var(--medio) 65%, transparent); border: none; }
+  .heat i.norec{ background: var(--line); border: none; }
+  .heat-legend{ font-size: 11px; color: var(--muted); display:flex; gap: 10px; flex-wrap: wrap; }
+  .heat-legend i{ display:inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .rot-actions{ display:flex; gap: 6px; flex-wrap: wrap; }
+
+  /* formulários e configurações */
+  .info-box{ background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .info-box.err{ border-color: color-mix(in srgb, var(--urgente) 55%, var(--line)); color: var(--text); }
+  .info-box.ok{ border-color: color-mix(in srgb, var(--finalizada) 55%, var(--line)); }
+  .info-box a{ color: var(--amber); }
+  details.more{ margin: 4px 0 6px; }
+  details.more summary{ cursor: pointer; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .ck-edit .checklist-item{ padding: 3px 0; }
+  .hist-list{ font-size: 12px; color: var(--muted); font-family: var(--font-mono); line-height: 1.7; }
+  .quick-dates{ display:flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .cfg-sec{ border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
+  .cfg-sec:first-child{ border-top: none; margin-top: 0; padding-top: 0; }
+  .cfg-sec h3{ font-family: var(--font-display); font-size: 16px; margin: 0 0 10px; }
+  .cat-edit{ display:flex; gap: 8px; align-items:center; margin-bottom: 6px; }
+  .cat-edit input[type=text]{ flex: 1; min-width: 0; }
+  .cat-edit input[type=color]{ width: 42px; height: 38px; padding: 2px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-soft); }
+  .cal-item{ display:flex; align-items:center; gap: 10px; padding: 5px 0; font-size: 14px; }
+  .field label.cal-item{ display:flex; text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-size: 14px; color: var(--text); margin: 0; }
+  .cal-item input{ accent-color: var(--amber); }
+  .cal-item .sw{ width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
+  .btn-row{ display:flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  .toast{ width: max-content; max-width: calc(100vw - 32px); }
+  .fab{
+    display:none; position: fixed; right: 16px; bottom: 16px; z-index: 40;
+    background: var(--amber); color: #201205; border: none; border-radius: 999px;
+    padding: 14px 20px; font-weight: 700; font-size: 15px; box-shadow: 0 10px 26px rgba(0,0,0,.45); cursor: pointer;
+  }
+
+  @media (max-width: 1000px){
+    .sched-layout{ grid-template-columns: 1fr; }
+    .kpis{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .kpi.k-prog{ grid-column: 1 / -1; }
+  }
+  @media (max-width: 760px){
+    .today-cats{ order: 2; }
+  }
+  @media (max-width: 560px){
+    #btnNovaTop{ display:none; }
+    .fab{ display:block; }
+    .user-chip span{ display:none; }
+    .brand .tag{ display:none; }
+    .kpis{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+    .kpi{ padding: 9px 11px; }
+    .kpi .n{ font-size: 21px; }
+    .tabs .tab{ flex: 0 0 auto; padding: 10px 12px 8px; }
+    .task{ gap: 7px; padding: 8px 6px 8px 8px; }
+    .task-time{ width: 38px; font-size: 11.5px; }
+    .task-btn{ width: 30px; height: 30px; }
+    .rot-grid{ grid-template-columns: 1fr; }
+    .modal{ padding: 18px; }
+    #todayView .qa-crit{ flex: 1 1 calc(50% - 6px); }
+    #todayView .qa-crit label{ display:none; }
+    #todayView .qa-btn{ flex: 1 1 calc(50% - 6px); height: 42px; }
+    .task{ flex-wrap: wrap; row-gap: 4px; }
+    .task-main{ flex: 1 1 calc(100% - 90px); }
+    .task .task-acts{ width: 100%; justify-content: flex-end; }
+    .task .task-acts .task-btn{ width: 34px; height: 30px; }
+    .semhora .task .task-acts{ justify-content: flex-start; }
+  }
+  .semhora .task-acts .play{ display:none; }
 </style>
 </head>
 <body>
@@ -990,19 +1226,37 @@
     <div class="topbar">
       <div class="brand">
         <h1>My<span>Tasks</span></h1>
-        <span class="tag">painel pessoal</span>
+        <span class="tag">painel diário</span>
       </div>
-      <div class="user-chip">
-        <img id="userAvatar" src="" alt="">
-        <span id="userName"></span>
-        <button onclick="logout()">Sair</button>
+      <div class="top-actions">
+        <button class="btn btn-primary" id="btnNovaTop" type="button" onclick="openForm()" title="Nova atividade (atalho: tecla N)">+ Nova atividade</button>
+        <button class="btn" type="button" onclick="openConfig()" title="Configurações: categorias, Google Agenda, fuso horário" aria-label="Configurações">⚙</button>
+        <div class="user-chip">
+          <img id="userAvatar" src="" alt="">
+          <span id="userName"></span>
+          <button onclick="logout()">Sair</button>
+        </div>
       </div>
     </div>
-    <div class="sync-note"><span class="dot-live"></span><span id="syncText">sincronizado na nuvem</span></div>
+    <div class="sync-note">
+      <span><span class="dot-live" id="syncDot"></span><span id="syncText">sincronizado na nuvem</span></span>
+      <span id="googleStatus"></span>
+    </div>
+
+    <div class="kpis" id="kpis" role="group" aria-label="Indicadores de hoje"></div>
 
     <div class="tabs">
       <button class="tab active" id="tabHoje" onclick="setTab('hoje')">
         Hoje <span class="count" id="countHoje">0</span>
+      </button>
+      <button class="tab" id="tabCronograma" onclick="setTab('cronograma')">
+        Cronograma
+      </button>
+      <button class="tab" id="tabRotina" onclick="setTab('rotina')">
+        Rotina diária <span class="count" id="countRotina">0</span>
+      </button>
+      <button class="tab" id="tabProximos" onclick="setTab('proximos')">
+        Próximos dias <span class="count" id="countProximos">0</span>
       </button>
       <button class="tab" id="tabAtividades" onclick="setTab('atividades')">
         Atividades <span class="count" id="countAtividades">0</span>
@@ -1011,43 +1265,70 @@
         Pendências <span class="count" id="countPendencias">0</span>
       </button>
       <button class="tab" id="tabFinalizadas" onclick="setTab('finalizadas')">
-        Finalizadas <span class="count" id="countFinalizadas">0</span>
+        Concluídas <span class="count" id="countFinalizadas">0</span>
       </button>
     </div>
   </header>
+
+  <div class="banner" id="banner" hidden></div>
 
   <main>
 
     <!-- ============ HOJE (lista do dia) ============ -->
     <section id="todayView">
-      <div class="today-date" id="todayDate"></div>
+      <div class="today-head">
+        <div class="today-date" id="todayDate"></div>
+        <div class="legend"><span class="chip chip-rec">🔁 rotina</span> <span class="chip chip-google">📅 Google Agenda</span> <span>sem selo: adicionada por você</span></div>
+      </div>
+      <form class="quick-add" id="quickAdd" autocomplete="off">
+        <label class="sr-only" for="qaTitulo">Nova tarefa</label>
+        <input type="text" id="qaTitulo" placeholder="Novo chamado ou serviço para hoje — digite e aperte Enter" maxlength="200">
+        <div class="qa-crit">
+          <label for="qaCriterio">Prioridade</label>
+          <select id="qaCriterio">
+            <option value="URGENTE">Urgente</option>
+            <option value="ALTO">Alta</option>
+            <option value="MEDIO" selected>Média</option>
+            <option value="BAIXO">Baixa</option>
+          </select>
+        </div>
+        <div class="qa-crit">
+          <label for="qaCategoria">Categoria</label>
+          <select id="qaCategoria"></select>
+        </div>
+        <div class="qa-crit">
+          <label for="qaHora">Horário</label>
+          <input type="time" id="qaHora">
+        </div>
+        <button type="submit" class="qa-btn" title="Adicionar tarefa" aria-label="Adicionar tarefa">+</button>
+      </form>
+      <div class="qa-hint">Só o título é obrigatório. Dica: comece com o horário ("14:30 Reunião com TI") para já entrar no cronograma.</div>
       <div class="today-layout">
         <aside class="today-panel today-cats">
-          <h2 class="panel-label">Critérios</h2>
+          <h2 class="panel-label">Prioridades</h2>
           <div class="cat-list" id="catList"></div>
-          <div class="today-progress" id="todayProgress"></div>
+          <h2 class="panel-label agenda-label">Agenda de hoje</h2>
+          <div id="todayAgenda"></div>
         </aside>
         <div class="today-panel today-tasks">
           <h2 class="panel-label" id="todayListTitle">Tarefas de hoje</h2>
-          <ul class="task-list" id="taskList"></ul>
+          <div id="todaySections"></div>
           <div class="today-empty" id="todayEmpty" hidden></div>
-          <form class="quick-add" id="quickAdd" autocomplete="off">
-            <label class="sr-only" for="qaTitulo">Nova tarefa</label>
-            <input type="text" id="qaTitulo" placeholder="Digite uma nova tarefa para hoje" maxlength="200">
-            <div class="qa-crit">
-              <label for="qaCriterio">Critério</label>
-              <select id="qaCriterio">
-                <option value="URGENTE">Urgente</option>
-                <option value="ALTO">Alto</option>
-                <option value="MEDIO" selected>Médio</option>
-                <option value="BAIXO">Baixo</option>
-              </select>
-            </div>
-            <button type="submit" class="qa-btn" title="Adicionar tarefa" aria-label="Adicionar tarefa">+</button>
-          </form>
         </div>
       </div>
     </section>
+
+    <!-- ============ CRONOGRAMA ============ -->
+    <section id="schedView" hidden></section>
+
+    <!-- ============ ROTINA DIÁRIA ============ -->
+    <section id="rotinaView" hidden></section>
+
+    <!-- ============ PRÓXIMOS DIAS ============ -->
+    <section id="proxView" hidden></section>
+
+    <!-- ============ CONCLUÍDAS (histórico) ============ -->
+    <section id="concView" hidden></section>
 
     <div id="boardView" hidden>
     <div class="stats" id="stats"></div>
@@ -1069,17 +1350,24 @@
           <option value="recente">Ordenar: mais recente</option>
           <option value="titulo">Ordenar: título (A-Z)</option>
         </select>
-        <select class="sort" id="criterioFilter" onchange="render()" title="Mostrar só um critério de urgência">
-          <option value="">Critério: todos</option>
+        <select class="sort" id="criterioFilter" onchange="render()" title="Mostrar só uma prioridade">
+          <option value="">Prioridade: todas</option>
           <option value="URGENTE">Urgente</option>
-          <option value="ALTO">Alto</option>
-          <option value="MEDIO">Médio</option>
-          <option value="BAIXO">Baixo</option>
+          <option value="ALTO">Alta</option>
+          <option value="MEDIO">Média</option>
+          <option value="BAIXO">Baixa</option>
+        </select>
+        <select class="sort" id="categoriaFilter" onchange="render()" title="Mostrar só uma categoria"></select>
+        <select class="sort" id="origemFilter" onchange="render()" title="Mostrar só uma origem">
+          <option value="">Origem: todas</option>
+          <option value="manual">Adicionadas por você</option>
+          <option value="rotina">Rotina</option>
+          <option value="google">Google Agenda</option>
         </select>
       </div>
       <div class="action-group">
         <button class="btn btn-primary" id="addBtn" onclick="openForm()" title="Criar um novo item, do zero">+ Nova</button>
-        <button class="btn" id="importAgendaBtn" onclick="openImportAgenda()" title="Traz eventos da sua Google Agenda como novas atividades">📅 Agenda Google</button>
+        <button class="btn" id="importAgendaBtn" onclick="sincronizarGoogle({manual:true})" title="Busca agora os compromissos da sua Google Agenda">📅 Google Agenda</button>
       </div>
     </div>
 
@@ -1095,48 +1383,51 @@
   </main>
 </div>
 
-<!-- Modal -->
+<!-- Modal: atividade / rotina -->
 <div class="overlay" id="overlay" onclick="if(event.target===this) closeForm()">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <h2 id="modalTitle">Nova Atividade</h2>
+    <div class="info-box" id="formInfo" hidden></div>
     <div class="field">
-      <label>Título</label>
-      <input type="text" id="fTitulo" placeholder="Digite o título">
-    </div>
-    <div class="field">
-      <label>Descrição</label>
-      <textarea id="fDescricao" placeholder="Descreva com detalhes"></textarea>
+      <label for="fTitulo">Título *</label>
+      <input type="text" id="fTitulo" placeholder="Ex.: Chamado 4521 — impressora do RH" maxlength="200">
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Critério</label>
+        <label for="fCriterio">Prioridade</label>
         <select id="fCriterio">
-          <option value="BAIXO">Baixo</option>
-          <option value="MEDIO">Médio</option>
-          <option value="ALTO">Alto</option>
+          <option value="BAIXO">Baixa</option>
+          <option value="MEDIO">Média</option>
+          <option value="ALTO">Alta</option>
           <option value="URGENTE">Urgente</option>
         </select>
       </div>
-      <div class="field" id="statusField">
-        <label>Status</label>
-        <select id="fStatus">
-          <option value="NÃO INICIADO">Não iniciado</option>
-          <option value="EM ANDAMENTO">Em andamento</option>
-          <option value="FINALIZADA">Finalizada</option>
-        </select>
+      <div class="field">
+        <label for="fCategoria">Categoria</label>
+        <select id="fCategoria"></select>
       </div>
     </div>
-    <div class="field">
-      <label>Prazo (opcional)</label>
-      <input type="date" id="fPrazo">
+    <div class="field-row">
+      <div class="field">
+        <label for="fPrazo" id="fPrazoLabel">Data</label>
+        <input type="date" id="fPrazo">
+      </div>
+      <div class="field">
+        <label for="fHoraIni">Início</label>
+        <input type="time" id="fHoraIni">
+      </div>
+      <div class="field">
+        <label for="fHoraFim">Término</label>
+        <input type="time" id="fHoraFim">
+      </div>
     </div>
-    <div class="field">
-      <label>Repetir</label>
+    <div class="field" id="recTipoField">
+      <label for="fRecorrenciaTipo">Repetir</label>
       <select id="fRecorrenciaTipo" onchange="onRecTipoChange()">
-        <option value="nenhuma">Não se repete</option>
-        <option value="diaria">Todos os dias</option>
-        <option value="semanal">Dias específicos da semana</option>
-        <option value="mensal">Mensalmente (mesmo dia do prazo)</option>
+        <option value="nenhuma">Não se repete (atividade pontual)</option>
+        <option value="diaria">Rotina — todos os dias</option>
+        <option value="semanal">Rotina — dias específicos da semana</option>
+        <option value="mensal">Rotina — mensalmente (mesmo dia do mês)</option>
       </select>
     </div>
     <div class="field" id="recDiasField" style="display:none">
@@ -1149,41 +1440,91 @@
         <button type="button" class="dia-chip" data-dia="4" onclick="toggleDia(4,this)">Qui</button>
         <button type="button" class="dia-chip" data-dia="5" onclick="toggleDia(5,this)">Sex</button>
         <button type="button" class="dia-chip" data-dia="6" onclick="toggleDia(6,this)">Sáb</button>
+        <button type="button" class="btn btn-sm" onclick="setDiasUteis()">Seg a Sex</button>
       </div>
     </div>
     <div class="field-hint" id="recHint" style="display:none">
-      Quando vencer e for concluída, uma nova atividade é criada automaticamente com a próxima data.
+      Vira uma rotina: aparece sozinha como pendente em cada dia programado. Concluir num dia não afeta os outros dias.
     </div>
+    <details class="more" id="formMais">
+      <summary>Mais detalhes (descrição, status, prazo de entrega, observações, checklist)</summary>
+      <div class="field">
+        <label for="fDescricao">Descrição</label>
+        <textarea id="fDescricao" placeholder="Detalhes do serviço, solicitante, local…"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field" id="statusField">
+          <label for="fStatus">Status</label>
+          <select id="fStatus">
+            <option value="NÃO INICIADO">Não iniciado</option>
+            <option value="EM ANDAMENTO">Em andamento</option>
+            <option value="FINALIZADA">Concluída</option>
+          </select>
+        </div>
+        <div class="field" id="entregaField">
+          <label for="fPrazoEntrega">Prazo de entrega</label>
+          <input type="date" id="fPrazoEntrega">
+        </div>
+      </div>
+      <div class="field" id="obsField">
+        <label for="fObs">Observações</label>
+        <textarea id="fObs" placeholder="Anotações durante a execução"></textarea>
+      </div>
+      <div class="field">
+        <label>Checklist</label>
+        <div class="ck-edit" id="formChecklist"></div>
+        <div class="checklist-add">
+          <input type="text" id="formCkNovo" placeholder="Adicionar item e Enter" onkeydown="if(event.key==='Enter'){event.preventDefault();formCkAdd();}">
+          <button type="button" class="btn btn-sm" onclick="formCkAdd()">+</button>
+        </div>
+      </div>
+      <div class="field" id="histField" hidden>
+        <label>Registro</label>
+        <div class="hist-list" id="formHist"></div>
+      </div>
+    </details>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveForm()">Salvar</button>
+      <button class="btn btn-ghost btn-danger left" id="formExcluir" type="button" onclick="excluirDoForm()" hidden>Excluir</button>
+      <button class="btn btn-ghost" type="button" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" type="button" onclick="saveForm()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- Import from Google Calendar -->
-<div class="overlay" id="importOverlay" onclick="if(event.target===this) closeImportAgenda()">
-  <div class="modal">
-    <h2>Importar da Google Agenda</h2>
-    <div class="field-row">
-      <div class="field">
-        <label>De</label>
-        <input type="date" id="fImportDe">
-      </div>
-      <div class="field">
-        <label>Até</label>
-        <input type="date" id="fImportAte">
-      </div>
+<!-- Modal: reagendar / adiar -->
+<div class="overlay" id="reagOverlay" onclick="if(event.target===this) closeReagendar()">
+  <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="reagTitulo">
+    <h2 id="reagTitulo">Reagendar</h2>
+    <div class="field-hint" id="reagSub" style="margin:-4px 0 14px"></div>
+    <div class="quick-dates" id="reagRapidos"></div>
+    <div class="field">
+      <label for="reagData">Nova data</label>
+      <input type="date" id="reagData">
     </div>
-    <div class="field-hint">
-      Cada evento do período vira uma Atividade (prazo = data do evento). Precisa conectar sua conta Google na primeira vez; eventos já importados antes não são duplicados.
+    <div class="field-row">
+      <div class="field"><label for="reagIni">Início</label><input type="time" id="reagIni"></div>
+      <div class="field"><label for="reagFim">Término</label><input type="time" id="reagFim"></div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeImportAgenda()">Cancelar</button>
-      <button class="btn btn-primary" onclick="confirmarImportarAgenda()">Conectar e importar</button>
+      <button class="btn btn-ghost" type="button" onclick="closeReagendar()">Cancelar</button>
+      <button class="btn btn-primary" type="button" onclick="confirmarReagendar()">Reagendar</button>
     </div>
   </div>
 </div>
+
+<!-- Modal: configurações (categorias, Google Agenda, preferências) -->
+<div class="overlay" id="cfgOverlay" onclick="if(event.target===this) closeConfig()">
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="cfgTitulo">
+    <h2 id="cfgTitulo">Configurações</h2>
+    <div class="field-hint" style="margin:-4px 0 16px">Salvas na sua conta e válidas em todos os dispositivos.</div>
+    <div id="cfgBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" onclick="closeConfig()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" type="button" onclick="openForm()">+ Nova atividade</button>
 
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
@@ -1193,7 +1534,8 @@
     getAuth, GithubAuthProvider, signInWithPopup, signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
-    getFirestore, doc, setDoc, onSnapshot
+    getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+    doc, setDoc, getDoc, onSnapshot, arrayUnion
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1208,11 +1550,62 @@
 
   const fbApp = initializeApp(firebaseConfig);
   const auth = getAuth(fbApp);
-  const db = getFirestore(fbApp);
+  // cache local: o app abre com os dados mesmo sem internet, e as alterações feitas
+  // offline ficam na fila e sobem sozinhas quando a conexão volta.
+  let db;
+  try {
+    db = initializeFirestore(fbApp, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+  } catch (e) {
+    db = getFirestore(fbApp);
+  }
 
   let currentUser = null;
   let unsubscribeDoc = null;
   let suppressNextSave = false;
+
+  // campos de cada atividade/pendência que vão para a nuvem
+  const CAMPOS_ITEM = [
+    'id','titulo','descricao','criterio','status','prazo','checklist','recorrencia','googleEventId',
+    'ordem','_ts','concluidaEm','concluidaEmTs','proximaId','daAtividade',
+    'categoria','horaInicio','horaFim','prazoEntrega','observacoes','iniciadaEm','reagendamentos',
+    'rotinaId','ocorrencia','naoRealizada',
+    'googleCalendarId','googleCalendarNome','googleCor','googleLink','googleLocal','googleUpdated','diaInteiro'
+  ];
+  function limparItem(o){
+    const r = {};
+    CAMPOS_ITEM.forEach(k => { if (o[k] !== undefined) r[k] = o[k]; });
+    if (!r._ts) r._ts = Date.now();
+    if (r.prazo === undefined) r.prazo = '';
+    return r;
+  }
+  function semUndefined(v){ return JSON.parse(JSON.stringify(v === undefined ? null : v)); }
+
+  function mostrarBanner(html){
+    const b = document.getElementById('banner');
+    if (!html){ b.hidden = true; b.innerHTML = ''; return; }
+    b.innerHTML = html; b.hidden = false;
+  }
+  window.__mostrarBanner = mostrarBanner;
+
+  function setSync(texto, tipo){
+    document.getElementById('syncText').textContent = texto;
+    const dot = document.getElementById('syncDot');
+    dot.classList.toggle('saving', tipo === 'saving');
+    dot.classList.toggle('err', tipo === 'err');
+  }
+
+  const REGRA_FIRESTORE = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      match /{sub=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}`;
+  window.__regraFirestore = REGRA_FIRESTORE;
 
   document.getElementById('loginBtn').addEventListener('click', () => {
     const provider = new GithubAuthProvider();
@@ -1241,24 +1634,34 @@
         // não suprime o próximo salvamento: render() nunca salva sozinho, e a supressão
         // antiga fazia a primeira alteração depois de cada sincronização não ir para a nuvem.
         suppressNextSave = false;
-        if (snap.exists()){
-          const data = snap.data();
-          window.__state.atividades = (data.atividades || []).map(hydrate);
-          window.__state.pendencias = (data.pendencias || []).map(hydrate);
-        } else {
-          window.__state.atividades = [];
-          window.__state.pendencias = [];
-        }
-        const movidas = window.__migrarVencidas ? window.__migrarVencidas() : 0;
+        // uma gravação desta própria aba ainda pendente: não sobrescreve o que está na tela
+        if (snap.metadata && snap.metadata.hasPendingWrites && window.__state.carregado) return;
+        const data = snap.exists() ? snap.data() : {};
+        const st = window.__state;
+        st.atividades = (data.atividades || []).map(hydrate);
+        st.pendencias = (data.pendencias || []).map(hydrate);
+        st.rotinas = Array.isArray(data.rotinas) ? data.rotinas : [];
+        st.categorias = Array.isArray(data.categorias) ? data.categorias : [];
+        st.config = data.config || {};
+        st.google = data.google || {};
+        st.schema = data.schema || 0;
+        st.carregado = true;
+        mostrarBanner('');
+
+        // ajustes que dependem do dia de hoje: atualização da versão antiga dos dados,
+        // vencidas para Pendências e geração da rotina de hoje (tudo idempotente)
+        const ajustes = window.__ajustarAoCarregar ? window.__ajustarAoCarregar() : { mudou: false };
         window.__render();
-        document.getElementById('syncText').textContent = 'sincronizado na nuvem';
-        if (movidas > 0){
-          // a migração alterou o estado que acabou de vir da nuvem — grava de volta
-          window.__saveToCloud(true);
-          if (window.__showToast) window.__showToast(movidas === 1 ? '1 atividade vencida foi para Pendências' : movidas + ' atividades vencidas foram para Pendências');
-        }
+        setSync('sincronizado na nuvem');
+        if (ajustes.mudou) window.__saveToCloud(true);
+        if (ajustes.aviso && window.__showToast) window.__showToast(ajustes.aviso);
       }, (err) => {
-        document.getElementById('syncText').textContent = 'erro ao sincronizar: verifique as regras do Firestore';
+        setSync('erro ao sincronizar', 'err');
+        if (err && err.code === 'permission-denied'){
+          mostrarBanner('<b>O Firestore recusou o acesso aos seus dados.</b> Confira as regras de segurança no console do Firebase (Firestore → Regras):<pre>' + REGRA_FIRESTORE.replace(/</g,'&lt;') + '</pre>');
+        } else {
+          mostrarBanner('<b>Não foi possível sincronizar com a nuvem</b> (' + ((err && (err.code || err.message)) || 'erro desconhecido') + '). Seus dados continuam salvos; recarregue a página quando a conexão voltar.');
+        }
       });
 
       if (window.__scheduleMidnightCheck) window.__scheduleMidnightCheck();
@@ -1276,34 +1679,85 @@
     return Object.assign(base, item);
   }
 
+  // ---------- arquivo: o Firestore limita cada documento a 1 MB ----------
+  // Quando o histórico crescer demais, as concluídas com mais de 90 dias vão para
+  // users/{uid}/arquivo/{AAAA-MM}. Nada é apagado antes de o arquivo ser gravado.
+  const LIMITE_BYTES = 700 * 1024;
+  let arquivando = false;
+  async function arquivarAntigasSePreciso(){
+    const st = window.__state;
+    const tamanho = JSON.stringify({ a: st.atividades, p: st.pendencias, r: st.rotinas }).length;
+    if (tamanho < LIMITE_BYTES || arquivando || !currentUser) return false;
+    arquivando = true;
+    try {
+      const limite = window.__addDias(window.__todayStr(), -90);
+      const antigas = st.pendencias.filter(p => p.status === 'FINALIZADA' && p.concluidaEm && p.concluidaEm < limite);
+      if (!antigas.length) return false;
+      const porMes = {};
+      antigas.forEach(p => { const m = p.concluidaEm.slice(0, 7); (porMes[m] = porMes[m] || []).push(limparItem(p)); });
+      for (const mes of Object.keys(porMes)){
+        await setDoc(doc(db, 'users', currentUser.uid, 'arquivo', mes), { itens: arrayUnion(...semUndefined(porMes[mes])) }, { merge: true });
+      }
+      const ids = new Set(antigas.map(p => p.id));
+      st.pendencias = st.pendencias.filter(p => !ids.has(p.id));
+      if (window.__showToast) window.__showToast(antigas.length + ' concluídas antigas foram arquivadas (consulte em Concluídas → Arquivo)');
+      return true;
+    } catch (e) {
+      mostrarBanner('<b>Seu histórico está grande e não pôde ser arquivado</b> (' + (e.code || e.message) + '). Nada foi perdido. Para liberar o arquivamento, use estas regras no Firestore:<pre>' + REGRA_FIRESTORE.replace(/</g,'&lt;') + '</pre>');
+      return false;
+    } finally {
+      arquivando = false;
+    }
+  }
+
+  window.__lerArquivo = async function(mes){
+    if (!currentUser) return [];
+    const snap = await getDoc(doc(db, 'users', currentUser.uid, 'arquivo', mes));
+    return snap.exists() ? (snap.data().itens || []) : [];
+  };
+
   let saveTimer = null;
+  let retryTimer = null;
+  let saveAgendado = false;
   window.__saveToCloud = function(immediate){
     if (suppressNextSave){ suppressNextSave = false; return; }
-    if (!currentUser) return;
+    if (!currentUser || !window.__state.carregado) return;
 
     clearTimeout(saveTimer);
-    const doSave = () => {
+    clearTimeout(retryTimer);
+    const doSave = async () => {
+      saveAgendado = false;
+      const st = window.__state;
+      await arquivarAntigasSePreciso();
       const userDocRef = doc(db, 'users', currentUser.uid);
-      document.getElementById('syncText').textContent = 'salvando...';
+      setSync(navigator.onLine === false ? 'sem internet — alterações guardadas e serão enviadas quando a conexão voltar' : 'salvando...', 'saving');
       setDoc(userDocRef, {
-        atividades: window.__state.atividades.map(a => ({
-          id: a.id, titulo: a.titulo, descricao: a.descricao, criterio: a.criterio, prazo: a.prazo || '', checklist: a.checklist || [], recorrencia: a.recorrencia || null, googleEventId: a.googleEventId || null,
-          ordem: typeof a.ordem === 'number' ? a.ordem : null, _ts: a._ts || Date.now()
-        })),
-        pendencias: window.__state.pendencias.map(p => ({
-          id: p.id, titulo: p.titulo, descricao: p.descricao, criterio: p.criterio, status: p.status, prazo: p.prazo || '', checklist: p.checklist || [], recorrencia: p.recorrencia || null, googleEventId: p.googleEventId || null,
-          ordem: typeof p.ordem === 'number' ? p.ordem : null, _ts: p._ts || Date.now(),
-          concluidaEm: p.concluidaEm || null, proximaId: p.proximaId || null, daAtividade: !!p.daAtividade
-        }))
-      }).then(() => {
-        document.getElementById('syncText').textContent = 'sincronizado na nuvem';
-      }).catch(() => {
-        document.getElementById('syncText').textContent = 'falha ao salvar — tente novamente';
+        atividades: st.atividades.map(limparItem),
+        pendencias: st.pendencias.map(limparItem),
+        rotinas: semUndefined(st.rotinas || []),
+        categorias: semUndefined(st.categorias || []),
+        config: semUndefined(st.config || {}),
+        google: semUndefined(st.google || {}),
+        schema: st.schema || 0
+      }, { merge: true }).then(() => {
+        setSync('sincronizado na nuvem');
+      }).catch((err) => {
+        // os dados continuam na memória desta aba; tenta de novo em 5 s
+        setSync('falha ao salvar (' + (err.code || 'erro') + ') — tentando de novo…', 'err');
+        if (err && err.code === 'permission-denied'){
+          mostrarBanner('<b>O Firestore recusou a gravação.</b> Suas alterações estão só nesta aba — não feche antes de corrigir as regras (Firestore → Regras):<pre>' + REGRA_FIRESTORE.replace(/</g,'&lt;') + '</pre>');
+        }
+        retryTimer = setTimeout(() => window.__saveToCloud(true), 5000);
       });
     };
 
-    if (immediate){ doSave(); } else { saveTimer = setTimeout(doSave, 600); }
+    if (immediate){ doSave(); } else { saveAgendado = true; saveTimer = setTimeout(doSave, 600); }
   };
+  // fechar, recarregar ou trocar de aba com uma gravação agendada: grava na hora
+  function gravarPendente(){ if (saveAgendado) window.__saveToCloud(true); }
+  window.addEventListener('pagehide', gravarPendente);
+  window.addEventListener('beforeunload', gravarPendente);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') gravarPendente(); });
 </script>
 
 <script>
@@ -1316,7 +1770,23 @@
     formPreset: null,    // critério/status pré-escolhidos ao criar pelo "+" de uma coluna
     openChecklists: {},  // id -> true/false, remembers which cards have the checklist expanded
     groupBy: lsGet('mt_groupBy', 'criterio'),            // só vale na aba Pendências
-    collapsed: JSON.parse(lsGet('mt_collapsed', '{}'))   // colunas recolhidas
+    collapsed: JSON.parse(lsGet('mt_collapsed', '{}')),  // colunas recolhidas
+    // painel diário
+    rotinas: [],          // modelos das atividades recorrentes (rotina do cargo)
+    categorias: [],
+    config: {},           // fuso, horário do cronograma
+    google: {},           // Client ID, calendários escolhidos, última sincronização (nunca o token)
+    schema: 0,
+    carregado: false,
+    todayStatus: 'todas', // filtro dos indicadores: todas | pendentes | concluidas | atrasadas
+    todayMostrarFeitas: false,
+    recem: {},            // concluídas há instantes: ficam riscadas na lista por 1,5 s
+    cronoDia: null,
+    proxDias: Number(lsGet('mt_proxDias', '14')) || 14,
+    concPeriodo: lsGet('mt_concPeriodo', '7'),
+    concNaoRealizadas: false,
+    filtroRotinaId: '',
+    diaAtual: null
   };
 
   function lsGet(k, def){ try { const v = localStorage.getItem(k); return v === null ? def : v; } catch(e){ return def; } }
@@ -1324,9 +1794,9 @@
   window.__state = state;
 
   const CRITERIO_META = {
-    BAIXO:   {label:'Baixo',   color:'var(--baixo)'},
-    MEDIO:   {label:'Médio',   color:'var(--medio)'},
-    ALTO:    {label:'Alto',    color:'var(--alto)'},
+    BAIXO:   {label:'Baixa',   color:'var(--baixo)'},
+    MEDIO:   {label:'Média',   color:'var(--medio)'},
+    ALTO:    {label:'Alta',    color:'var(--alto)'},
     URGENTE: {label:'Urgente', color:'var(--urgente)'}
   };
   const CRITERIO_ORDER = ['URGENTE','ALTO','MEDIO','BAIXO'];
@@ -1337,15 +1807,66 @@
     'FINALIZADA':   {label:'Finalizada',   color:'var(--finalizada)'}
   };
 
+  const CATEGORIAS_PADRAO = [
+    { id: 'rotina',         nome: 'Rotina diária',      cor: '#9B8CF2' },
+    { id: 'chamados',       nome: 'Chamados técnicos',  cor: '#5B8DEF' },
+    { id: 'suporte',        nome: 'Suporte a usuários', cor: '#4FB0A5' },
+    { id: 'manutencao',     nome: 'Manutenção',         cor: '#E8823D' },
+    { id: 'projetos',       nome: 'Projetos',           cor: '#E8B84B' },
+    { id: 'reunioes',       nome: 'Reuniões',           cor: '#4CAF7D' },
+    { id: 'administrativo', nome: 'Administrativo',     cor: '#8B93A7' },
+    { id: 'outros',         nome: 'Outros',             cor: '#6B7385' }
+  ];
+
   function uid(){ return 'id' + Math.random().toString(36).slice(2, 10); }
   window.__uid = uid;
 
-  function todayStr(){
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  // ---------- data e hora no fuso configurado (padrão America/Sao_Paulo) ----------
+  // A virada do dia segue o fuso da configuração, não o relógio do aparelho.
+  const FUSO_PADRAO = 'America/Sao_Paulo';
+  function fuso(){ return (state.config && state.config.fuso) || FUSO_PADRAO; }
+  const _fmtFuso = {};
+  function partesFuso(d){
+    const tz = fuso();
+    if (!_fmtFuso[tz]){
+      try {
+        _fmtFuso[tz] = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+      } catch(e){
+        _fmtFuso[tz] = new Intl.DateTimeFormat('en-CA', { timeZone: FUSO_PADRAO, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' });
+      }
+    }
+    const o = {};
+    _fmtFuso[tz].formatToParts(d || new Date()).forEach(p => { o[p.type] = p.value; });
+    return { data: o.year + '-' + o.month + '-' + o.day, hora: (o.hour === '24' ? '00' : o.hour) + ':' + o.minute };
   }
+  function todayStr(){ return partesFuso().data; }
+  function agoraHM(){ return partesFuso().hora; }
+  function addDias(str, n){
+    const [y,m,d] = str.split('-').map(Number);
+    const dt = new Date(y, m-1, d + n);
+    return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+  }
+  window.__todayStr = todayStr;
+  window.__addDias = addDias;
+  function horaDoTs(iso){ return iso ? partesFuso(new Date(iso)).hora : ''; }
+  function minutos(hm){ if (!hm) return null; const [h,m] = hm.split(':').map(Number); return h*60 + m; }
+  function hmDeMinutos(t){ t = Math.max(0, Math.min(23*60+59, t)); return String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0'); }
+
+  function isDone(item){ return item.status === 'FINALIZADA'; }
+  function origemDe(item){ return item.rotinaId ? 'rotina' : (item.googleEventId ? 'google' : 'manual'); }
+
+  // atrasada = não concluída e (data ou prazo de entrega já passaram, ou o horário de hoje já passou).
+  // Compromissos do Google que já passaram não viram atraso.
   function isOverdue(item){
-    return item.prazo && item.prazo < todayStr() && item.status !== 'FINALIZADA';
+    if (isDone(item) || item.googleEventId) return false;
+    const hoje = todayStr();
+    if (item.prazo && item.prazo < hoje) return true;
+    if (item.prazoEntrega && item.prazoEntrega < hoje) return true;
+    if (item.prazo === hoje){
+      const lim = item.horaFim || item.horaInicio;
+      if (lim && lim < agoraHM()) return true;
+    }
+    return false;
   }
   function formatPrazo(p){
     const [y,m,d] = p.split('-');
@@ -1409,8 +1930,14 @@
   // gera a próxima ocorrência de uma pendência recorrente concluída, de volta em Atividades
   // (chamada sempre que um item vira FINALIZADA: também registra o dia da conclusão,
   // usado pela aba Hoje para mostrar o que foi concluído no dia)
+  // chamada sempre que um item vira FINALIZADA: registra dia e horário da conclusão.
+  // Itens da rotina não usam mais a "próxima ocorrência ao concluir": a rotina gera
+  // uma ocorrência nova por dia programado (ver gerarRotinasHoje). O código abaixo
+  // continua valendo só para algum item antigo que ainda tenha recorrência própria.
   function gerarProximaAtividade(item){
     item.concluidaEm = todayStr();
+    item.concluidaEmTs = new Date().toISOString();
+    delete item.naoRealizada;
     if (!item.recorrencia || item.recorrencia.tipo === 'nenhuma') return null;
     const hoje = todayStr();
     // ancora sempre no prazo original (preserva o dia da semana/mês combinado) e avança
@@ -1443,26 +1970,20 @@
 
   // move pra Pendências toda atividade cujo prazo já passou (dia seguinte à meia-noite).
   // idempotente: pode ser chamada várias vezes sem duplicar nada.
+  // Compromissos do Google não viram pendência: reunião que passou não é tarefa atrasada.
   function migrarVencidas(){
     const hoje = todayStr();
     let movidas = 0;
     for (let i = state.atividades.length - 1; i >= 0; i--){
       const a = state.atividades[i];
-      if (a.prazo && a.prazo < hoje){
+      if (a.prazo && a.prazo < hoje && !a.googleEventId){
         state.atividades.splice(i, 1);
-        state.pendencias.push({
-          id: a.id,
-          titulo: a.titulo,
-          descricao: a.descricao,
-          criterio: a.criterio,
-          status: 'NÃO INICIADO',
-          prazo: a.prazo,
+        state.pendencias.push(Object.assign({}, a, {
+          status: a.status === 'EM ANDAMENTO' ? 'EM ANDAMENTO' : 'NÃO INICIADO',
           checklist: a.checklist || [],
-          recorrencia: a.recorrencia || null,
-          googleEventId: a.googleEventId || null,
           ordem: nextOrdem(state.pendencias),
-          _ts: Date.now()
-        });
+          _ts: a._ts || Date.now()
+        }));
         movidas++;
       }
     }
@@ -1470,22 +1991,151 @@
   }
   window.__migrarVencidas = migrarVencidas;
 
-  // reagenda a checagem pra logo depois da próxima virada de dia, caso o app
-  // fique aberto passando da meia-noite sem nenhuma sincronização nova chegar.
-  let midnightTimer = null;
-  function scheduleMidnightCheck(){
-    clearTimeout(midnightTimer);
-    const now = new Date();
-    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 10);
-    midnightTimer = setTimeout(() => {
-      const movidas = migrarVencidas();
-      if (movidas > 0){
-        render();
-        persist(true);
-        showToast(movidas === 1 ? '1 atividade vencida foi para Pendências' : movidas + ' atividades vencidas foram para Pendências');
+  // ---------- rotina diária (atividades recorrentes) ----------
+  // Cada rotina é um modelo. Em cada dia programado o app cria UMA ocorrência com id
+  // fixo "rot_<rotina>_<data>": abrir o app várias vezes no mesmo dia (ou em dois
+  // aparelhos) nunca duplica, e concluir hoje não mexe nos outros dias.
+  function rotinaNoDia(r, dia){
+    if (!r || r.ativa === false) return false;
+    if (r.inicio && dia < r.inicio) return false;
+    const d = parseDateLocal(dia);
+    if (r.tipo === 'mensal'){
+      const ultimo = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      return d.getDate() === Math.min(r.diaMes || 1, ultimo);
+    }
+    return (r.dias || []).includes(d.getDay());
+  }
+  function idOcorrencia(rid, dia){ return 'rot_' + rid + '_' + dia; }
+  function findRotina(rid){ return state.rotinas.find(r => r.id === rid); }
+  function novaOcorrencia(r, dia){
+    return {
+      id: idOcorrencia(r.id, dia),
+      titulo: r.titulo,
+      descricao: r.descricao || '',
+      criterio: r.criterio || 'MEDIO',
+      categoria: r.categoria || '',
+      prazo: dia,
+      horaInicio: r.horaInicio || '',
+      horaFim: r.horaFim || '',
+      checklist: (r.checklist || []).map(t => ({ id: uid(), texto: t, feito: false })),
+      recorrencia: null,
+      rotinaId: r.id,
+      ocorrencia: dia,
+      ordem: nextOrdem(state.atividades),
+      _ts: Date.now()
+    };
+  }
+  function gerarRotinasHoje(){
+    const dia = todayStr();
+    let n = 0;
+    state.rotinas.forEach(r => {
+      if (!rotinaNoDia(r, dia)) return;
+      const id = idOcorrencia(r.id, dia);
+      if (findItem(id)) return; // já existe (pendente, concluída ou pulada)
+      state.atividades.push(novaOcorrencia(r, dia));
+      n++;
+    });
+    return n;
+  }
+
+  // Dados da versão anterior: itens com "Repetir" viram rotinas. A ocorrência atrasada
+  // ou de hoje é mantida (com o id novo); as futuras passam a ser geradas pela rotina.
+  // O histórico de concluídas fica como está.
+  function migrarRecorrenciasAntigas(){
+    const hoje = todayStr();
+    let n = 0;
+    const converter = (lista, ehPendencia) => {
+      for (let i = lista.length - 1; i >= 0; i--){
+        const it = lista[i];
+        const rec = it.recorrencia;
+        if (!rec || !rec.tipo || rec.tipo === 'nenhuma') continue;
+        if (ehPendencia && it.status === 'FINALIZADA'){ it.recorrencia = null; n++; continue; }
+        const rid = 'r' + String(it.id).replace(/[^A-Za-z0-9_-]/g, '');
+        if (!findRotina(rid)){
+          let dias = rec.tipo === 'diaria' ? [0,1,2,3,4,5,6] : (rec.dias || []).slice();
+          if (rec.tipo === 'semanal' && !dias.length) dias = [1,2,3,4,5];
+          state.rotinas.push({
+            id: rid, titulo: it.titulo, descricao: it.descricao || '', criterio: it.criterio || 'MEDIO',
+            categoria: 'rotina', tipo: rec.tipo === 'mensal' ? 'mensal' : 'semanal', dias,
+            diaMes: rec.dia || (it.prazo ? parseDateLocal(it.prazo).getDate() : 1),
+            horaInicio: '', horaFim: '', checklist: (it.checklist || []).map(c => c.texto),
+            ativa: true, inicio: (it.prazo && it.prazo < hoje) ? it.prazo : hoje, _ts: Date.now()
+          });
+        }
+        if (!it.prazo || it.prazo > hoje){
+          lista.splice(i, 1);
+        } else {
+          it.recorrencia = null;
+          it.rotinaId = rid;
+          it.ocorrencia = it.prazo;
+          it.id = idOcorrencia(rid, it.prazo);
+        }
+        n++;
       }
-      scheduleMidnightCheck();
-    }, Math.max(1000, next - now));
+    };
+    converter(state.atividades, false);
+    converter(state.pendencias, true);
+    return n;
+  }
+
+  // roda a cada carregamento vindo da nuvem e na virada do dia; tudo idempotente
+  function ajustarAoCarregar(){
+    let mudou = false;
+    let aviso = '';
+    if ((state.schema || 0) < 2){
+      const convertidas = migrarRecorrenciasAntigas();
+      if (!state.categorias.length) state.categorias = CATEGORIAS_PADRAO.map(c => Object.assign({}, c));
+      if (!state.config.fuso) state.config.fuso = FUSO_PADRAO;
+      state.schema = 2;
+      mudou = true;
+      if (convertidas) aviso = 'Suas atividades com "Repetir" viraram rotinas (aba Rotina diária)';
+    }
+    // pendência aberta do Google volta para Atividades (vinha da versão antiga)
+    for (let i = state.pendencias.length - 1; i >= 0; i--){
+      const p = state.pendencias[i];
+      if (p.googleEventId && !isDone(p)){
+        state.pendencias.splice(i, 1);
+        delete p.status;
+        state.atividades.push(p);
+        mudou = true;
+      }
+    }
+    const movidas = migrarVencidas();
+    const geradas = gerarRotinasHoje();
+    if (movidas || geradas) mudou = true;
+    if (!aviso && movidas) aviso = movidas === 1 ? '1 atividade vencida foi para Pendências' : movidas + ' atividades vencidas foram para Pendências';
+    state.diaAtual = todayStr();
+    return { mudou, aviso };
+  }
+  window.__ajustarAoCarregar = ajustarAoCarregar;
+
+  // Checa a cada 30 s se o dia virou (no fuso configurado). Também atualiza a tela a
+  // cada minuto, para o "agora" do cronograma e os atrasos por horário.
+  let midnightTimer = null;
+  let ultimoMinuto = '';
+  function scheduleMidnightCheck(){
+    clearInterval(midnightTimer);
+    midnightTimer = setInterval(verificarRelogio, 30000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verificarRelogio(); });
+  }
+  function verificarRelogio(){
+    if (!state.carregado) return;
+    const hoje = todayStr();
+    if (state.diaAtual && hoje !== state.diaAtual){
+      const anterior = state.diaAtual;
+      if (state.cronoDia === anterior) state.cronoDia = hoje;
+      const r = ajustarAoCarregar();
+      render();
+      if (r.mudou) persist(true);
+      showToast('Bom dia! A rotina de hoje já está na lista' + (r.aviso && r.aviso.indexOf('vencida') > -1 ? ' · ' + r.aviso : ''));
+      return;
+    }
+    const minuto = agoraHM();
+    if (minuto !== ultimoMinuto){
+      ultimoMinuto = minuto;
+      if (['hoje','cronograma'].includes(state.tab) && !document.querySelector('.overlay.open')) render();
+      else renderHeader();
+    }
   }
   window.__scheduleMidnightCheck = scheduleMidnightCheck;
 
@@ -1494,15 +2144,16 @@
   function getUnderlyingList(){ return state.tab === 'atividades' ? state.atividades : state.pendencias; }
 
   // ---------- tabs ----------
+  const TAB_IDS = { hoje:'tabHoje', cronograma:'tabCronograma', rotina:'tabRotina', proximos:'tabProximos', atividades:'tabAtividades', pendencias:'tabPendencias', finalizadas:'tabFinalizadas' };
+  const VIEW_IDS = { hoje:'todayView', cronograma:'schedView', rotina:'rotinaView', proximos:'proxView', finalizadas:'concView' };
   function setTab(tab){
+    if (!TAB_IDS[tab]) tab = 'hoje';
     state.tab = tab;
     lsSet('mt_tab', tab);
-    document.getElementById('tabHoje').classList.toggle('active', tab==='hoje');
-    document.getElementById('todayView').hidden = tab !== 'hoje';
-    document.getElementById('boardView').hidden = tab === 'hoje';
-    document.getElementById('tabAtividades').classList.toggle('active', tab==='atividades');
-    document.getElementById('tabPendencias').classList.toggle('active', tab==='pendencias');
-    document.getElementById('tabFinalizadas').classList.toggle('active', tab==='finalizadas');
+    Object.keys(TAB_IDS).forEach(t => document.getElementById(TAB_IDS[t]).classList.toggle('active', t === tab));
+    Object.keys(VIEW_IDS).forEach(t => { document.getElementById(VIEW_IDS[t]).hidden = t !== tab; });
+    // o quadro (estilo Trello) continua nas abas Atividades e Pendências
+    document.getElementById('boardView').hidden = !(tab === 'atividades' || tab === 'pendencias');
 
     const addBtn = document.getElementById('addBtn');
     if (tab === 'atividades'){ addBtn.textContent = '+ Nova Atividade'; addBtn.style.display = 'inline-block'; }
@@ -1516,6 +2167,8 @@
     document.getElementById('groupByGroup').style.display = (tab === 'pendencias') ? 'flex' : 'none';
 
     document.getElementById('criterioFilter').value = '';
+    if (tab !== 'hoje') state.todayStatus = 'todas';
+    if (tab !== 'finalizadas') state.filtroRotinaId = '';
     render();
   }
   window.setTab = setTab;
@@ -1559,10 +2212,10 @@
     if (state.tab === 'pendencias'){
       // agrupado por status, a coluna "Finalizada" também aparece, para arrastar até ela
       return currentGroupBy() === 'status'
-        ? state.pendencias.slice()
+        ? state.pendencias.filter(p => !p.naoRealizada)
         : state.pendencias.filter(p => p.status !== 'FINALIZADA');
     }
-    return state.pendencias.filter(p => p.status === 'FINALIZADA');
+    return state.pendencias.filter(p => p.status === 'FINALIZADA' && !p.naoRealizada);
   }
 
   function getColumns(){
@@ -1599,26 +2252,42 @@
 
   function render(){
     // uma sincronização que chega no meio de um arrasto espera o card ser solto
-    if (drag.active){ renderPending = true; return; }
+    if (drag.active || zdrag.active){ renderPending = true; return; }
     renderPending = false;
 
-    document.getElementById('countHoje').textContent = getTodayItems().filter(i => i.status !== 'FINALIZADA').length;
-    if (state.tab === 'hoje'){
-      document.getElementById('countAtividades').textContent = state.atividades.length;
-      document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
-      document.getElementById('countFinalizadas').textContent = state.pendencias.filter(p => p.status === 'FINALIZADA').length;
-      renderToday();
-      return;
-    }
+    renderHeader();
+    if (state.tab === 'hoje'){ renderToday(); return; }
+    if (state.tab === 'cronograma'){ renderCronograma(); return; }
+    if (state.tab === 'rotina'){ renderRotina(); return; }
+    if (state.tab === 'proximos'){ renderProximos(); return; }
+    if (state.tab === 'finalizadas'){ renderConcluidas(); return; }
+    renderBoard();
+  }
+  window.__render = render;
+  window.render = render;
 
+  // filtros comuns: busca (título, descrição, observações), prioridade, categoria e origem
+  function passaFiltros(i, f){
+    if (f.query){
+      const txt = ((i.titulo || '') + ' ' + (i.descricao || '') + ' ' + (i.observacoes || '')).toLowerCase();
+      if (!txt.includes(f.query)) return false;
+    }
+    if (f.criterio && i.criterio !== f.criterio) return false;
+    if (f.categoria === '__sem' && i.categoria) return false;
+    if (f.categoria && f.categoria !== '__sem' && i.categoria !== f.categoria) return false;
+    if (f.origem && origemDe(i) !== f.origem) return false;
+    return true;
+  }
+
+  function renderBoard(){
+    preencherSelectCategorias(document.getElementById('categoriaFilter'), 'filtro');
     const query = document.getElementById('searchInput').value.trim().toLowerCase();
     const sortMode = document.getElementById('sortSelect').value;
     const criterioFilter = document.getElementById('criterioFilter').value;
+    const categoriaFilter = document.getElementById('categoriaFilter').value;
+    const origemFilter = document.getElementById('origemFilter').value;
 
-    let items = getTabItems().filter(i =>
-      i.titulo.toLowerCase().includes(query) || (i.descricao || '').toLowerCase().includes(query)
-    );
-    if (criterioFilter) items = items.filter(i => i.criterio === criterioFilter);
+    let items = getTabItems().filter(i => passaFiltros(i, { query, criterio: criterioFilter, categoria: categoriaFilter, origem: origemFilter }));
     sortItems(items, sortMode);
 
     const groupBy = currentGroupBy();
@@ -1658,7 +2327,7 @@
     });
     board.scrollLeft = scrollLeft;
 
-    const noFilterActive = !query && !criterioFilter;
+    const noFilterActive = !query && !criterioFilter && !categoriaFilter && !origemFilter;
     const showEmpty = !noFilterActive && items.length === 0;
     document.getElementById('emptyState').style.display = showEmpty ? 'block' : 'none';
     document.getElementById('emptyTitle').textContent = 'Nenhum resultado';
@@ -1671,14 +2340,8 @@
           : 'Arraste os cards entre as colunas para mudar o critério, ou solte numa aba para mover o card para lá.')
         + ' No celular, segure o card por um instante antes de arrastar.';
 
-    document.getElementById('countAtividades').textContent = state.atividades.length;
-    document.getElementById('countPendencias').textContent = state.pendencias.filter(p => p.status !== 'FINALIZADA').length;
-    document.getElementById('countFinalizadas').textContent = state.pendencias.filter(p => p.status === 'FINALIZADA').length;
-
     renderStats();
   }
-  window.__render = render;
-  window.render = render;
 
   function escapeHTML(str){
     const d = document.createElement('div');
@@ -1703,17 +2366,18 @@
     card.dataset.id = item.id;
     card.tabIndex = 0;
     card.setAttribute('aria-label', item.titulo + ' — Enter para editar');
-    card.style.borderLeftColor = isOverdue(item) ? 'var(--atrasada)' : CRITERIO_META[item.criterio].color;
+    card.style.borderLeftColor = isOverdue(item) ? 'var(--atrasada)' : critMeta(item.criterio).color;
 
     // na separação por critério a própria coluna já diz o critério; o selo só aparece por status
     const criterioBadge = groupBy === 'status'
-      ? `<span class="badge" style="background:${CRITERIO_META[item.criterio].color}22; color:${CRITERIO_META[item.criterio].color}">${CRITERIO_META[item.criterio].label}</span>`
+      ? `<span class="badge" style="background:color-mix(in srgb, ${critMeta(item.criterio).color} 14%, transparent); color:${critMeta(item.criterio).color}">${critMeta(item.criterio).label}</span>`
       : '';
     const overdueBadge = isOverdue(item) ? `<span class="badge badge-atrasada">Atrasada</span>` : '';
     const prazoBadge = item.prazo ? `<span class="badge badge-prazo">${isOverdue(item) ? '⚠' : '📅'} ${formatPrazo(item.prazo)}</span>` : '';
     const recorrenciaLabel = formatRecorrencia(item.recorrencia);
     const recorrenciaBadge = recorrenciaLabel ? `<span class="badge badge-recorrente">🔁 ${recorrenciaLabel}</span>` : '';
-    const metaRow = criterioBadge + overdueBadge + prazoBadge + recorrenciaBadge;
+    const horaBadge = item.horaInicio ? `<span class="badge badge-prazo">🕘 ${item.horaInicio}${item.horaFim ? '–' + item.horaFim : ''}</span>` : '';
+    const metaRow = criterioBadge + overdueBadge + prazoBadge + horaBadge + recorrenciaBadge + chipsExtras(item, { semAtraso: true });
 
     let footerRight = '';
     if (isPendenciaTab() && item.status){
@@ -1745,7 +2409,8 @@
     card.innerHTML = `
       <div class="card-actions">
         <button class="icon-btn" title="Editar" onclick="openForm('${item.id}')">✎</button>
-        <button class="icon-btn" title="Excluir" onclick="deleteItem('${item.id}')">✕</button>
+        ${!isDone(item) ? `<button class="icon-btn" title="Reagendar" onclick="openReagendar('${item.id}')">📅</button>` : ''}
+        <button class="icon-btn" title="${rotuloExcluir(item)}" onclick="deleteItem('${item.id}')">✕</button>
       </div>
       <div class="card-title">${highlight(item.titulo, query)}</div>
       <div class="card-desc">${item.descricao ? highlight(item.descricao, query) : ''}</div>
@@ -2162,28 +2827,120 @@
 
   // ---------- status change ----------
   function changeStatus(id, newStatus){
-    const item = state.pendencias.find(p => p.id === id);
+    const item = findItem(id);
     if (!item) return;
-    const statusAnterior = item.status;
-    item.status = newStatus;
-    if (newStatus === 'FINALIZADA' && statusAnterior !== 'FINALIZADA'){
-      gerarProximaAtividade(item);
-    }
+    aplicarStatus(item, newStatus);
     render();
     persist();
-    if (newStatus !== 'FINALIZADA' || !item.recorrencia || item.recorrencia.tipo === 'nenhuma'){
-      showToast('Status atualizado');
-    }
+    showToast(newStatus === 'FINALIZADA' ? 'Concluída' : 'Status atualizado');
   }
   window.changeStatus = changeStatus;
 
+  // ---------- concluir / reabrir / iniciar ----------
+  // Concluir: a atividade vira pendência FINALIZADA com dia e horário da conclusão
+  // (é o histórico). Uma ocorrência da rotina só registra aquele dia.
+  function concluirItem(item){
+    if (!item || isDone(item)) return;
+    const ai = state.atividades.indexOf(item);
+    if (ai > -1){
+      state.atividades.splice(ai, 1);
+      item.daAtividade = true;
+      item.ordem = nextOrdem(state.pendencias);
+      state.pendencias.push(item);
+    }
+    item.status = 'FINALIZADA';
+    gerarProximaAtividade(item);
+  }
+
+  function reabrirItem(item, statusNovo){
+    if (!item) return;
+    // desfaz a próxima ocorrência criada pela recorrência antiga, para não duplicar
+    if (item.proximaId){
+      state.atividades = state.atividades.filter(i => i.id !== item.proximaId);
+      item.proximaId = null;
+    }
+    item.concluidaEm = null;
+    item.concluidaEmTs = null;
+    delete item.naoRealizada;
+    const hoje = todayStr();
+    const pi = state.pendencias.indexOf(item);
+    const voltaParaAtividades = pi > -1 && (
+      (item.daAtividade && (!item.prazo || item.prazo >= hoje)) ||
+      ((item.rotinaId || item.googleEventId) && item.prazo && item.prazo >= hoje)
+    );
+    if (voltaParaAtividades){
+      state.pendencias.splice(pi, 1);
+      delete item.daAtividade;
+      item.ordem = nextOrdem(state.atividades);
+      state.atividades.push(item);
+      if (statusNovo === 'EM ANDAMENTO') item.status = 'EM ANDAMENTO'; else delete item.status;
+    } else if (pi > -1){
+      item.status = statusNovo || 'NÃO INICIADO';
+      item.daAtividade = false;
+    } else {
+      if (statusNovo === 'EM ANDAMENTO') item.status = 'EM ANDAMENTO'; else delete item.status;
+    }
+  }
+
+  function aplicarStatus(item, novo){
+    const anterior = item.status || 'NÃO INICIADO';
+    if (novo === anterior) return;
+    if (novo === 'FINALIZADA'){ concluirItem(item); return; }
+    if (anterior === 'FINALIZADA'){ reabrirItem(item, novo); return; }
+    if (novo === 'EM ANDAMENTO' && !item.iniciadaEm) item.iniciadaEm = new Date().toISOString();
+    if (state.pendencias.includes(item)) item.status = novo;
+    else if (novo === 'NÃO INICIADO') delete item.status;
+    else item.status = novo;
+  }
+
+  function iniciarItem(id){
+    const item = findItem(id);
+    if (!item || isDone(item)) return;
+    const andamento = item.status === 'EM ANDAMENTO';
+    aplicarStatus(item, andamento ? 'NÃO INICIADO' : 'EM ANDAMENTO');
+    render();
+    persist(true);
+    showToast(andamento ? 'Voltou para pendente' : 'Em andamento: ' + item.titulo);
+  }
+  window.iniciarItem = iniciarItem;
+
+  function mudarPrioridade(id){
+    const item = findItem(id);
+    if (!item) return;
+    const i = CRITERIO_ORDER.indexOf(item.criterio);
+    item.criterio = CRITERIO_ORDER[(i + 1) % CRITERIO_ORDER.length];
+    render();
+    persist();
+    showToast('Prioridade: ' + critMeta(item.criterio).label);
+  }
+  window.mudarPrioridade = mudarPrioridade;
+
   // ---------- delete with undo ----------
+  // Ocorrência da rotina e compromisso do Google não são apagados (voltariam na próxima
+  // geração/sincronização): ficam registrados como "não realizado" e saem das listas.
+  function rotuloExcluir(item){
+    if (item.rotinaId && !isDone(item)) return 'Pular (não realizar neste dia)';
+    if (item.googleEventId) return 'Ocultar este compromisso';
+    return 'Excluir';
+  }
   let lastDeleted = null;
   function deleteItem(id){
+    const item = findItem(id);
+    if (!item) return;
+    if (item.rotinaId || item.googleEventId){
+      if (item.naoRealizada) return;
+      if (item.rotinaId && isDone(item)){ showToast('Reabra a ocorrência antes de pulá-la'); return; }
+      concluirItem(item);
+      item.naoRealizada = true;
+      render();
+      persist();
+      showToast(item.rotinaId ? 'Pulada neste dia (fica no histórico como não realizada)' : 'Compromisso ocultado', 'Desfazer', () => { reabrirItem(item); render(); persist(); });
+      return;
+    }
     const list = state.atividades.some(i => i.id === id) ? state.atividades : state.pendencias;
     const idx = list.findIndex(i => i.id === id);
     if (idx === -1) return;
-    lastDeleted = { list, item: list[idx], index: idx };
+    lastDeleted = { emPendencias: list === state.pendencias, item: list[idx], index: idx };
     list.splice(idx, 1);
     render();
     showToast('Item removido', 'Desfazer', undoDelete);
@@ -2193,26 +2950,135 @@
 
   function undoDelete(){
     if (!lastDeleted) return;
-    lastDeleted.list.splice(lastDeleted.index, 0, lastDeleted.item);
+    // usa a lista atual (uma sincronização pode ter trocado o array enquanto o aviso estava na tela)
+    const list = lastDeleted.emPendencias ? state.pendencias : state.atividades;
+    if (!findItem(lastDeleted.item.id)) list.splice(Math.min(lastDeleted.index, list.length), 0, lastDeleted.item);
     lastDeleted = null;
     render();
     persist();
     showToast('Restaurado');
   }
 
+  // ---------- reagendar / adiar ----------
+  function reagendarItem(item, data, ini, fim){
+    if (item.googleEventId){ showToast('Compromissos do Google são remarcados no próprio Google Agenda'); return false; }
+    if (item.prazo !== data) item.reagendamentos = (item.reagendamentos || 0) + 1;
+    item.prazo = data;
+    item.horaInicio = ini || '';
+    item.horaFim = fim || '';
+    const pi = state.pendencias.indexOf(item);
+    if (pi > -1 && !isDone(item) && data && data >= todayStr()){
+      state.pendencias.splice(pi, 1);
+      if (item.status !== 'EM ANDAMENTO') delete item.status;
+      item.ordem = nextOrdem(state.atividades);
+      state.atividades.push(item);
+    }
+    migrarVencidas();
+    return true;
+  }
+
+  function adiarItem(id){
+    const item = findItem(id);
+    if (!item) return;
+    const amanha = addDias(todayStr(), 1);
+    if (reagendarItem(item, amanha, item.horaInicio, item.horaFim)){
+      render();
+      persist(true);
+      showToast('Adiada para amanhã (' + formatPrazo(amanha) + ')');
+    }
+  }
+  window.adiarItem = adiarItem;
+
+  function openReagendar(id){
+    const item = findItem(id);
+    if (!item) return;
+    if (item.googleEventId){ showToast('Compromissos do Google são remarcados no próprio Google Agenda'); return; }
+    state.reagId = id;
+    const hoje = todayStr();
+    document.getElementById('reagSub').textContent = item.titulo + (item.prazo ? ' — hoje marcada para ' + formatPrazo(item.prazo) : ' — sem data');
+    document.getElementById('reagData').value = item.prazo && item.prazo >= hoje ? item.prazo : hoje;
+    document.getElementById('reagIni').value = item.horaInicio || '';
+    document.getElementById('reagFim').value = item.horaFim || '';
+    let util = addDias(hoje, 1);
+    while ([0,6].includes(parseDateLocal(util).getDay())) util = addDias(util, 1);
+    const rapidos = [['Hoje', hoje], ['Amanhã', addDias(hoje, 1)], ['Próx. dia útil', util], ['+7 dias', addDias(hoje, 7)]];
+    document.getElementById('reagRapidos').innerHTML = rapidos.map(([l, d]) =>
+      `<button type="button" class="btn btn-sm" onclick="document.getElementById('reagData').value='${d}'">${l} · ${formatPrazo(d).slice(0,5)}</button>`).join('');
+    document.getElementById('reagOverlay').classList.add('open');
+    document.getElementById('reagData').focus();
+  }
+  window.openReagendar = openReagendar;
+  function closeReagendar(){ document.getElementById('reagOverlay').classList.remove('open'); state.reagId = null; }
+  window.closeReagendar = closeReagendar;
+  function confirmarReagendar(){
+    const item = findItem(state.reagId);
+    const data = document.getElementById('reagData').value;
+    if (!item){ closeReagendar(); return; }
+    if (!data){ showToast('Escolha a nova data'); return; }
+    const ini = document.getElementById('reagIni').value, fim = document.getElementById('reagFim').value;
+    if (ini && fim && fim < ini){ showToast('O término não pode ser antes do início'); return; }
+    if (reagendarItem(item, data, ini, fim)){
+      closeReagendar();
+      render();
+      persist(true);
+      showToast('Reagendada para ' + formatPrazo(data) + (ini ? ' às ' + ini : ''));
+    }
+  }
+  window.confirmarReagendar = confirmarReagendar;
+
+  // ---------- categorias ----------
+  function categoriaDe(id){ return id ? (state.categorias.find(c => c.id === id) || null) : null; }
+  function preencherSelectCategorias(sel, modo){
+    if (!sel) return;
+    const atual = sel.value;
+    let html = modo === 'filtro'
+      ? '<option value="">Categoria: todas</option><option value="__sem">Sem categoria</option>'
+      : '<option value="">Sem categoria</option>';
+    html += state.categorias.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.nome)}</option>`).join('');
+    if (sel.dataset.html !== html){ sel.innerHTML = html; sel.dataset.html = html; }
+    if ([...sel.options].some(o => o.value === atual)) sel.value = atual;
+  }
+  function critMeta(c){ return CRITERIO_META[c] || CRITERIO_META.MEDIO; }
+
+  // selos de categoria, origem, andamento, prazo de entrega e checklist (usados em todas as listas)
+  function chipsExtras(item, opts){
+    opts = opts || {};
+    let h = '';
+    const cat = categoriaDe(item.categoria);
+    if (cat) h += `<span class="chip" style="--c:${escapeHTML(cat.cor)}">${escapeHTML(cat.nome)}</span>`;
+    if (item.rotinaId) h += `<span class="chip chip-rec" title="Ocorrência da rotina">🔁 Rotina</span>`;
+    if (item.googleEventId) h += `<span class="chip chip-google" title="Importado do Google Agenda">📅 ${escapeHTML(item.googleCalendarNome || 'Google')}</span>`;
+    if (item.status === 'EM ANDAMENTO') h += `<span class="chip chip-doing">▶ Em andamento</span>`;
+    if (item.prazoEntrega) h += `<span class="chip ${!isDone(item) && item.prazoEntrega < todayStr() ? 'chip-late' : 'chip-plain'}">Entrega ${formatPrazo(item.prazoEntrega).slice(0,5)}</span>`;
+    if (item.googleLocal) h += `<span class="chip chip-plain">📍 ${escapeHTML(item.googleLocal.slice(0, 40))}</span>`;
+    if (item.observacoes) h += `<span class="chip chip-plain" title="${escapeHTML(item.observacoes)}">📝 obs.</span>`;
+    if (item.naoRealizada) h += `<span class="chip chip-late">Não realizada</span>`;
+    return h;
+  }
+
   // ---------- form ----------
   let formDias = new Set();
+  state.formModo = 'item';
+  state.formCk = [];
 
   function toggleDia(dia, btnEl){
     if (formDias.has(dia)){ formDias.delete(dia); btnEl.classList.remove('active'); }
     else { formDias.add(dia); btnEl.classList.add('active'); }
   }
   window.toggleDia = toggleDia;
+  function setDiasUteis(){
+    formDias = new Set([1,2,3,4,5]);
+    document.querySelectorAll('#diasPicker .dia-chip').forEach(btn => btn.classList.toggle('active', formDias.has(Number(btn.dataset.dia))));
+  }
+  window.setDiasUteis = setDiasUteis;
 
   function onRecTipoChange(){
     const tipo = document.getElementById('fRecorrenciaTipo').value;
     document.getElementById('recDiasField').style.display = tipo === 'semanal' ? 'block' : 'none';
     document.getElementById('recHint').style.display = tipo === 'nenhuma' ? 'none' : 'block';
+    if (state.formModo !== 'rotina'){
+      document.getElementById('fPrazoLabel').textContent = tipo === 'nenhuma' ? 'Data' : 'Começa em';
+    }
   }
   window.onRecTipoChange = onRecTipoChange;
 
@@ -2225,33 +3091,111 @@
     onRecTipoChange();
   }
 
-  function openForm(id){
+  // checklist dentro do formulário
+  function renderFormCk(){
+    document.getElementById('formChecklist').innerHTML = state.formCk.map((c, i) => `
+      <div class="checklist-item">
+        <input type="checkbox" ${c.feito ? 'checked' : ''} ${state.formModo === 'rotina' ? 'disabled' : ''} onchange="formCkToggle(${i})">
+        <span class="txt ${c.feito ? 'done' : ''}">${escapeHTML(c.texto)}</span>
+        <button class="rm" type="button" onclick="formCkRemove(${i})" title="Remover">✕</button>
+      </div>`).join('');
+  }
+  function formCkAdd(){
+    const inp = document.getElementById('formCkNovo');
+    const t = inp.value.trim();
+    if (!t) return;
+    state.formCk.push({ id: uid(), texto: t, feito: false });
+    inp.value = '';
+    renderFormCk();
+  }
+  window.formCkAdd = formCkAdd;
+  window.formCkToggle = i => { state.formCk[i].feito = !state.formCk[i].feito; renderFormCk(); };
+  window.formCkRemove = i => { state.formCk.splice(i, 1); renderFormCk(); };
+
+  function setFormBase(o){
+    preencherSelectCategorias(document.getElementById('fCategoria'), 'form');
+    document.getElementById('fTitulo').value = o.titulo || '';
+    document.getElementById('fDescricao').value = o.descricao || '';
+    document.getElementById('fCriterio').value = CRITERIO_META[o.criterio] ? o.criterio : 'MEDIO';
+    document.getElementById('fCategoria').value = o.categoria || '';
+    document.getElementById('fPrazo').value = o.prazo || '';
+    document.getElementById('fHoraIni').value = o.horaInicio || '';
+    document.getElementById('fHoraFim').value = o.horaFim || '';
+    document.getElementById('fPrazoEntrega').value = o.prazoEntrega || '';
+    document.getElementById('fObs').value = o.observacoes || '';
+    ['fTitulo','fDescricao','fPrazo','fHoraIni','fHoraFim'].forEach(idc => { document.getElementById(idc).disabled = !!o.bloquearGoogle; });
+    state.formCk = (o.checklist || []).map(c => typeof c === 'string' ? { id: uid(), texto: c, feito: false } : Object.assign({}, c));
+    renderFormCk();
+    const temDetalhe = !!(o.descricao || o.observacoes || o.prazoEntrega || (o.checklist && o.checklist.length));
+    document.getElementById('formMais').open = temDetalhe;
+  }
+  function setInfo(html){
+    const box = document.getElementById('formInfo');
+    box.innerHTML = html || '';
+    box.hidden = !html;
+  }
+  function mostrarCampos(m){
+    document.getElementById('statusField').style.display = m.status ? 'block' : 'none';
+    document.getElementById('entregaField').style.display = m.entrega ? 'block' : 'none';
+    document.getElementById('obsField').style.display = m.obs ? 'block' : 'none';
+    document.getElementById('recTipoField').style.display = m.repetir ? 'block' : 'none';
+    document.querySelector('#fRecorrenciaTipo option[value="nenhuma"]').hidden = !!m.soRotina;
+    document.getElementById('formExcluir').hidden = !m.excluir;
+    if (m.excluir) document.getElementById('formExcluir').textContent = m.excluir;
+    if (!m.repetir){ document.getElementById('recDiasField').style.display = 'none'; document.getElementById('recHint').style.display = 'none'; }
+  }
+
+  function openForm(id, preset){
+    if (typeof id !== 'string') id = null;
+    state.formModo = 'item';
+    state.editingRotinaId = null;
     state.editingId = id || null;
     const editItem = id ? findItem(id) : null;
     if (id && !editItem) return;
-    const isPendencia = editItem ? state.pendencias.includes(editItem) : isPendenciaTab();
+    const isPendencia = editItem ? state.pendencias.includes(editItem) : state.tab === 'pendencias';
     state.editingIsPendencia = isPendencia;
-    document.getElementById('statusField').style.display = isPendencia ? 'block' : 'none';
+    document.getElementById('fPrazoLabel').textContent = 'Data';
 
     if (id){
       const item = editItem;
-      document.getElementById('modalTitle').textContent = isPendencia ? 'Editar Pendência' : 'Editar Atividade';
-      document.getElementById('fTitulo').value = item.titulo;
-      document.getElementById('fDescricao').value = item.descricao;
-      document.getElementById('fCriterio').value = item.criterio;
-      document.getElementById('fPrazo').value = item.prazo || '';
-      if (isPendencia) document.getElementById('fStatus').value = item.status;
-      setRecorrenciaForm(item.recorrencia);
-    } else {
-      document.getElementById('modalTitle').textContent = isPendencia ? 'Nova Pendência' : 'Nova Atividade';
-      document.getElementById('fTitulo').value = '';
-      document.getElementById('fDescricao').value = '';
-      const preset = state.formPreset || {};
-      document.getElementById('fCriterio').value = preset.criterio || 'BAIXO';
-      document.getElementById('fPrazo').value = '';
-      document.getElementById('fStatus').value = preset.status || 'NÃO INICIADO';
-      state.formPreset = null;
+      const google = !!item.googleEventId;
+      document.getElementById('modalTitle').textContent = google ? 'Compromisso do Google Agenda' : (item.rotinaId ? 'Ocorrência da rotina' : (isPendencia ? 'Editar Pendência' : 'Editar Atividade'));
+      setFormBase(Object.assign({}, item, { bloquearGoogle: google }));
+      document.getElementById('fStatus').value = item.status || 'NÃO INICIADO';
       setRecorrenciaForm(null);
+      mostrarCampos({ status: true, entrega: true, obs: true, repetir: false, excluir: rotuloExcluir(item) });
+      if (google){
+        setInfo('Vem do calendário <b>' + escapeHTML(item.googleCalendarNome || 'Google') + '</b>. Título, data, horário e descrição são atualizados a cada sincronização; aqui você ajusta prioridade, categoria, status, observações e checklist.'
+          + (item.googleLink ? ' <a href="' + escapeHTML(item.googleLink) + '" target="_blank" rel="noopener">Abrir no Google Agenda ↗</a>' : ''));
+      } else if (item.rotinaId){
+        const r = findRotina(item.rotinaId);
+        setInfo('Ocorrência de <b>' + formatPrazo(item.ocorrencia || item.prazo) + '</b> da rotina "' + escapeHTML(r ? r.titulo : item.titulo) + '". O que mudar aqui vale só para este dia.'
+          + (r ? ' <a href="#" onclick="event.preventDefault(); closeForm(); openRotina(\'' + r.id + '\')">Editar a rotina</a>' : ''));
+      } else {
+        setInfo('');
+      }
+      const h = [];
+      if (item._ts) h.push('Criada em ' + formatTs(new Date(item._ts).toISOString()));
+      if (item.iniciadaEm) h.push('Iniciada em ' + formatTs(item.iniciadaEm));
+      if (item.reagendamentos) h.push('Reagendada ' + item.reagendamentos + (item.reagendamentos === 1 ? ' vez' : ' vezes'));
+      if (item.naoRealizada) h.push('Marcada como não realizada em ' + formatPrazo(item.concluidaEm));
+      else if (item.concluidaEmTs) h.push('Concluída em ' + formatTs(item.concluidaEmTs));
+      else if (item.concluidaEm) h.push('Concluída em ' + formatPrazo(item.concluidaEm));
+      document.getElementById('formHist').innerHTML = h.map(escapeHTML).join('<br>');
+      document.getElementById('histField').hidden = !h.length;
+    } else {
+      const p = Object.assign({}, state.formPreset || {}, preset || {});
+      state.formPreset = null;
+      const dataPadrao = p.prazo !== undefined ? p.prazo
+        : (state.tab === 'cronograma' ? (state.cronoDia || todayStr())
+        : (['atividades','pendencias'].includes(state.tab) ? '' : todayStr()));
+      document.getElementById('modalTitle').textContent = isPendencia ? 'Nova Pendência' : 'Nova Atividade';
+      setFormBase({ criterio: p.criterio || 'MEDIO', prazo: dataPadrao, horaInicio: p.horaInicio || '', categoria: p.categoria || '' });
+      document.getElementById('fStatus').value = p.status || 'NÃO INICIADO';
+      setRecorrenciaForm(null);
+      mostrarCampos({ status: true, entrega: true, obs: true, repetir: true, excluir: '' });
+      setInfo('');
+      document.getElementById('histField').hidden = true;
     }
 
     document.getElementById('overlay').classList.add('open');
@@ -2259,11 +3203,44 @@
   }
   window.openForm = openForm;
 
+  function openRotina(rid){
+    const r = rid ? findRotina(rid) : null;
+    state.formModo = 'rotina';
+    state.editingRotinaId = r ? r.id : null;
+    state.editingId = null;
+    document.getElementById('modalTitle').textContent = r ? 'Editar rotina' : 'Nova rotina';
+    document.getElementById('fPrazoLabel').textContent = 'Começa em';
+    setFormBase(r ? { titulo: r.titulo, descricao: r.descricao, criterio: r.criterio, categoria: r.categoria, prazo: r.inicio, horaInicio: r.horaInicio, horaFim: r.horaFim, checklist: r.checklist || [] }
+                  : { criterio: 'MEDIO', categoria: categoriaDe('rotina') ? 'rotina' : '', prazo: todayStr() });
+    mostrarCampos({ status: false, entrega: false, obs: false, repetir: true, soRotina: true, excluir: r ? 'Excluir rotina' : '' });
+    setRecorrenciaForm(r ? { tipo: r.tipo === 'mensal' ? 'mensal' : (r.dias && r.dias.length === 7 ? 'diaria' : 'semanal'), dias: r.dias } : { tipo: 'semanal', dias: [1,2,3,4,5] });
+    setInfo('Uma rotina cria sozinha uma atividade pendente em cada dia programado. Concluir num dia não afeta os outros, e cada execução fica no histórico.');
+    document.getElementById('histField').hidden = true;
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('fTitulo').focus();
+  }
+  window.openRotina = openRotina;
+
   function closeForm(){
     document.getElementById('overlay').classList.remove('open');
     state.editingId = null;
+    state.editingRotinaId = null;
+    state.formModo = 'item';
   }
   window.closeForm = closeForm;
+
+  function excluirDoForm(){
+    if (state.formModo === 'rotina'){
+      const rid = state.editingRotinaId;
+      closeForm();
+      if (rid) excluirRotina(rid);
+      return;
+    }
+    const id = state.editingId;
+    closeForm();
+    if (id) deleteItem(id);
+  }
+  window.excluirDoForm = excluirDoForm;
 
   function buildRecorrenciaFromForm(){
     const tipo = document.getElementById('fRecorrenciaTipo').value;
@@ -2284,44 +3261,106 @@
     return { tipo }; // diaria
   }
 
-  function saveForm(){
+  function lerFormBase(){
     const titulo = document.getElementById('fTitulo').value.trim();
-    if (!titulo){ document.getElementById('fTitulo').focus(); return; }
-    const descricao = document.getElementById('fDescricao').value.trim();
-    const criterio = document.getElementById('fCriterio').value;
-    const prazo = document.getElementById('fPrazo').value;
-    const isPendencia = !!state.editingIsPendencia;
-    const status = document.getElementById('fStatus').value;
+    if (!titulo){ document.getElementById('fTitulo').focus(); showToast('Informe o título'); return null; }
+    const horaInicio = document.getElementById('fHoraIni').value;
+    const horaFim = document.getElementById('fHoraFim').value;
+    if (horaInicio && horaFim && horaFim < horaInicio){ showToast('O término não pode ser antes do início'); return null; }
+    return {
+      titulo,
+      descricao: document.getElementById('fDescricao').value.trim(),
+      criterio: document.getElementById('fCriterio').value,
+      categoria: document.getElementById('fCategoria').value,
+      prazo: document.getElementById('fPrazo').value,
+      horaInicio, horaFim,
+      prazoEntrega: document.getElementById('fPrazoEntrega').value,
+      observacoes: document.getElementById('fObs').value.trim(),
+      checklist: state.formCk.map(c => ({ id: c.id || uid(), texto: c.texto, feito: !!c.feito }))
+    };
+  }
 
-    const recorrencia = buildRecorrenciaFromForm();
-    if (recorrencia && recorrencia.__invalido){
-      showToast(recorrencia.motivo === 'prazo' ? 'Defina um prazo para calcular a recorrência mensal' : 'Selecione ao menos um dia da semana');
+  function salvarRotinaDoForm(dados){
+    const rec = buildRecorrenciaFromForm();
+    if (!rec){ showToast('Escolha em quais dias a rotina se repete'); return false; }
+    if (rec.__invalido){
+      showToast(rec.motivo === 'prazo' ? 'Defina a data de início para a rotina mensal' : 'Selecione ao menos um dia da semana');
+      return false;
+    }
+    const hoje = todayStr();
+    const campos = {
+      titulo: dados.titulo, descricao: dados.descricao, criterio: dados.criterio, categoria: dados.categoria,
+      horaInicio: dados.horaInicio, horaFim: dados.horaFim,
+      checklist: dados.checklist.map(c => c.texto),
+      tipo: rec.tipo === 'mensal' ? 'mensal' : 'semanal',
+      dias: rec.tipo === 'diaria' ? [0,1,2,3,4,5,6] : (rec.dias || []),
+      diaMes: rec.tipo === 'mensal' ? rec.dia : null,
+      inicio: dados.prazo || hoje
+    };
+    let r = state.editingRotinaId ? findRotina(state.editingRotinaId) : null;
+    if (r){
+      Object.assign(r, campos);
+      // a ocorrência de hoje, se ainda pendente, acompanha a edição
+      const occ = findItem(idOcorrencia(r.id, hoje));
+      if (occ && !isDone(occ)){
+        Object.assign(occ, { titulo: r.titulo, descricao: r.descricao, criterio: r.criterio, categoria: r.categoria, horaInicio: r.horaInicio, horaFim: r.horaFim });
+        if (!(occ.checklist || []).some(c => c.feito)) occ.checklist = (r.checklist || []).map(t => ({ id: uid(), texto: t, feito: false }));
+        if (!rotinaNoDia(r, hoje)) { deleteItem(occ.id); }
+      }
+    } else {
+      r = Object.assign({ id: 'r' + uid().slice(2) + Date.now().toString(36), ativa: true, _ts: Date.now() }, campos);
+      state.rotinas.push(r);
+    }
+    gerarRotinasHoje();
+    return r;
+  }
+
+  function saveForm(){
+    const dados = lerFormBase();
+    if (!dados) return;
+
+    if (state.formModo === 'rotina'){
+      const nova = !state.editingRotinaId;
+      const r = salvarRotinaDoForm(dados);
+      if (!r) return;
+      closeForm(); render(); persist(true);
+      showToast(nova ? 'Rotina criada — aparece sozinha nos dias programados' : 'Rotina atualizada');
       return;
     }
 
-    const list = isPendencia ? state.pendencias : state.atividades;
+    const status = document.getElementById('fStatus').value;
 
     if (state.editingId){
-      const item = list.find(i => i.id === state.editingId);
+      const item = findItem(state.editingId);
       if (!item){ closeForm(); return; }
-      const statusAnterior = item.status;
-      item.titulo = titulo; item.descricao = descricao; item.criterio = criterio; item.prazo = prazo;
-      item.recorrencia = recorrencia;
-      if (isPendencia){
-        item.status = status;
-        if (status === 'FINALIZADA' && statusAnterior !== 'FINALIZADA') gerarProximaAtividade(item);
+      if (item.googleEventId){
+        // título, data e horário pertencem ao Google
+        Object.assign(item, { criterio: dados.criterio, categoria: dados.categoria, prazoEntrega: dados.prazoEntrega, observacoes: dados.observacoes, checklist: dados.checklist });
+      } else {
+        Object.assign(item, dados);
+      }
+      aplicarStatus(item, status);
+      if (!isDone(item) && state.pendencias.includes(item) && item.prazo && item.prazo >= todayStr()){
+        reagendarItem(item, item.prazo, item.horaInicio, item.horaFim);
       }
     } else {
-      const novo = { id: uid(), titulo, descricao, criterio, prazo, _ts: Date.now(), checklist: [], recorrencia, ordem: nextOrdem(list) };
-      if (isPendencia){
-        novo.status = status;
-        list.push(novo);
-        if (status === 'FINALIZADA') gerarProximaAtividade(novo);
-      } else {
-        list.push(novo);
+      const rec = buildRecorrenciaFromForm();
+      if (rec){
+        const r = salvarRotinaDoForm(dados);
+        if (!r) return;
+        closeForm(); render(); persist(true);
+        showToast('Rotina criada — aparece sozinha nos dias programados (aba Rotina diária)');
+        return;
       }
+      const isPendencia = !!state.editingIsPendencia;
+      const list = isPendencia ? state.pendencias : state.atividades;
+      const novo = Object.assign({ id: uid(), _ts: Date.now(), recorrencia: null, ordem: nextOrdem(list) }, dados);
+      if (isPendencia) novo.status = 'NÃO INICIADO';
+      list.push(novo);
+      if (status !== 'NÃO INICIADO') aplicarStatus(novo, status);
     }
 
+    migrarVencidas();
     closeForm();
     render();
     persist(true);
@@ -2329,11 +3368,50 @@
   }
   window.saveForm = saveForm;
 
+  // ---------- rotinas: pausar, excluir ----------
+  function alternarRotina(rid){
+    const r = findRotina(rid);
+    if (!r) return;
+    r.ativa = r.ativa === false;
+    if (r.ativa) gerarRotinasHoje();
+    render();
+    persist(true);
+    showToast(r.ativa ? 'Rotina reativada' : 'Rotina pausada — não gera novas ocorrências');
+  }
+  window.alternarRotina = alternarRotina;
+
+  function excluirRotina(rid){
+    const r = findRotina(rid);
+    if (!r) return;
+    if (!confirm('Excluir a rotina "' + r.titulo + '"?\n\nEla deixa de aparecer nos próximos dias. O histórico das execuções continua guardado.')) return;
+    state.rotinas = state.rotinas.filter(x => x.id !== rid);
+    const occ = findItem(idOcorrencia(rid, todayStr()));
+    if (occ && !isDone(occ)) state.atividades = state.atividades.filter(i => i !== occ);
+    render();
+    persist(true);
+    showToast('Rotina excluída');
+  }
+  window.excluirRotina = excluirRotina;
+
+  function formatTs(iso){
+    const p = partesFuso(new Date(iso));
+    return formatPrazo(p.data) + ' às ' + p.hora;
+  }
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape'){
       if (drag.active){ cancelDrag(); return; }
+      if (zdrag.active){ zCancel(); return; }
       closeForm();
-      closeImportAgenda();
+      closeReagendar();
+      closeConfig();
+      return;
+    }
+    const tag = (e.target.tagName || '').toLowerCase();
+    if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey && !e.altKey
+        && !['input','textarea','select'].includes(tag) && !document.querySelector('.overlay.open') && state.carregado){
+      e.preventDefault();
+      openForm();
     }
   });
 
@@ -2341,139 +3419,445 @@
     if (window.__saveToCloud) window.__saveToCloud(immediate);
   }
 
-  // ---------- importar da Google Agenda ----------
-  // Cole aqui o Client ID OAuth (tipo "Aplicativo da Web") criado no Google Cloud Console,
-  // com a Google Calendar API habilitada e a origem https://lucasgomes-droid.github.io
-  // cadastrada em "Origens JavaScript autorizadas". Veja o passo a passo enviado junto.
-  const GOOGLE_CLIENT_ID = 'COLE_AQUI_SEU_CLIENT_ID.apps.googleusercontent.com';
+  // ---------- Google Agenda (sincronização real via Google Calendar API) ----------
+  // Autenticação: Google Identity Services (OAuth 2.0, fluxo de token no navegador).
+  // O token de acesso fica só na memória desta aba (dura ~1 h) — nunca é salvo no
+  // Firestore nem no navegador. O Client ID é público por natureza e fica nas Configurações.
+  // Permissão pedida: somente leitura da agenda.
   const GOOGLE_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+  const G = { client: null, clientIdUsado: '', token: null, expira: 0, calendarios: null, sincronizando: false, erro: '', ultimaLocal: 0 };
 
-  let googleTokenClient = null;
-  let googleAccessToken = null;
+  function googleClientId(){ return ((state.google && state.google.clientId) || '').trim(); }
+  function gTokenOk(){ return !!G.token && Date.now() < G.expira - 60000; }
 
-  function initGoogleTokenClient(){
-    if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) return null;
-    if (googleTokenClient) return googleTokenClient;
-    googleTokenClient = window.google.accounts.oauth2.initTokenClient({
-      client_id: GOOGLE_CLIENT_ID,
-      scope: GOOGLE_SCOPE,
-      callback: '' // definido a cada chamada, em confirmarImportarAgenda
-    });
-    return googleTokenClient;
-  }
-
-  function openImportAgenda(){
-    const hoje = todayStr();
-    const em30 = new Date(); em30.setDate(em30.getDate() + 30);
-    document.getElementById('fImportDe').value = hoje;
-    document.getElementById('fImportAte').value = dateToStr(em30);
-    document.getElementById('importOverlay').classList.add('open');
-  }
-  window.openImportAgenda = openImportAgenda;
-
-  function closeImportAgenda(){
-    document.getElementById('importOverlay').classList.remove('open');
-  }
-  window.closeImportAgenda = closeImportAgenda;
-
-  function confirmarImportarAgenda(){
-    const de = document.getElementById('fImportDe').value;
-    const ate = document.getElementById('fImportAte').value;
-    if (!de || !ate){ showToast('Defina o período'); return; }
-    if (de > ate){ showToast('A data "De" não pode ser depois da data "Até"'); return; }
-    if (GOOGLE_CLIENT_ID.indexOf('COLE_AQUI') === 0){
-      showToast('Configure o GOOGLE_CLIENT_ID no código antes de usar (veja instruções)');
+  function conectarGoogle(){
+    const cid = googleClientId();
+    if (!cid){
+      showToast('Informe o Client ID do Google nas Configurações primeiro');
+      openConfig();
       return;
     }
-    const client = initGoogleTokenClient();
-    if (!client){
-      showToast('Não foi possível carregar o login do Google — verifique sua conexão e tente de novo');
+    if (!(window.google && google.accounts && google.accounts.oauth2)){
+      G.erro = 'O login do Google não carregou (sem internet ou bloqueado por extensão do navegador).';
+      renderHeader(); renderConfigSeAberto();
+      showToast(G.erro);
       return;
     }
-    client.callback = (resp) => {
-      if (!resp || resp.error){
-        showToast('Não foi possível conectar com o Google' + (resp && resp.error ? ' (' + resp.error + ')' : ''));
-        return;
-      }
-      googleAccessToken = resp.access_token;
-      importarEventosDoPeriodo(de, ate);
-    };
-    client.requestAccessToken({ prompt: googleAccessToken ? '' : 'consent' });
+    if (!G.client || G.clientIdUsado !== cid){
+      G.client = google.accounts.oauth2.initTokenClient({
+        client_id: cid,
+        scope: GOOGLE_SCOPE,
+        callback: aoReceberToken,
+        error_callback: (err) => {
+          G.erro = err && err.type === 'popup_closed' ? 'A janela de login do Google foi fechada antes de concluir.'
+                 : err && err.type === 'popup_failed_to_open' ? 'O navegador bloqueou a janela de login do Google. Libere pop-ups para este site.'
+                 : 'Falha no login do Google' + (err && err.type ? ' (' + err.type + ')' : '') + '.';
+          renderHeader(); renderConfigSeAberto();
+          showToast(G.erro);
+        }
+      });
+      G.clientIdUsado = cid;
+    }
+    G.client.requestAccessToken({ prompt: state.google.consentido ? '' : 'consent' });
   }
-  window.confirmarImportarAgenda = confirmarImportarAgenda;
+  window.conectarGoogle = conectarGoogle;
 
-  // busca todos os eventos do período, paginando quando necessário
-  async function buscarEventosGoogle(timeMin, timeMax){
-    let eventos = [];
-    let pageToken = '';
+  async function aoReceberToken(resp){
+    if (!resp || resp.error){
+      G.erro = 'O Google não autorizou o acesso' + (resp && resp.error ? ' (' + resp.error + ')' : '') + '.';
+      renderHeader(); renderConfigSeAberto(); showToast(G.erro);
+      return;
+    }
+    if (google.accounts.oauth2.hasGrantedAllScopes && !google.accounts.oauth2.hasGrantedAllScopes(resp, GOOGLE_SCOPE)){
+      G.erro = 'A permissão de leitura da agenda não foi concedida. Conecte de novo e marque a opção de acesso ao Google Agenda.';
+      renderHeader(); renderConfigSeAberto(); showToast(G.erro);
+      return;
+    }
+    G.token = resp.access_token;
+    G.expira = Date.now() + (Number(resp.expires_in) || 3600) * 1000;
+    G.erro = '';
+    if (!state.google.consentido){ state.google.consentido = true; persist(); }
+    try {
+      await carregarCalendarios();
+    } catch (e) {
+      tratarErroGoogle(e);
+      return;
+    }
+    sincronizarGoogle({ manual: true });
+  }
+
+  function desconectarGoogle(){
+    if (G.token && window.google && google.accounts && google.accounts.oauth2) {
+      try { google.accounts.oauth2.revoke(G.token, () => {}); } catch(_) {}
+    }
+    G.token = null; G.expira = 0; G.calendarios = null; G.erro = '';
+    state.google.consentido = false;
+    persist();
+    renderHeader(); renderConfigSeAberto();
+    showToast('Google Agenda desconectada. Os compromissos já importados continuam aqui.');
+  }
+  window.desconectarGoogle = desconectarGoogle;
+
+  async function gFetch(url){
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + G.token } });
+    if (!res.ok){
+      let msg = '';
+      try { const j = await res.json(); msg = (j.error && j.error.message) || ''; } catch(_) {}
+      const e = new Error(msg || ('HTTP ' + res.status));
+      e.status = res.status;
+      throw e;
+    }
+    return res.json();
+  }
+
+  async function carregarCalendarios(){
+    let itens = [], pageToken = '';
     do {
-      const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
+      const data = await gFetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=reader&maxResults=250' + (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : ''));
+      itens = itens.concat(data.items || []);
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    G.calendarios = itens.map(c => ({ id: c.id, nome: c.summaryOverride || c.summary || c.id, cor: c.backgroundColor || '', primary: !!c.primary }));
+    if (!Array.isArray(state.google.calendarios) || !state.google.calendarios.length){
+      const p = G.calendarios.find(c => c.primary) || G.calendarios[0];
+      state.google.calendarios = p ? [{ id: p.id, nome: p.nome, cor: p.cor, primary: true }] : [];
+      persist();
+    }
+    renderConfigSeAberto();
+  }
+
+  async function buscarEventosGoogle(calendarId, timeMin, timeMax){
+    let eventos = [], pageToken = '';
+    do {
+      const url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(calendarId) + '/events'
         + '?timeMin=' + encodeURIComponent(timeMin)
         + '&timeMax=' + encodeURIComponent(timeMax)
-        + '&singleEvents=true&orderBy=startTime&maxResults=250'
+        + '&singleEvents=true&showDeleted=true&maxResults=250'
         + (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : '');
-      const res = await fetch(url, { headers: { Authorization: 'Bearer ' + googleAccessToken } });
-      if (!res.ok){
-        const err = new Error('http_' + res.status);
-        err.status = res.status;
-        throw err;
-      }
-      const data = await res.json();
+      const data = await gFetch(url);
       eventos = eventos.concat(data.items || []);
       pageToken = data.nextPageToken || '';
     } while (pageToken);
     return eventos;
   }
 
-  async function importarEventosDoPeriodo(deStr, ateStr){
-    closeImportAgenda();
-    showToast('Buscando eventos da agenda...');
-    try {
-      const timeMin = new Date(deStr + 'T00:00:00').toISOString();
-      const timeMax = new Date(ateStr + 'T23:59:59').toISOString();
-      const eventos = await buscarEventosGoogle(timeMin, timeMax);
+  function textoPuro(html){
+    if (!html) return '';
+    const doc = new DOMParser().parseFromString(String(html).replace(/<br\s*\/?>/gi, '\n'), 'text/html');
+    return (doc.body.textContent || '').trim();
+  }
 
-      const jaImportados = new Set(
-        state.atividades.concat(state.pendencias)
-          .filter(i => i.googleEventId)
-          .map(i => i.googleEventId)
-      );
-
-      let novos = 0, ignorados = 0;
-      eventos.forEach(ev => {
-        if (!ev.id || ev.status === 'cancelled' || jaImportados.has(ev.id)){ ignorados++; return; }
-        const dataEvento = ev.start && (ev.start.date || (ev.start.dateTime ? ev.start.dateTime.slice(0, 10) : ''));
-        if (!dataEvento){ ignorados++; return; }
-        state.atividades.push({
-          id: uid(),
-          titulo: ev.summary || '(sem título)',
-          descricao: ev.description || '',
-          criterio: 'MEDIO',
-          prazo: dataEvento,
-          checklist: [],
-          recorrencia: null,
-          googleEventId: ev.id,
-          ordem: nextOrdem(state.atividades),
-          _ts: Date.now()
-        });
-        novos++;
-      });
-
-      if (novos > 0){ render(); persist(true); }
-      showToast(
-        novos === 0
-          ? 'Nenhum evento novo pra importar nesse período'
-          : novos + ' evento(s) importado(s) da agenda' + (ignorados ? ' (' + ignorados + ' já existiam ou foram ignorados)' : '')
-      );
-    } catch (err) {
-      if (err && err.status === 401){
-        googleAccessToken = null;
-        showToast('Sua sessão do Google expirou — clique em importar de novo');
-      } else {
-        showToast('Erro ao importar da agenda: ' + (err && err.message ? err.message : 'desconhecido'));
+  function converterEvento(ev, cal){
+    if (!ev.start) return null;
+    let prazo, horaInicio = '', horaFim = '', diaInteiro = false;
+    if (ev.start.date){
+      prazo = ev.start.date;
+      diaInteiro = true;
+    } else if (ev.start.dateTime){
+      const ini = partesFuso(new Date(ev.start.dateTime));
+      prazo = ini.data;
+      horaInicio = ini.hora;
+      if (ev.end && ev.end.dateTime){
+        const fim = partesFuso(new Date(ev.end.dateTime));
+        horaFim = fim.data === ini.data ? fim.hora : '23:59';
       }
+    } else return null;
+    return {
+      titulo: ev.summary || '(sem título)',
+      descricao: textoPuro(ev.description).slice(0, 3000),
+      prazo, horaInicio, horaFim, diaInteiro,
+      googleEventId: ev.id,
+      googleCalendarId: cal.id,
+      googleCalendarNome: cal.nome || '',
+      googleCor: cal.cor || '',
+      googleLink: ev.htmlLink || '',
+      googleLocal: ev.location || '',
+      googleUpdated: ev.updated || ''
+    };
+  }
+  function eventoRecusado(ev){ return (ev.attendees || []).some(a => a.self && a.responseStatus === 'declined'); }
+
+  function tratarErroGoogle(e){
+    if (e && e.status === 401){
+      G.token = null; G.expira = 0;
+      G.erro = 'A autorização do Google expirou ou foi revogada. Clique em "Conectar" para renovar.';
+    } else if (e && e.status === 403){
+      const m = e.message || '';
+      G.erro = 'O Google recusou o acesso: ' + m + (/has not been used|disabled|not enabled/i.test(m) ? ' — ative a "Google Calendar API" no projeto do Google Cloud.' : '');
+    } else if (e && e.status === 429){
+      G.erro = 'Limite de uso da API do Google atingido. Tente de novo em alguns minutos.';
+    } else if (e instanceof TypeError){
+      G.erro = 'Sem conexão com o Google. Nada foi alterado; tente de novo quando a internet voltar.';
+    } else {
+      G.erro = 'Erro ao sincronizar com o Google: ' + ((e && e.message) || 'desconhecido');
+    }
+    G.sincronizando = false;
+    renderHeader(); renderConfigSeAberto();
+    showToast(G.erro);
+  }
+
+  // Busca os eventos de 7 dias atrás até 30 dias à frente dos calendários escolhidos e
+  // aplica tudo de uma vez: cria os novos, atualiza os alterados no Google, remove os
+  // cancelados/excluídos. Status, prioridade, categoria e observações feitos aqui são mantidos.
+  // A chave de cada compromisso é o id do evento no Google: nunca duplica.
+  async function sincronizarGoogle(opts){
+    opts = opts || {};
+    if (!googleClientId()){ if (opts.manual){ showToast('Configure a Google Agenda primeiro'); openConfig(); } return; }
+    if (G.sincronizando) return;
+    if (!gTokenOk()){ if (opts.manual) conectarGoogle(); return; }
+    if (!state.carregado) return;
+    G.sincronizando = true; G.erro = '';
+    renderHeader(); renderConfigSeAberto();
+
+    const hoje = todayStr();
+    const ini = addDias(hoje, -7), fim = addDias(hoje, 30);
+    const timeMin = new Date(Date.UTC(...ini.split('-').map((v, i) => i === 1 ? v - 1 : +v)) - 86400000).toISOString();
+    const timeMax = new Date(Date.UTC(...fim.split('-').map((v, i) => i === 1 ? v - 1 : +v)) + 2 * 86400000).toISOString();
+    const cals = (state.google.calendarios && state.google.calendarios.length) ? state.google.calendarios : [{ id: 'primary', nome: 'Principal', primary: true }];
+
+    // 1) busca tudo (pode demorar); 2) aplica de uma vez sobre o estado atual
+    const resultados = [];
+    const falhas = [];
+    try {
+      for (const cal of cals){
+        try {
+          resultados.push({ cal, eventos: await buscarEventosGoogle(cal.id, timeMin, timeMax) });
+        } catch (e) {
+          if (e.status === 401 || e instanceof TypeError) throw e;
+          falhas.push((cal.nome || cal.id) + ': ' + e.message);
+        }
+      }
+    } catch (e) {
+      tratarErroGoogle(e);
+      return;
+    }
+
+    const todos = state.atividades.concat(state.pendencias);
+    const porEvento = new Map();
+    todos.forEach(i => { if (i.googleEventId) porEvento.set(i.googleEventId, i); });
+    const calsOk = new Set();
+    const vistos = new Set();
+    let criados = 0, atualizados = 0, removidos = 0;
+    const remover = new Set();
+    const catReuniao = (state.categorias.find(c => /reuni/i.test(c.nome)) || {}).id || '';
+
+    resultados.forEach(({ cal, eventos }) => {
+      calsOk.add(cal.id);
+      if (cal.primary) calsOk.add('primary');
+      eventos.forEach(ev => {
+        const exist = porEvento.get(ev.id);
+        if (ev.status === 'cancelled' || eventoRecusado(ev)){
+          if (exist && !isDone(exist)) remover.add(exist);
+          return;
+        }
+        const conv = converterEvento(ev, cal);
+        if (!conv || conv.prazo < ini || conv.prazo > fim) return;
+        vistos.add(ev.id);
+        if (exist){
+          let mudou = false;
+          Object.keys(conv).forEach(k => { if (exist[k] !== conv[k]){ exist[k] = conv[k]; mudou = true; } });
+          if (mudou) atualizados++;
+        } else {
+          const novo = Object.assign({ id: 'gc' + uid().slice(2), criterio: 'MEDIO', categoria: catReuniao, checklist: [], recorrencia: null, ordem: nextOrdem(state.atividades), _ts: Date.now() }, conv);
+          state.atividades.push(novo);
+          porEvento.set(ev.id, novo);
+          criados++;
+        }
+      });
+    });
+
+    const selecionado = cid => cals.some(c => c.id === cid || (cid === 'primary' && c.primary));
+    todos.forEach(i => {
+      if (!i.googleEventId || isDone(i)) return;
+      const cid = i.googleCalendarId || 'primary';
+      if (!selecionado(cid)){ remover.add(i); return; }            // calendário desmarcado
+      if (!calsOk.has(cid)) return;                                // calendário falhou: não mexe
+      if (i.prazo && i.prazo >= ini && i.prazo <= fim && !vistos.has(i.googleEventId)) remover.add(i); // excluído no Google
+      else if (i.prazo && i.prazo < ini) remover.add(i);           // passou e não foi marcado: não é histórico
+    });
+    if (remover.size){
+      state.atividades = state.atividades.filter(i => !remover.has(i));
+      state.pendencias = state.pendencias.filter(i => !remover.has(i));
+      removidos = remover.size;
+    }
+
+    state.google.ultimaSync = new Date().toISOString();
+    state.google.ultimaSyncResumo = { criados, atualizados, removidos };
+    G.ultimaLocal = Date.now();
+    G.sincronizando = false;
+    G.erro = falhas.length ? 'Alguns calendários falharam — ' + falhas.join(' · ') : '';
+    render(); renderConfigSeAberto();
+    persist(true);
+    if (opts.manual || criados || removidos){
+      showToast('Google Agenda sincronizada: ' + criados + ' novo(s), ' + atualizados + ' atualizado(s), ' + removidos + ' removido(s)');
     }
   }
+  window.sincronizarGoogle = sincronizarGoogle;
+
+  // enquanto a autorização estiver válida, sincroniza a cada 10 min e ao voltar para a aba
+  setInterval(() => {
+    if (gTokenOk() && document.visibilityState === 'visible') sincronizarGoogle({ auto: true });
+  }, 10 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && gTokenOk() && Date.now() - G.ultimaLocal > 5 * 60 * 1000) sincronizarGoogle({ auto: true });
+  });
+
+  function renderGoogleStatus(){
+    const el = document.getElementById('googleStatus');
+    if (!el) return;
+    let h = '📅 Google Agenda: ';
+    if (!googleClientId()){
+      h += 'não configurada · <button class="linkish" onclick="openConfig()">configurar</button>';
+    } else if (G.sincronizando){
+      h += 'sincronizando…';
+    } else if (G.erro){
+      h += '<span class="g-err">⚠ ' + escapeHTML(G.erro.length > 90 ? G.erro.slice(0, 90) + '…' : G.erro) + '</span> · '
+        + (gTokenOk() ? '<button class="linkish" onclick="sincronizarGoogle({manual:true})">tentar de novo</button>' : '<button class="linkish" onclick="conectarGoogle()">conectar</button>');
+    } else {
+      h += state.google.ultimaSync ? 'última sincronização ' + formatTs(state.google.ultimaSync) : 'ainda não sincronizada';
+      h += ' · ' + (gTokenOk() ? '<button class="linkish" onclick="sincronizarGoogle({manual:true})">sincronizar agora</button>' : '<button class="linkish" onclick="conectarGoogle()">conectar</button>');
+    }
+    el.innerHTML = h;
+  }
+
+  // ---------- configurações ----------
+  function openConfig(){
+    renderConfig();
+    document.getElementById('cfgOverlay').classList.add('open');
+  }
+  window.openConfig = openConfig;
+  function closeConfig(){ document.getElementById('cfgOverlay').classList.remove('open'); }
+  window.closeConfig = closeConfig;
+  function renderConfigSeAberto(){ if (document.getElementById('cfgOverlay').classList.contains('open')) renderConfig(); }
+
+  const FUSOS = ['America/Sao_Paulo','America/Manaus','America/Cuiaba','America/Porto_Velho','America/Rio_Branco','America/Belem','America/Fortaleza','America/Recife','America/Noronha','UTC'];
+
+  function renderConfig(){
+    const g = state.google || {};
+    const cid = googleClientId();
+    let st;
+    if (!cid) st = '<div class="info-box">Para ligar a Google Agenda, cole abaixo o <b>Client ID OAuth</b> criado no Google Cloud (passo a passo no arquivo de instruções). Sem isso, nenhuma conexão é feita.</div>';
+    else if (G.erro) st = '<div class="info-box err">⚠ ' + escapeHTML(G.erro) + '</div>';
+    else if (gTokenOk()) st = '<div class="info-box ok">Conectada. Autorização válida até ' + partesFuso(new Date(G.expira)).hora + ' (depois disso, clique em Conectar para renovar).'
+      + (g.ultimaSync ? '<br>Última sincronização: ' + formatTs(g.ultimaSync) + (g.ultimaSyncResumo ? ' — ' + g.ultimaSyncResumo.criados + ' novo(s), ' + g.ultimaSyncResumo.atualizados + ' atualizado(s), ' + g.ultimaSyncResumo.removidos + ' removido(s)' : '') : '') + '</div>';
+    else st = '<div class="info-box">Não conectada nesta aba.' + (g.ultimaSync ? ' Última sincronização: ' + formatTs(g.ultimaSync) + '.' : '') + ' Os compromissos já importados continuam visíveis.</div>';
+
+    let cals = '';
+    if (G.calendarios){
+      const sel = new Set((g.calendarios || []).map(c => c.id));
+      cals = '<div class="field"><label>Calendários exibidos</label>' + G.calendarios.map(c =>
+        `<label class="cal-item"><input type="checkbox" ${sel.has(c.id) ? 'checked' : ''} onchange="toggleCalendario('${escapeHTML(c.id).replace(/'/g, "\\'")}', this.checked)">
+          <span class="sw" style="background:${escapeHTML(c.cor || '#4A90E2')}"></span>${escapeHTML(c.nome)}${c.primary ? ' <span class="field-hint">(principal)</span>' : ''}</label>`).join('') + '</div>';
+    } else if ((g.calendarios || []).length){
+      cals = '<div class="field-hint">Calendários escolhidos: ' + g.calendarios.map(c => escapeHTML(c.nome)).join(', ') + '. Conecte para alterar.</div>';
+    }
+
+    const cats = state.categorias.map((c, i) => `
+      <div class="cat-edit">
+        <input type="color" value="${escapeHTML(c.cor || '#8B93A7')}" onchange="editarCategoria(${i}, 'cor', this.value)" aria-label="Cor">
+        <input type="text" value="${escapeHTML(c.nome)}" maxlength="40" onchange="editarCategoria(${i}, 'nome', this.value)" aria-label="Nome da categoria">
+        <button class="icon-btn" type="button" title="Remover categoria" onclick="removerCategoria(${i})">✕</button>
+      </div>`).join('');
+
+    const cfg = state.config || {};
+    const horas = (sel) => Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${h === sel ? 'selected' : ''}>${String(h).padStart(2,'0')}:00</option>`).join('');
+
+    document.getElementById('cfgBody').innerHTML = `
+      <section class="cfg-sec">
+        <h3>📅 Google Agenda</h3>
+        ${st}
+        <div class="field">
+          <label for="cfgClientId">Client ID OAuth (Google Cloud)</label>
+          <input type="text" id="cfgClientId" value="${escapeHTML(cid)}" placeholder="123456-abc.apps.googleusercontent.com" spellcheck="false">
+          <div class="field-hint">Origem autorizada no Google Cloud: <code>${escapeHTML(location.origin)}</code>. Só leitura da agenda é solicitada.</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-sm" type="button" onclick="salvarClientId()">Salvar Client ID</button>
+          ${cid ? `<button class="btn btn-sm btn-primary" type="button" onclick="conectarGoogle()">${gTokenOk() ? 'Reconectar' : 'Conectar'}</button>` : ''}
+          ${gTokenOk() ? `<button class="btn btn-sm" type="button" ${G.sincronizando ? 'disabled' : ''} onclick="sincronizarGoogle({manual:true})">${G.sincronizando ? 'Sincronizando…' : 'Sincronizar agora'}</button>
+                          <button class="btn btn-sm btn-ghost" type="button" onclick="desconectarGoogle()">Desconectar</button>` : ''}
+        </div>
+        ${cals}
+      </section>
+      <section class="cfg-sec">
+        <h3>Categorias</h3>
+        ${cats || '<div class="field-hint">Nenhuma categoria.</div>'}
+        <div class="btn-row"><button class="btn btn-sm" type="button" onclick="adicionarCategoria()">+ Nova categoria</button></div>
+      </section>
+      <section class="cfg-sec">
+        <h3>Preferências</h3>
+        <div class="field-row">
+          <div class="field">
+            <label for="cfgFuso">Fuso horário (virada do dia)</label>
+            <select id="cfgFuso" onchange="salvarPreferencia('fuso', this.value)">${FUSOS.map(f => `<option ${f === fuso() ? 'selected' : ''}>${f}</option>`).join('')}</select>
+          </div>
+          <div class="field">
+            <label for="cfgIni">Cronograma começa</label>
+            <select id="cfgIni" onchange="salvarPreferencia('cronoIni', Number(this.value))">${horas(cfg.cronoIni ?? 7)}</select>
+          </div>
+          <div class="field">
+            <label for="cfgFim">Cronograma termina</label>
+            <select id="cfgFim" onchange="salvarPreferencia('cronoFim', Number(this.value))">${horas(cfg.cronoFim ?? 19)}</select>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  function salvarClientId(){
+    const v = document.getElementById('cfgClientId').value.trim();
+    if (v && !/\.apps\.googleusercontent\.com$/.test(v)){ showToast('Esse não parece um Client ID do Google (termina em .apps.googleusercontent.com)'); return; }
+    state.google.clientId = v;
+    G.client = null; G.token = null; G.erro = '';
+    persist(true);
+    renderConfig(); renderHeader();
+    showToast(v ? 'Client ID salvo. Agora clique em Conectar.' : 'Client ID removido');
+  }
+  window.salvarClientId = salvarClientId;
+
+  function toggleCalendario(id, on){
+    const c = (G.calendarios || []).find(x => x.id === id);
+    if (!c) return;
+    let lista = (state.google.calendarios || []).filter(x => x.id !== id);
+    if (on) lista.push({ id: c.id, nome: c.nome, cor: c.cor, primary: c.primary });
+    state.google.calendarios = lista;
+    persist(true);
+    sincronizarGoogle({ manual: false });
+  }
+  window.toggleCalendario = toggleCalendario;
+
+  function editarCategoria(i, campo, valor){
+    const c = state.categorias[i];
+    if (!c) return;
+    valor = String(valor).trim();
+    if (campo === 'nome' && !valor){ renderConfig(); return; }
+    c[campo] = valor;
+    persist(); render();
+  }
+  window.editarCategoria = editarCategoria;
+  function adicionarCategoria(){
+    state.categorias.push({ id: 'c' + uid().slice(2), nome: 'Nova categoria', cor: '#8B93A7' });
+    persist(); renderConfig();
+  }
+  window.adicionarCategoria = adicionarCategoria;
+  function removerCategoria(i){
+    const c = state.categorias[i];
+    if (!c) return;
+    const uso = state.atividades.concat(state.pendencias).filter(x => x.categoria === c.id).length;
+    if (uso && !confirm('A categoria "' + c.nome + '" está em ' + uso + ' item(ns). Eles ficam sem categoria. Continuar?')) return;
+    state.atividades.concat(state.pendencias).forEach(x => { if (x.categoria === c.id) x.categoria = ''; });
+    state.rotinas.forEach(r => { if (r.categoria === c.id) r.categoria = ''; });
+    state.categorias.splice(i, 1);
+    persist(); renderConfig(); render();
+  }
+  window.removerCategoria = removerCategoria;
+  function salvarPreferencia(k, v){
+    state.config[k] = v;
+    let r = null;
+    if (k === 'fuso') r = ajustarAoCarregar();
+    persist(true); render();
+    showToast('Preferência salva');
+  }
+  window.salvarPreferencia = salvarPreferencia;
 
   // ---------- toast ----------
   let toastTimer;
@@ -2499,33 +3883,154 @@
   window.__showToast = showToast;
 
   // ---------- aba Hoje: lista do dia ----------
-  // Entra na lista: atividades com prazo hoje, pendências em aberto que venceram até hoje
-  // e tudo o que foi concluído hoje (aparece riscado, como uma lista de papel).
+  // Entra no dia: atividades com data de hoje, pendências em aberto que venceram até hoje
+  // e tudo o que foi concluído hoje. Cada item conta uma vez só (mesmo id), inclusive
+  // compromissos do Google. Itens pulados/ocultados ("não realizada") não contam.
   state.todayFiltro = '';
 
   function getTodayItems(){
     const hoje = todayStr();
     const ativ = state.atividades.filter(i => i.prazo === hoje);
-    const pend = state.pendencias.filter(i =>
-      (i.status !== 'FINALIZADA' && i.prazo && i.prazo <= hoje) ||
-      (i.status === 'FINALIZADA' && i.concluidaEm === hoje)
-    );
+    const pend = state.pendencias.filter(i => !i.naoRealizada && (
+      (!isDone(i) && !i.googleEventId && i.prazo && i.prazo <= hoje) ||
+      (!isDone(i) && !i.prazo && i.prazoEntrega && i.prazoEntrega <= hoje) ||
+      (isDone(i) && i.concluidaEm === hoje)
+    ));
     return ativ.concat(pend);
   }
 
-  function isDone(item){ return item.status === 'FINALIZADA'; }
+  function resumoHoje(){
+    const all = getTodayItems();
+    const feitas = all.filter(isDone).length;
+    const pend = all.length - feitas;
+    const atrasadas = all.filter(isOverdue).length;
+    const pct = all.length ? Math.round(feitas / all.length * 100) : 0;
+    return { all, total: all.length, feitas, pend, atrasadas, pct };
+  }
 
   const TRASH_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
   const EDIT_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const CAL_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+
+  // ---------- cabeçalho: indicadores e contadores das abas ----------
+  function renderHeader(){
+    const r = resumoHoje();
+    const ativo = f => state.tab === 'hoje' && state.todayStatus === f ? ' active' : '';
+    document.getElementById('kpis').innerHTML = `
+      <button class="kpi${ativo('todas')}" type="button" onclick="filtrarHoje('todas')" title="Ver tudo de hoje"><span class="n">${r.total}</span><span class="l">Previstas para hoje</span></button>
+      <button class="kpi k-done${ativo('concluidas')}" type="button" onclick="filtrarHoje('concluidas')" title="Ver as concluídas de hoje"><span class="n">${r.feitas}</span><span class="l">Concluídas</span></button>
+      <button class="kpi${ativo('pendentes')}" type="button" onclick="filtrarHoje('pendentes')" title="Ver só as pendentes"><span class="n">${r.pend}</span><span class="l">Pendentes</span></button>
+      <button class="kpi k-late${ativo('atrasadas')}" type="button" onclick="filtrarHoje('atrasadas')" title="Ver só as atrasadas"><span class="n">${r.atrasadas}</span><span class="l">Atrasadas</span></button>
+      <button class="kpi k-prog" type="button" onclick="filtrarHoje('todas')" title="Progresso do dia">
+        <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+          <span class="l"><b>${r.feitas} de ${r.total}</b> atividades concluídas</span><span class="n">${r.pct}%</span>
+        </span>
+        <span class="bar"><span style="width:${r.pct}%"></span></span>
+      </button>`;
+
+    const hoje = todayStr();
+    const em7 = addDias(hoje, 7);
+    const pendAbertas = state.pendencias.filter(p => !isDone(p));
+    document.getElementById('countHoje').textContent = r.pend;
+    document.getElementById('countRotina').textContent = state.rotinas.filter(x => x.ativa !== false).length;
+    document.getElementById('countProximos').textContent = state.atividades.filter(i => i.prazo > hoje && i.prazo <= em7).length;
+    document.getElementById('countAtividades').textContent = state.atividades.length;
+    const cp = document.getElementById('countPendencias');
+    cp.textContent = pendAbertas.length;
+    cp.classList.toggle('alert', pendAbertas.some(isOverdue));
+    document.getElementById('countFinalizadas').textContent = state.pendencias.filter(p => isDone(p) && !p.naoRealizada && p.concluidaEm === hoje).length;
+    renderGoogleStatus();
+  }
+
+  function filtrarHoje(f){
+    state.todayStatus = f;
+    if (f === 'concluidas') state.todayMostrarFeitas = true;
+    if (state.tab !== 'hoje') setTab('hoje'); else render();
+  }
+  window.filtrarHoje = filtrarHoje;
+
+  function rotuloDia(d){
+    const hoje = todayStr();
+    const pre = d === hoje ? 'Hoje · ' : d === addDias(hoje, 1) ? 'Amanhã · ' : d === addDias(hoje, -1) ? 'Ontem · ' : '';
+    const sem = parseDateLocal(d).toLocaleDateString('pt-BR', { weekday: 'long' });
+    return pre + sem + ', ' + formatPrazo(d).slice(0, 5);
+  }
+
+  // ---------- linha de atividade (Hoje, Cronograma, Próximos, Concluídas) ----------
+  function linhaTarefa(item, o){
+    o = o || {};
+    const hoje = todayStr();
+    const recem = !!state.recem[item.id];
+    const done = isDone(item);
+    const prevista = !!item.prevista;
+    const google = !!item.googleEventId;
+    const meta = critMeta(item.criterio);
+    const late = isOverdue(item);
+    const cls = ['task',
+      done ? (recem ? 'done just-done' : 'done') : '',
+      item.status === 'EM ANDAMENTO' ? 'doing' : '',
+      google ? 'o-google' : '',
+      prevista ? 'prevista' : '',
+      o.zitem ? 'zitem' : ''].join(' ');
+    const pc = late ? 'var(--atrasada)' : (google && item.googleCor ? escapeHTML(item.googleCor) : meta.color);
+    const tempo = item.horaInicio
+      ? `<div class="task-time">${item.horaInicio}${item.horaFim ? `<small>${item.horaFim}</small>` : ''}</div>`
+      : (o.semHora ? '' : `<div class="task-time none">${item.diaInteiro ? 'dia<small>todo</small>' : '—'}</div>`);
+
+    let tags = (prevista || done)
+      ? `<span class="chip" style="--c:${meta.color}">${meta.label}</span>`
+      : `<button type="button" class="chip" style="--c:${meta.color}" title="Clique para mudar a prioridade" onclick="mudarPrioridade('${item.id}')">${meta.label}</button>`;
+    if (late) tags += `<span class="chip chip-late">Atrasada${item.prazo && item.prazo < hoje ? ' · ' + formatPrazo(item.prazo).slice(0,5) : ''}</span>`;
+    if (o.mostrarData && item.prazo && !(late && item.prazo < hoje)) tags += `<span class="chip chip-plain">📅 ${formatPrazo(item.prazo).slice(0,5)}</span>`;
+    tags += chipsExtras(item);
+    const ck = item.checklist || [];
+    if (ck.length) tags += `<span class="chip chip-plain">☑ ${ck.filter(c => c.feito).length}/${ck.length}</span>`;
+    if (prevista) tags += `<span class="chip chip-plain">prevista</span>`;
+
+    const abrir = prevista ? `openRotina('${item.rotinaId}')` : `openForm('${item.id}')`;
+    let acoes = '';
+    if (done && !recem){
+      const hc = item.concluidaEmTs ? horaDoTs(item.concluidaEmTs) : '';
+      acoes = `<span class="done-time" title="Concluída em ${formatPrazo(item.concluidaEm || hoje)}">${item.naoRealizada ? '' : '✓ ' + (hc || formatPrazo(item.concluidaEm || hoje).slice(0,5))}</span>`
+        + `<button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="${abrir}">${EDIT_SVG}</button>`;
+    } else if (!prevista && !done){
+      if (!google) acoes += `<button type="button" class="task-btn play" title="${item.status === 'EM ANDAMENTO' ? 'Pausar (voltar a pendente)' : 'Iniciar (em andamento)'}" onclick="iniciarItem('${item.id}')">${item.status === 'EM ANDAMENTO' ? '⏸' : '▶'}</button>`;
+      if (!google) acoes += `<button type="button" class="task-btn" title="Reagendar / adiar" onclick="openReagendar('${item.id}')">${CAL_SVG}</button>`;
+      if (google && item.googleLink) acoes += `<a class="task-btn" href="${escapeHTML(item.googleLink)}" target="_blank" rel="noopener" title="Abrir no Google Agenda">↗</a>`;
+      acoes += `<button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="${abrir}">${EDIT_SVG}</button>`;
+      acoes += `<button type="button" class="task-btn task-del" title="${rotuloExcluir(item)}" aria-label="${rotuloExcluir(item)}" onclick="deleteItem('${item.id}')">${google ? '🙈' : TRASH_SVG}</button>`;
+    }
+
+    return `<li class="${cls}" style="--pc:${pc}; border-left-color:${pc}" data-id="${item.id}" ${o.arrastavel ? 'data-drag="1"' : ''}>
+      <input type="checkbox" class="task-check" ${done ? 'checked' : ''} ${prevista ? 'disabled title="Prevista: aparece no dia"' : ''} aria-label="Concluir ${escapeHTML(item.titulo)}" onchange="toggleToday('${item.id}', this.checked)">
+      ${tempo}
+      <div class="task-main">
+        <button type="button" class="task-title" onclick="${abrir}">${escapeHTML(item.titulo)}</button>
+        <div class="task-tags">${tags}</div>
+      </div>
+      <div class="task-acts" style="display:flex;gap:4px;align-items:center">${acoes}</div>
+    </li>`;
+  }
+
+  function ordenarDoDia(a, b){
+    const and = x => x.status === 'EM ANDAMENTO' ? 0 : 1;
+    return (and(a) - and(b))
+      || ((a.horaInicio || '99:99').localeCompare(b.horaInicio || '99:99'))
+      || (CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio))
+      || ((a._ts || 0) - (b._ts || 0));
+  }
 
   function renderToday(){
-    const dataHoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const dataHoje = parseDateLocal(todayStr()).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     document.getElementById('todayDate').textContent = dataHoje.charAt(0).toUpperCase() + dataHoje.slice(1);
+    preencherSelectCategorias(document.getElementById('qaCategoria'), 'form');
 
+    const hoje = todayStr();
     const all = getTodayItems();
     const filtro = state.todayFiltro;
+    const st = state.todayStatus;
 
-    // painel de critérios (filtra a lista ao clicar)
+    // painel de prioridades (filtra a lista ao clicar)
     const abertas = all.filter(i => !isDone(i));
     const cats = [{ key: '', label: 'Todas', color: 'var(--amber)' }]
       .concat(CRITERIO_ORDER.map(c => ({ key: c, label: CRITERIO_META[c].label, color: CRITERIO_META[c].color })));
@@ -2538,54 +4043,77 @@
       </button>`;
     }).join('');
 
-    // progresso do dia
-    const feitas = all.length - abertas.length;
-    const pct = all.length ? Math.round(feitas / all.length * 100) : 0;
-    document.getElementById('todayProgress').innerHTML = all.length
-      ? `<div class="prog-text"><strong>${feitas}</strong> de ${all.length} concluídas</div>
-         <div class="prog-bar"><span style="width:${pct}%"></span></div>`
-      : '';
+    renderAgendaHoje(all);
 
-    let items = filtro ? all.filter(i => i.criterio === filtro) : all;
-    items.sort((a, b) =>
-      (isDone(a) - isDone(b)) ||
-      (CRITERIO_ORDER.indexOf(a.criterio) - CRITERIO_ORDER.indexOf(b.criterio)) ||
-      ((a._ts || 0) - (b._ts || 0))
-    );
+    const items = filtro ? all.filter(i => i.criterio === filtro) : all;
+    const ativos = items.filter(i => !isDone(i) || state.recem[i.id]);
+    const anteriores = ativos.filter(i => (i.prazo && i.prazo < hoje) || !i.prazo).sort((a, b) => (a.prazo || '').localeCompare(b.prazo || '') || ordenarDoDia(a, b));
+    const doDia = ativos.filter(i => !anteriores.includes(i)).sort(ordenarDoDia);
+    const feitas = items.filter(i => isDone(i) && !state.recem[i.id])
+      .sort((a, b) => (b.concluidaEmTs || '').localeCompare(a.concluidaEmTs || ''));
 
-    document.getElementById('todayListTitle').textContent = filtro
-      ? 'Tarefas de hoje · ' + CRITERIO_META[filtro].label
-      : 'Tarefas de hoje';
+    const sufixo = filtro ? ' · ' + CRITERIO_META[filtro].label : '';
+    const titulos = { todas: 'Tarefas de hoje', pendentes: 'Pendentes de hoje', concluidas: 'Concluídas hoje', atrasadas: 'Atrasadas' };
+    document.getElementById('todayListTitle').innerHTML = escapeHTML(titulos[st] + sufixo)
+      + (st !== 'todas' ? ' <button class="linkish" style="text-transform:none;letter-spacing:0;font-family:var(--font-body);margin-left:8px" onclick="filtrarHoje(\'todas\')">ver tudo</button>' : '');
 
-    const list = document.getElementById('taskList');
-    list.innerHTML = items.map(item => {
-      const done = isDone(item);
-      const meta = CRITERIO_META[item.criterio];
-      const atrasada = !done && item.prazo && item.prazo < todayStr();
-      const ck = item.checklist || [];
-      const ckDone = ck.filter(c => c.feito).length;
-      const rec = formatRecorrencia(item.recorrencia);
-      return `<li class="task ${done ? 'done' : ''}" data-id="${item.id}">
-        <input type="checkbox" class="task-check" id="chk-${item.id}" ${done ? 'checked' : ''} onchange="toggleToday('${item.id}', this.checked)">
-        <div class="task-main">
-          <label for="chk-${item.id}" class="task-title">${escapeHTML(item.titulo)}</label>
-          <div class="task-tags">
-            <span class="chip" style="--c:${meta.color}">${meta.label}</span>
-            ${atrasada ? `<span class="chip chip-late">Atrasada · ${formatPrazo(item.prazo)}</span>` : ''}
-            ${rec ? `<span class="chip chip-rec" title="Repete: ${rec}">🔁 ${rec}</span>` : ''}
-            ${ck.length ? `<span class="chip chip-plain">☑ ${ckDone}/${ck.length}</span>` : ''}
-          </div>
-        </div>
-        <button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="openForm('${item.id}')">${EDIT_SVG}</button>
-        <button type="button" class="task-btn task-del" title="Excluir" aria-label="Excluir ${escapeHTML(item.titulo)}" onclick="deleteItem('${item.id}')">${TRASH_SVG}</button>
-      </li>`;
-    }).join('');
+    let html = '';
+    const lista = (arr) => '<ul class="task-list">' + arr.map(i => linhaTarefa(i)).join('') + '</ul>';
+    if (st === 'atrasadas'){
+      const late = ativos.filter(i => isOverdue(i) || state.recem[i.id]);
+      if (late.length) html += lista(late);
+    } else if (st === 'concluidas'){
+      if (feitas.length) html += lista(feitas);
+    } else {
+      const rotAntigas = anteriores.filter(i => i.rotinaId && !state.recem[i.id]).length;
+      if (anteriores.length) html += `<div class="sec-label late">De dias anteriores · ${anteriores.length}<span class="right">`
+        + (rotAntigas ? `<button class="linkish" onclick="dispensarRotinasAntigas()" title="As ocorrências da rotina de dias que já passaram ficam no histórico como não realizadas">dispensar ${rotAntigas} de rotina</button> · ` : '')
+        + `<button class="linkish" onclick="setTab('pendencias')">abrir Pendências</button></span></div>` + lista(anteriores);
+      if (doDia.length) html += (anteriores.length ? `<div class="sec-label">Para hoje · ${doDia.length}</div>` : '') + lista(doDia);
+      if (st === 'todas' && feitas.length){
+        html += `<button type="button" class="done-toggle" onclick="state.todayMostrarFeitas=!state.todayMostrarFeitas; render()">${state.todayMostrarFeitas ? '▾ Ocultar' : '▸ Mostrar'} concluídas de hoje (${feitas.length})</button>`;
+        if (state.todayMostrarFeitas) html += '<div style="margin-top:8px">' + lista(feitas) + '</div>';
+      }
+    }
+    document.getElementById('todaySections').innerHTML = html;
 
+    const vazio = !html;
     const empty = document.getElementById('todayEmpty');
-    empty.hidden = items.length > 0;
-    empty.textContent = filtro
-      ? 'Nenhuma tarefa ' + CRITERIO_META[filtro].label.toLowerCase() + ' para hoje.'
-      : 'Nada para hoje ainda. Escreva uma tarefa abaixo e aperte Enter.';
+    empty.hidden = !vazio && !(st === 'todas' && !ativos.length && feitas.length);
+    if (st === 'todas' && !ativos.length && feitas.length){
+      empty.hidden = false;
+      empty.textContent = '🎉 Tudo feito por hoje! ' + feitas.length + ' atividade(s) concluída(s).';
+    } else if (vazio){
+      empty.textContent = st === 'concluidas' ? 'Nada concluído hoje ainda.'
+        : st === 'atrasadas' ? 'Nenhuma atividade atrasada. 👍'
+        : filtro ? 'Nenhuma tarefa ' + CRITERIO_META[filtro].label.toLowerCase() + ' para hoje.'
+        : 'Nada para hoje ainda. Escreva uma tarefa acima e aperte Enter.';
+    }
+  }
+
+  function renderAgendaHoje(all){
+    const hoje = todayStr();
+    const agora = agoraHM();
+    const comHora = all.filter(i => i.prazo === hoje && (i.horaInicio || i.diaInteiro))
+      .sort((a, b) => (a.horaInicio || '').localeCompare(b.horaInicio || ''));
+    const box = document.getElementById('todayAgenda');
+    if (!comHora.length){
+      box.innerHTML = '<div class="agenda-empty">Nada com horário hoje. Defina um horário ao criar a tarefa ou arraste no <button class="linkish" onclick="setTab(\'cronograma\')">Cronograma</button>.</div>';
+      return;
+    }
+    let h = '<ul class="agenda-list">';
+    let marcou = false;
+    comHora.forEach(i => {
+      if (!marcou && i.horaInicio && i.horaInicio > agora){ h += `<li class="now-line">agora ${agora}</li>`; marcou = true; }
+      const passou = i.horaInicio && (i.horaFim || i.horaInicio) < agora;
+      const cor = i.googleEventId ? (i.googleCor || 'var(--google)') : critMeta(i.criterio).color;
+      h += `<li class="agenda-item ${isDone(i) ? 'done' : ''} ${passou ? 'past' : ''}" onclick="openForm('${i.id}')">
+        <span class="t">${i.horaInicio || 'dia todo'}</span>
+        <span class="ttl" style="--c:${escapeHTML(cor)}">${i.googleEventId ? '📅 ' : i.rotinaId ? '🔁 ' : ''}${escapeHTML(i.titulo)}</span>
+      </li>`;
+    });
+    if (!marcou) h += `<li class="now-line">agora ${agora}</li>`;
+    box.innerHTML = h + '</ul>';
   }
 
   function setTodayFiltro(c){
@@ -2595,79 +4123,531 @@
   }
   window.setTodayFiltro = setTodayFiltro;
 
-  // marcar/desmarcar a caixinha
-  function toggleToday(id, checked){
+  // rotina de dias que já passaram e não foi feita: registra como "não realizada"
+  // (fica no histórico da rotina) em vez de acumular uma por dia em Pendências
+  function dispensarRotinasAntigas(){
     const hoje = todayStr();
-    if (checked){
-      const ai = state.atividades.findIndex(i => i.id === id);
-      if (ai !== -1){
-        // atividade concluída vira pendência finalizada (lembrando de onde veio, para poder desmarcar)
-        const a = state.atividades.splice(ai, 1)[0];
-        a.status = 'FINALIZADA';
-        a.daAtividade = true;
-        a.ordem = nextOrdem(state.pendencias);
-        state.pendencias.push(a);
-        gerarProximaAtividade(a);
-      } else {
-        const p = state.pendencias.find(i => i.id === id);
-        if (!p || p.status === 'FINALIZADA') return;
-        p.status = 'FINALIZADA';
-        gerarProximaAtividade(p);
-      }
-    } else {
-      const pi = state.pendencias.findIndex(i => i.id === id);
-      if (pi === -1) return;
-      const p = state.pendencias[pi];
-      // desfaz a próxima ocorrência criada pela recorrência, para não duplicar ao marcar de novo
-      if (p.proximaId){
-        state.atividades = state.atividades.filter(i => i.id !== p.proximaId);
-        p.proximaId = null;
-      }
-      p.concluidaEm = null;
-      if (p.daAtividade && (!p.prazo || p.prazo >= hoje)){
-        state.pendencias.splice(pi, 1);
-        delete p.status;
-        delete p.daAtividade;
-        p.ordem = nextOrdem(state.atividades);
-        state.atividades.push(p);
-      } else {
-        p.status = 'NÃO INICIADO';
-        p.daAtividade = false;
-      }
-    }
+    const alvo = state.pendencias.filter(p => p.rotinaId && !isDone(p) && p.prazo && p.prazo < hoje);
+    if (!alvo.length) return;
+    const ids = alvo.map(p => p.id);
+    alvo.forEach(p => { concluirItem(p); p.naoRealizada = true; });
     render();
     persist(true);
+    showToast(alvo.length + ' ocorrência(s) de rotina marcadas como não realizadas', 'Desfazer', () => {
+      ids.forEach(id => { const it = findItem(id); if (it) reabrirItem(it); });
+      render(); persist(true);
+    });
+  }
+  window.dispensarRotinasAntigas = dispensarRotinasAntigas;
+
+  // marcar/desmarcar a caixinha: concluir fica riscado por um instante e sai da lista
+  function toggleToday(id, checked){
+    const item = findItem(id);
+    if (!item) return;
+    if (checked){
+      if (isDone(item)) return;
+      concluirItem(item);
+      state.recem[id] = true;
+      setTimeout(() => { delete state.recem[id]; render(); }, 1500);
+      render();
+      persist(true);
+      showToast('Concluída: ' + item.titulo, 'Desfazer', () => {
+        delete state.recem[id];
+        const it = findItem(id);
+        if (it){ reabrirItem(it); render(); persist(true); }
+      });
+    } else {
+      delete state.recem[id];
+      reabrirItem(item);
+      render();
+      persist(true);
+      showToast('Reaberta');
+    }
   }
   window.toggleToday = toggleToday;
 
-  // adicionar rápido: vira uma atividade com prazo hoje
+  // adicionar rápido: vira uma atividade com data de hoje. "14:30 texto" já define o horário.
   document.getElementById('quickAdd').addEventListener('submit', e => {
     e.preventDefault();
     const input = document.getElementById('qaTitulo');
-    const titulo = input.value.trim();
+    let titulo = input.value.trim();
     if (!titulo){ input.focus(); return; }
+    let hora = document.getElementById('qaHora').value;
+    const m = titulo.match(/^(\d{1,2})(?::|h)(\d{2})?\s*(?:-|–)?\s+(.+)$/i);
+    if (m && Number(m[1]) < 24 && (!m[2] || Number(m[2]) < 60)){
+      hora = hora || (m[1].padStart(2, '0') + ':' + (m[2] || '00'));
+      titulo = m[3].trim();
+    }
     state.atividades.push({
       id: uid(),
       titulo,
       descricao: '',
       criterio: document.getElementById('qaCriterio').value,
+      categoria: document.getElementById('qaCategoria').value,
       prazo: todayStr(),
+      horaInicio: hora || '',
+      horaFim: '',
       checklist: [],
       recorrencia: null,
       ordem: nextOrdem(state.atividades),
       _ts: Date.now()
     });
     input.value = '';
+    document.getElementById('qaHora').value = '';
     input.focus();
     render();
     persist(true);
+    showToast(hora ? 'Adicionada ao cronograma de hoje às ' + hora : 'Adicionada para hoje');
   });
+
+  // ---------- Cronograma ----------
+  function itensDoDia(dia){
+    return state.atividades.filter(i => i.prazo === dia)
+      .concat(state.pendencias.filter(i => i.prazo === dia && !i.naoRealizada));
+  }
+  // rotinas que ainda vão gerar ocorrência num dia futuro (só para visualizar)
+  function previstasDoDia(dia){
+    if (dia <= todayStr()) return [];
+    return state.rotinas.filter(r => rotinaNoDia(r, dia) && !findItem(idOcorrencia(r.id, dia)))
+      .map(r => Object.assign(novaOcorrencia(r, dia), { id: 'prev_' + r.id + '_' + dia, prevista: true }));
+  }
+
+  function cronoNav(n){ state.cronoDia = addDias(state.cronoDia || todayStr(), n); render(); }
+  window.cronoNav = cronoNav;
+  function cronoIr(d){ if (d){ state.cronoDia = d; render(); } }
+  window.cronoIr = cronoIr;
+
+  function renderCronograma(){
+    const hoje = todayStr();
+    const dia = state.cronoDia || hoje;
+    state.cronoDia = dia;
+    const itens = itensDoDia(dia).concat(previstasDoDia(dia));
+    const semHora = itens.filter(i => !i.horaInicio).sort((a, b) => (isDone(a) - isDone(b)) || (ordemOf(a) - ordemOf(b)) || ordenarDoDia(a, b));
+    const comHora = itens.filter(i => i.horaInicio).sort(ordenarDoDia);
+    const cfg = state.config || {};
+    let hIni = cfg.cronoIni ?? 7, hFim = cfg.cronoFim ?? 19;
+    if (hFim < hIni) [hIni, hFim] = [hFim, hIni];
+    comHora.forEach(i => { const h = Number(i.horaInicio.slice(0, 2)); hIni = Math.min(hIni, h); hFim = Math.max(hFim, h); });
+    const ehHoje = dia === hoje;
+    const horaAgora = Number(agoraHM().slice(0, 2));
+    const feitas = itens.filter(isDone).length;
+    const opt = i => ({ zitem: true, arrastavel: !i.googleEventId && !i.prevista && !isDone(i) });
+
+    let slots = '';
+    for (let h = hIni; h <= hFim; h++){
+      const hh = String(h).padStart(2, '0');
+      const doSlot = comHora.filter(i => Number(i.horaInicio.slice(0, 2)) === h);
+      const cls = ehHoje ? (h === horaAgora ? 'now' : h < horaAgora ? 'past' : '') : (dia < hoje ? 'past' : '');
+      slots += `<div class="slot ${cls}"><div class="h">${hh}:00</div><ul class="zone task-list" data-zone="slot:${hh}">${doSlot.map(i => linhaTarefa(i, opt(i))).join('')}</ul></div>`;
+    }
+
+    document.getElementById('schedView').innerHTML = `
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">${escapeHTML(rotuloDia(dia).replace(/^(\w)/, c => c.toUpperCase()))}</h2>
+          <p class="view-sub">${itens.length} atividade(s) · ${feitas} concluída(s) · ${semHora.length} sem horário${dia > hoje && itens.some(i => i.prevista) ? ' · rotinas previstas aparecem esmaecidas' : ''}</p>
+        </div>
+        <div class="day-nav">
+          <button class="btn btn-sm" type="button" onclick="cronoNav(-1)" aria-label="Dia anterior">‹</button>
+          <button class="btn btn-sm" type="button" onclick="cronoIr(todayStr())" ${ehHoje ? 'disabled' : ''}>Hoje</button>
+          <button class="btn btn-sm" type="button" onclick="cronoNav(1)" aria-label="Próximo dia">›</button>
+          <input type="date" value="${dia}" onchange="cronoIr(this.value)" aria-label="Escolher dia">
+          <button class="btn btn-sm btn-primary" type="button" onclick="openForm(null, { prazo: '${dia}' })">+ Neste dia</button>
+        </div>
+      </div>
+      <div class="sched-layout">
+        <div class="today-panel">
+          <h2 class="panel-label">Sem horário definido · ${semHora.length}</h2>
+          <ul class="task-list semhora" data-zone="semhora">${semHora.map(i => linhaTarefa(i, Object.assign(opt(i), { semHora: true }))).join('')}</ul>
+          <div class="field-hint">Arraste uma atividade para um horário ao lado (ou de volta para cá para tirar o horário). No celular, segure um instante antes de arrastar. Compromissos do Google têm o horário do próprio Google.</div>
+        </div>
+        <div class="timeline">${slots}</div>
+      </div>`;
+  }
+
+  function aoSoltarCronograma(id, zona, ordemIds){
+    const item = findItem(id);
+    if (!item) return;
+    if (zona === 'semhora'){
+      const tinha = !!item.horaInicio;
+      item.horaInicio = ''; item.horaFim = '';
+      (ordemIds || []).forEach((oid, i) => { const it = findItem(oid); if (it) it.ordem = (i + 1) * 10; });
+      persist(true);
+      if (tinha) showToast('Horário removido');
+      return;
+    }
+    const h = Number(zona.split(':')[1]);
+    const iniAnt = minutos(item.horaInicio);
+    const dur = (iniAnt !== null && item.horaFim) ? minutos(item.horaFim) - iniAnt : null;
+    const ini = (iniAnt !== null && Math.floor(iniAnt / 60) === h) ? iniAnt : h * 60;
+    item.horaInicio = hmDeMinutos(ini);
+    item.horaFim = dur && dur > 0 ? hmDeMinutos(ini + dur) : '';
+    persist(true);
+    showToast('Agendada para ' + item.horaInicio + (item.horaFim ? '–' + item.horaFim : ''));
+  }
+
+  // arrastar no cronograma (mouse e toque), no mesmo estilo do quadro
+  const zdrag = { active: false, pending: null, timer: null, id: null, src: null, ghost: null, ph: null, zone: null, x: 0, y: 0, ox: 0, oy: 0, pointerId: null, raf: 0, bloqueiaClique: false };
+  document.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || zdrag.active || drag.active) return;
+    const el = e.target.closest('.zitem[data-drag]');
+    if (!el || e.target.closest('input, select, textarea, a, label, .task-acts, button.chip')) return;
+    zdrag.pending = { el, x: e.clientX, y: e.clientY, pointerId: e.pointerId, type: e.pointerType };
+    zdrag.x = e.clientX; zdrag.y = e.clientY;
+    if (e.pointerType !== 'mouse'){
+      clearTimeout(zdrag.timer);
+      zdrag.timer = setTimeout(() => {
+        if (!zdrag.pending) return;
+        try { if (navigator.vibrate) navigator.vibrate(12); } catch(_){}
+        zStart();
+      }, LONG_PRESS_MS);
+    }
+  });
+  document.addEventListener('pointermove', e => {
+    if (zdrag.active){
+      if (e.pointerId !== zdrag.pointerId) return;
+      zdrag.x = e.clientX; zdrag.y = e.clientY;
+      zPosicionar(); zAtualizar();
+      return;
+    }
+    if (zdrag.pending && e.pointerId === zdrag.pending.pointerId){
+      const dist = Math.hypot(e.clientX - zdrag.pending.x, e.clientY - zdrag.pending.y);
+      zdrag.x = e.clientX; zdrag.y = e.clientY;
+      if (zdrag.pending.type === 'mouse'){ if (dist > 5) zStart(); }
+      else if (dist > 10){ clearTimeout(zdrag.timer); zdrag.pending = null; }
+    }
+  });
+  document.addEventListener('pointerup', e => {
+    if (zdrag.active && e.pointerId === zdrag.pointerId){ zFinish(); return; }
+    if (zdrag.pending && e.pointerId === zdrag.pending.pointerId){ clearTimeout(zdrag.timer); zdrag.pending = null; }
+  });
+  document.addEventListener('pointercancel', () => { if (zdrag.active) zCancel(); else { clearTimeout(zdrag.timer); zdrag.pending = null; } });
+  document.addEventListener('touchmove', e => { if (zdrag.active) e.preventDefault(); }, { passive: false });
+  document.addEventListener('click', e => {
+    if (zdrag.bloqueiaClique){ zdrag.bloqueiaClique = false; e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
+  function zStart(){
+    const p = zdrag.pending;
+    clearTimeout(zdrag.timer);
+    if (!p) return;
+    const el = p.el;
+    const rect = el.getBoundingClientRect();
+    zdrag.active = true; zdrag.pending = null;
+    zdrag.id = el.dataset.id; zdrag.pointerId = p.pointerId; zdrag.src = el;
+    zdrag.ox = p.x - rect.left; zdrag.oy = p.y - rect.top;
+    const ghost = el.cloneNode(true);
+    ghost.classList.add('drag-ghost');
+    ghost.style.width = rect.width + 'px';
+    ghost.style.listStyle = 'none';
+    document.body.appendChild(ghost);
+    zdrag.ghost = ghost;
+    const ph = document.createElement('li');
+    ph.className = 'zplaceholder';
+    ph.style.height = rect.height + 'px';
+    el.parentNode.insertBefore(ph, el);
+    el.style.display = 'none';
+    zdrag.ph = ph;
+    zZona(el.parentNode.closest('[data-zone]') || el.parentNode);
+    document.body.classList.add('zdragging');
+    zPosicionar();
+    zdrag.raf = requestAnimationFrame(zAutoScroll);
+  }
+  function zPosicionar(){
+    if (zdrag.ghost) zdrag.ghost.style.transform = `translate(${zdrag.x - zdrag.ox}px, ${zdrag.y - zdrag.oy}px) rotate(1.5deg)`;
+  }
+  function zZona(z){
+    if (zdrag.zone === z) return;
+    if (zdrag.zone) zdrag.zone.classList.remove('drop-over');
+    zdrag.zone = z;
+    if (z) z.classList.add('drop-over');
+  }
+  function zAtualizar(){
+    const el = document.elementFromPoint(zdrag.x, zdrag.y);
+    const zone = el && el.closest('[data-zone]');
+    if (!zone) return;
+    zZona(zone);
+    let antes = null;
+    for (const c of zone.querySelectorAll('.zitem')){
+      if (c === zdrag.src) continue;
+      const r = c.getBoundingClientRect();
+      if (zdrag.y < r.top + r.height / 2){ antes = c; break; }
+    }
+    if (antes){ if (zdrag.ph.nextElementSibling !== antes) zone.insertBefore(zdrag.ph, antes); }
+    else if (zdrag.ph.parentNode !== zone || zdrag.ph.nextElementSibling) zone.appendChild(zdrag.ph);
+  }
+  function zAutoScroll(){
+    if (!zdrag.active) return;
+    const edge = 70;
+    let dy = 0;
+    if (zdrag.y < edge) dy = -Math.ceil((edge - zdrag.y) / 3);
+    else if (zdrag.y > window.innerHeight - edge) dy = Math.ceil((zdrag.y - (window.innerHeight - edge)) / 3);
+    if (dy){ window.scrollBy(0, Math.max(-22, Math.min(22, dy))); zAtualizar(); }
+    zdrag.raf = requestAnimationFrame(zAutoScroll);
+  }
+  function zLimpar(){
+    cancelAnimationFrame(zdrag.raf);
+    if (zdrag.ghost) zdrag.ghost.remove();
+    if (zdrag.ph) zdrag.ph.remove();
+    if (zdrag.src) zdrag.src.style.display = '';
+    zZona(null);
+    document.body.classList.remove('zdragging');
+    zdrag.active = false;
+    zdrag.ghost = zdrag.ph = zdrag.src = null;
+    zdrag.pointerId = null;
+  }
+  function zCancel(){ zLimpar(); zdrag.id = null; render(); }
+  window.zCancel = zCancel;
+  function zFinish(){
+    const id = zdrag.id;
+    const zone = zdrag.zone;
+    const key = zone && zone.dataset.zone;
+    let ordemIds = null;
+    if (zone && zdrag.ph.parentNode === zone){
+      ordemIds = [...zone.children]
+        .filter(n => n === zdrag.ph || (n.classList.contains('zitem') && n !== zdrag.src))
+        .map(n => n === zdrag.ph ? id : n.dataset.id);
+    }
+    zLimpar();
+    zdrag.id = null;
+    zdrag.bloqueiaClique = true;
+    setTimeout(() => { zdrag.bloqueiaClique = false; }, 50);
+    if (key) aoSoltarCronograma(id, key, ordemIds);
+    render();
+  }
+
+  // ---------- Rotina diária ----------
+  function diaDoTs(ts){ return ts ? partesFuso(new Date(ts)).data : ''; }
+  function estadoRotinaNoDia(r, d, occs){
+    const hoje = todayStr();
+    const inicio = [r.inicio, diaDoTs(r._ts)].filter(Boolean).sort()[0] || '';
+    const programada = rotinaNoDia(Object.assign({}, r, { ativa: true }), d) && (!inicio || d >= inicio);
+    const occ = occs[d];
+    if (occ){
+      if (occ.naoRealizada) return { cls: 'miss', txt: 'não realizada' };
+      if (isDone(occ)) return { cls: 'ok', txt: 'concluída' + (occ.concluidaEmTs ? ' às ' + horaDoTs(occ.concluidaEmTs) : '') };
+      return d < hoje ? { cls: 'miss', txt: 'não concluída (em Pendências)' } : { cls: 'open', txt: 'pendente' };
+    }
+    if (!programada) return { cls: '', txt: 'não programada', fora: true };
+    if (d === hoje) return { cls: 'open', txt: r.ativa === false ? 'pausada' : 'pendente' };
+    return { cls: 'norec', txt: 'sem registro (app não aberto ou rotina pausada)' };
+  }
+
+  function renderRotina(){
+    const hoje = todayStr();
+    const rotinas = state.rotinas.slice().sort((a, b) =>
+      ((a.ativa === false) - (b.ativa === false)) || (a.horaInicio || '99').localeCompare(b.horaInicio || '99') || a.titulo.localeCompare(b.titulo));
+    const todos = state.atividades.concat(state.pendencias);
+
+    const cards = rotinas.map(r => {
+      const occs = {};
+      todos.forEach(i => { if (i.rotinaId === r.id) occs[i.ocorrencia || i.prazo] = i; });
+      const meta = critMeta(r.criterio);
+      const cat = categoriaDe(r.categoria);
+      const dias = r.tipo === 'mensal'
+        ? `<span class="on">Todo dia ${r.diaMes || 1} do mês</span>`
+        : DIAS_ABREV.map((d, i) => `<span class="${(r.dias || []).includes(i) ? 'on' : ''}">${d}</span>`).join('');
+
+      let hojeTxt;
+      const occHoje = occs[hoje];
+      if (r.ativa === false) hojeTxt = 'Pausada — não gera novas ocorrências.';
+      else if (!rotinaNoDia(r, hoje)) hojeTxt = 'Não programada para hoje.';
+      else if (!occHoje) hojeTxt = 'Gerando a ocorrência de hoje…';
+      else if (occHoje.naoRealizada) hojeTxt = 'Hoje: <b>pulada</b>.';
+      else if (isDone(occHoje)) hojeTxt = 'Hoje: <b>concluída' + (occHoje.concluidaEmTs ? ' às ' + horaDoTs(occHoje.concluidaEmTs) : '') + '</b> ✓';
+      else hojeTxt = 'Hoje: <b>' + (occHoje.status === 'EM ANDAMENTO' ? 'em andamento' : 'pendente') + '</b> <button class="btn btn-sm" type="button" onclick="toggleToday(\'' + occHoje.id + '\', true)">✓ Concluir</button>';
+
+      let heat = '';
+      let prog = 0, feitas = 0;
+      for (let k = 29; k >= 0; k--){
+        const d = addDias(hoje, -k);
+        const e = estadoRotinaNoDia(r, d, occs);
+        if (!e.fora && !(d === hoje && e.cls === 'open')){ prog++; if (e.cls === 'ok') feitas++; }
+        if (k < 14) heat += `<i class="${e.cls}" title="${formatPrazo(d)} (${DIAS_ABREV[parseDateLocal(d).getDay()]}): ${e.txt}"></i>`;
+      }
+      const taxa = prog ? `Execução nos últimos 30 dias: <b>${feitas} de ${prog}</b> (${Math.round(feitas / prog * 100)}%)` : 'Ainda sem histórico.';
+
+      return `<article class="rot-card ${r.ativa === false ? 'paused' : ''}" style="--pc:${meta.color}">
+        <div>
+          <h3>${escapeHTML(r.titulo)}</h3>
+          <div class="task-tags" style="margin-top:6px">
+            <span class="chip" style="--c:${meta.color}">${meta.label}</span>
+            ${cat ? `<span class="chip" style="--c:${escapeHTML(cat.cor)}">${escapeHTML(cat.nome)}</span>` : ''}
+            ${r.horaInicio ? `<span class="chip chip-plain">🕘 ${r.horaInicio}${r.horaFim ? '–' + r.horaFim : ''}</span>` : '<span class="chip chip-plain">sem horário</span>'}
+            ${(r.checklist || []).length ? `<span class="chip chip-plain">☑ ${(r.checklist || []).length} itens</span>` : ''}
+          </div>
+        </div>
+        <div class="rot-days">${dias}</div>
+        <div class="rot-today">${hojeTxt}</div>
+        <div>
+          <div class="heat" aria-label="Últimos 14 dias">${heat}</div>
+          <div class="rot-today" style="margin-top:6px">${taxa}</div>
+        </div>
+        <div class="rot-actions">
+          <button class="btn btn-sm" type="button" onclick="openRotina('${r.id}')">✎ Editar</button>
+          <button class="btn btn-sm" type="button" onclick="alternarRotina('${r.id}')">${r.ativa === false ? '▶ Reativar' : '⏸ Pausar'}</button>
+          <button class="btn btn-sm" type="button" onclick="verHistoricoRotina('${r.id}')">Histórico</button>
+          <button class="btn btn-sm btn-ghost btn-danger" type="button" onclick="excluirRotina('${r.id}')">Excluir</button>
+        </div>
+      </article>`;
+    }).join('');
+
+    document.getElementById('rotinaView').innerHTML = `
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">Rotina diária</h2>
+          <p class="view-sub">Atividades fixas do seu cargo. Cada uma vira uma atividade pendente nos dias programados; concluir hoje não muda os outros dias.</p>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="openRotina()">+ Nova rotina</button>
+      </div>
+      ${rotinas.length ? `<div class="heat-legend" style="margin-bottom:14px">Últimos 14 dias:
+          <span><i style="background:var(--finalizada)"></i>concluída</span>
+          <span><i style="background:color-mix(in srgb, var(--atrasada) 75%, transparent)"></i>não realizada</span>
+          <span><i style="background:color-mix(in srgb, var(--medio) 65%, transparent)"></i>pendente hoje</span>
+          <span><i style="background:var(--line)"></i>sem registro</span>
+          <span><i style="border:1px dashed var(--line)"></i>não programada</span>
+        </div><div class="rot-grid">${cards}</div>`
+      : `<div class="empty"><div class="emoji">🔁</div><div class="big">Nenhuma rotina ainda</div><div>Cadastre as tarefas que você faz todo dia (ex.: "Verificar chamados em aberto") e elas aparecem sozinhas na aba Hoje.</div><div style="margin-top:14px"><button class="btn btn-primary" type="button" onclick="openRotina()">+ Nova rotina</button></div></div>`}`;
+  }
+
+  function verHistoricoRotina(rid){
+    state.concPeriodo = '30';
+    setTab('finalizadas');
+    state.filtroRotinaId = rid;
+    render();
+  }
+  window.verHistoricoRotina = verHistoricoRotina;
+
+  // ---------- Próximos dias ----------
+  // As listas com busca montam a barra de filtros uma vez só, para não perder o foco ao digitar.
+  function filtrosHtml(prefixo){
+    return `<input type="search" id="${prefixo}Busca" placeholder="Buscar por título, descrição ou observação…" oninput="render()" aria-label="Buscar">
+      <select id="${prefixo}Crit" onchange="render()" aria-label="Prioridade"><option value="">Prioridade: todas</option>${CRITERIO_ORDER.map(c => `<option value="${c}">${CRITERIO_META[c].label}</option>`).join('')}</select>
+      <select id="${prefixo}Cat" onchange="render()" aria-label="Categoria"></select>
+      <select id="${prefixo}Ori" onchange="render()" aria-label="Origem"><option value="">Origem: todas</option><option value="manual">Adicionadas por você</option><option value="rotina">Rotina</option><option value="google">Google Agenda</option></select>`;
+  }
+  function lerFiltros(prefixo){
+    preencherSelectCategorias(document.getElementById(prefixo + 'Cat'), 'filtro');
+    return {
+      query: document.getElementById(prefixo + 'Busca').value.trim().toLowerCase(),
+      criterio: document.getElementById(prefixo + 'Crit').value,
+      categoria: document.getElementById(prefixo + 'Cat').value,
+      origem: document.getElementById(prefixo + 'Ori').value
+    };
+  }
+
+  function renderProximos(){
+    const view = document.getElementById('proxView');
+    if (!document.getElementById('proxLista')){
+      view.innerHTML = `
+        <div class="view-head">
+          <div><h2 class="view-title">Próximos dias</h2><p class="view-sub">O que está programado a partir de amanhã, incluindo as rotinas previstas.</p></div>
+          <button class="btn btn-primary" type="button" onclick="openForm(null, { prazo: addDias(todayStr(), 1) })">+ Para amanhã</button>
+        </div>
+        <div class="filter-row">${filtrosHtml('prox')}
+          <select id="proxDias" onchange="state.proxDias=Number(this.value); lsSet('mt_proxDias', this.value); render()" aria-label="Período">
+            <option value="7">Próximos 7 dias</option><option value="14">Próximos 14 dias</option><option value="30">Próximos 30 dias</option>
+          </select>
+        </div>
+        <div id="proxLista"></div>`;
+    }
+    document.getElementById('proxDias').value = String(state.proxDias);
+    const f = lerFiltros('prox');
+    const hoje = todayStr();
+    let html = '';
+    let total = 0;
+    for (let k = 1; k <= state.proxDias; k++){
+      const d = addDias(hoje, k);
+      const itens = itensDoDia(d).concat(previstasDoDia(d)).filter(i => passaFiltros(i, f)).sort(ordenarDoDia);
+      if (!itens.length) continue;
+      total += itens.length;
+      html += `<div class="day-group"><h3>${escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))} <small>${itens.length} atividade(s)</small>
+        <button class="linkish" style="font-size:12px;margin-left:auto" onclick="state.cronoDia='${d}'; setTab('cronograma')">ver no cronograma</button></h3>
+        <ul class="task-list">${itens.map(i => linhaTarefa(i)).join('')}</ul></div>`;
+    }
+    const semData = state.atividades.filter(i => !i.prazo && passaFiltros(i, f)).sort(ordenarDoDia);
+    if (semData.length){
+      html += `<div class="day-group"><h3>Sem data definida <small>${semData.length}</small></h3><ul class="task-list">${semData.map(i => linhaTarefa(i)).join('')}</ul></div>`;
+    }
+    document.getElementById('proxLista').innerHTML = html || '<div class="empty"><div class="emoji">🗓️</div><div class="big">Nada programado</div><div>Nenhuma atividade nos próximos ' + state.proxDias + ' dias com esses filtros.</div></div>';
+  }
+
+  // ---------- Concluídas (histórico) ----------
+  function renderConcluidas(){
+    const view = document.getElementById('concView');
+    if (!document.getElementById('concLista')){
+      view.innerHTML = `
+        <div class="view-head">
+          <div><h2 class="view-title">Concluídas</h2><p class="view-sub">Histórico com dia e horário de conclusão. Desmarque a caixinha para reabrir.</p></div>
+        </div>
+        <div class="filter-row">${filtrosHtml('conc')}
+          <select id="concPeriodo" onchange="state.concPeriodo=this.value; lsSet('mt_concPeriodo', this.value); render()" aria-label="Período">
+            <option value="1">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="tudo">Tudo</option>
+          </select>
+          <label class="field-hint" style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="concNR" onchange="state.concNaoRealizadas=this.checked; render()"> mostrar não realizadas</label>
+        </div>
+        <div id="concRotina"></div>
+        <div id="concLista"></div>
+        <div class="arch-box">
+          <div class="field-hint" style="margin-bottom:8px">Concluídas com mais de 90 dias são arquivadas automaticamente quando o histórico fica grande (limite do Firestore). Para consultar um mês arquivado:</div>
+          <div class="filter-row" style="margin-bottom:8px">
+            <input type="month" id="concMes" aria-label="Mês arquivado">
+            <button class="btn btn-sm" type="button" onclick="consultarArquivo()">Consultar arquivo</button>
+          </div>
+          <div id="concArquivo"></div>
+        </div>`;
+    }
+    document.getElementById('concPeriodo').value = state.concPeriodo;
+    document.getElementById('concNR').checked = state.concNaoRealizadas;
+    const f = lerFiltros('conc');
+    const hoje = todayStr();
+    const desde = state.concPeriodo === 'tudo' ? '' : addDias(hoje, -(Number(state.concPeriodo) - 1));
+    const r = state.filtroRotinaId ? findRotina(state.filtroRotinaId) : null;
+    document.getElementById('concRotina').innerHTML = state.filtroRotinaId
+      ? `<div class="info-box">Mostrando só a rotina <b>${escapeHTML(r ? r.titulo : 'excluída')}</b>. <button class="linkish" onclick="state.filtroRotinaId=''; render()">mostrar todas</button></div>` : '';
+
+    const itens = state.pendencias.filter(p => isDone(p)
+      && (state.concNaoRealizadas || !p.naoRealizada)
+      && (!desde || (p.concluidaEm || '') >= desde)
+      && (!state.filtroRotinaId || p.rotinaId === state.filtroRotinaId)
+      && passaFiltros(p, f))
+      .sort((a, b) => (b.concluidaEm || '').localeCompare(a.concluidaEm || '') || (b.concluidaEmTs || '').localeCompare(a.concluidaEmTs || ''));
+
+    const grupos = {};
+    itens.forEach(i => { const d = i.concluidaEm || 'sem data'; (grupos[d] = grupos[d] || []).push(i); });
+    const html = Object.keys(grupos).map(d => `
+      <div class="day-group"><h3>${d === 'sem data' ? 'Sem data registrada' : escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))} <small>${grupos[d].length} item(ns)</small></h3>
+      <ul class="task-list">${grupos[d].map(i => linhaTarefa(i, { mostrarData: true })).join('')}</ul></div>`).join('');
+    document.getElementById('concLista').innerHTML = html || '<div class="empty"><div class="emoji">✅</div><div class="big">Nada concluído nesse período</div><div>Ajuste o período ou os filtros.</div></div>';
+  }
+
+  async function consultarArquivo(){
+    const mes = document.getElementById('concMes').value;
+    const box = document.getElementById('concArquivo');
+    if (!mes){ showToast('Escolha o mês'); return; }
+    box.innerHTML = '<div class="field-hint">Carregando…</div>';
+    try {
+      const itens = await window.__lerArquivo(mes);
+      box.innerHTML = itens.length
+        ? '<ul class="task-list">' + itens.sort((a, b) => (b.concluidaEm || '').localeCompare(a.concluidaEm || ''))
+            .map(i => `<li class="task done" style="--pc:${critMeta(i.criterio).color}"><div class="task-time">${formatPrazo(i.concluidaEm || mes + '-01').slice(0,5)}</div><div class="task-main"><span class="task-title">${escapeHTML(i.titulo)}</span><div class="task-tags">${chipsExtras(i)}</div></div></li>`).join('') + '</ul>'
+        : '<div class="field-hint">Nada arquivado em ' + mes.split('-').reverse().join('/') + '.</div>';
+    } catch (e) {
+      box.innerHTML = '<div class="info-box err">Não foi possível ler o arquivo (' + escapeHTML(e.code || e.message) + ').</div>';
+    }
+  }
+  window.consultarArquivo = consultarArquivo;
+  window.todayStr = todayStr;
+  window.addDias = addDias;
+  window.lsSet = lsSet;
+  window.state = state;
+  window.render = render;
 
   // ---------- init ----------
   state.groupBy = state.groupBy === 'status' ? 'status' : 'criterio';
   document.getElementById('groupCriterio').classList.toggle('active', state.groupBy === 'criterio');
   document.getElementById('groupStatus').classList.toggle('active', state.groupBy === 'status');
-  setTab(['hoje','atividades','pendencias','finalizadas'].includes(lsGet('mt_tab','hoje')) ? lsGet('mt_tab','hoje') : 'hoje');
+  setTab(lsGet('mt_tab', 'hoje'));
 </script>
 
 </body>
