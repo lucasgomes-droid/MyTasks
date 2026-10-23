@@ -31,6 +31,7 @@
     --finalizada: #4CAF7D;
     --atrasada: #E1524B;
     --recorrente: #9B8CF2;
+    --google: #4A90E2;
 
     --shadow-card: 0 1px 2px rgba(0,0,0,0.18);
     --shadow-card-hover: 0 10px 26px rgba(0,0,0,0.32);
@@ -1204,6 +1205,125 @@
     .semhora .task .task-acts{ justify-content: flex-start; }
   }
   .semhora .task-acts .play{ display:none; }
+
+  /* =====================================================================
+     Visual enxuto (v2): menos cartões, menos cor, ações num menu
+     ===================================================================== */
+  .narrow{ max-width: 860px; margin: 0 auto; }
+  .sync-note{ font-size: 11px; opacity: .85; }
+  main{ padding: 26px 28px 34px; }
+
+  .day-head{ display:flex; justify-content: space-between; align-items: flex-end; gap: 12px 20px; flex-wrap: wrap; }
+  .day-title{ font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 0 0 4px; letter-spacing: -.2px; }
+  .day-stats{ display:flex; flex-wrap: wrap; align-items: center; gap: 2px 0; font-size: 13.5px; color: var(--muted); }
+  .day-stats .sep{ margin: 0 8px; opacity: .6; }
+  .stat{ background: none; border: none; padding: 2px 0; color: var(--muted); font: inherit; cursor: pointer; border-bottom: 1px solid transparent; }
+  .stat b{ color: var(--text); font-weight: 600; }
+  .stat:hover{ color: var(--text); }
+  .stat.active{ color: var(--text); border-bottom-color: var(--amber); }
+  .stat.late{ color: var(--atrasada); }
+  .stat.link{ color: var(--amber); }
+  .stat-muted{ color: var(--muted); }
+  .day-progress{ height: 3px; background: var(--line); border-radius: 3px; margin: 14px 0 18px; overflow: hidden; }
+  .day-progress span{ display:block; height: 100%; width: 0; background: var(--finalizada); transition: width .35s ease; }
+
+  .seg{ display:inline-flex; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 2px; }
+  .seg button{ background: transparent; border: none; color: var(--muted); font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+  .seg button.active{ background: var(--card-raised-hover); color: var(--text); }
+  .seg button:not(.active):hover{ color: var(--text); }
+
+  .qa{ display:flex; gap: 8px; margin-bottom: 22px; }
+  .qa input[type=text]{ flex: 1; min-width: 0; padding: 11px 13px; font-size: 14.5px; }
+  .qa select{ flex: 0 0 auto; }
+  .list-head{
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 6px;
+  }
+
+  /* linhas */
+  .task-list{ gap: 0; }
+  .task, .task.o-google, .task.doing{
+    background: transparent; border: none; border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+    border-radius: 0; box-shadow: none; padding: 11px 6px; gap: 12px; align-items: center;
+  }
+  .task::before{ content:""; flex: 0 0 3px; align-self: stretch; border-radius: 3px; background: var(--pc, var(--line)); opacity: .9; }
+  .task:hover{ background: color-mix(in srgb, var(--bg-soft) 70%, transparent); }
+  .task-list .task:last-child{ border-bottom: none; }
+  .task.done{ opacity: .55; }
+  .task.prevista{ opacity: .5; }
+  .task.prevista::before{ background: repeating-linear-gradient(var(--pc) 0 4px, transparent 4px 7px); }
+  .task-check{ width: 18px; height: 18px; }
+  .task-time{ width: 40px; font-size: 12.5px; color: var(--text); }
+  .task-time.none{ width: 40px; color: var(--muted); font-size: 11px; }
+  .task-main{ flex: 1; min-width: 0; display:flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+  .task-title{ font-size: 14.5px; font-weight: 500; line-height: 1.35; word-break: break-word; }
+  .task.doing .task-title{ font-weight: 600; }
+  .task-meta{ font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .task-meta .dot-sep{ margin: 0 6px; opacity: .6; }
+  .m-late{ color: var(--atrasada); }
+  .m-doing{ color: var(--andamento); }
+  .done-time{ font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+  .more-btn{
+    flex: 0 0 auto; width: 32px; height: 32px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+    color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer; padding: 0 0 6px;
+  }
+  .more-btn:hover, .more-btn:focus-visible{ background: var(--bg-soft); border-color: var(--line); color: var(--text); }
+  @media (hover: hover){
+    .task .more-btn{ opacity: 0; }
+    .task:hover .more-btn, .task .more-btn:focus-visible{ opacity: 1; }
+  }
+
+  .sec-label{ font-size: 11px; margin: 22px 0 4px; }
+  .sec-label:first-child{ margin-top: 0; }
+  .done-toggle{ border-style: solid; border-color: transparent; text-align: left; padding: 10px 6px; margin-top: 6px; }
+  .done-toggle:hover{ border-color: transparent; background: var(--bg-soft); }
+  .today-empty{ border: none; padding: 30px 10px; text-align: center; color: var(--muted); font-size: 14px; }
+
+  /* menu de ações */
+  .menu{
+    position: fixed; z-index: 70; display: none; min-width: 210px; padding: 6px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-modal);
+  }
+  .menu.open{ display: block; }
+  .menu > button, .menu > a{
+    display:block; width: 100%; text-align: left; background: none; border: none; color: var(--text);
+    padding: 8px 10px; border-radius: 6px; font-size: 13.5px; cursor: pointer; text-decoration: none; font-family: var(--font-body);
+  }
+  .menu > button:hover, .menu > a:hover{ background: var(--bg-soft); }
+  .menu .danger{ color: var(--urgente); }
+  .menu-sep{ height: 1px; background: var(--line); margin: 6px 4px; }
+  .menu-label{ font-size: 11px; color: var(--muted); padding: 6px 10px 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .8px; }
+  .pri-row{ display:flex; gap: 4px; padding: 0 6px 4px; }
+  .pri-row button{
+    flex: 1; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 6px;
+    font-size: 11.5px; padding: 5px 2px; cursor: pointer;
+  }
+  .pri-row button:hover{ color: var(--text); }
+  .pri-row button.on{ border-color: var(--c); color: var(--text); background: color-mix(in srgb, var(--c) 14%, transparent); }
+
+  /* cronograma, listas e rotina mais sóbrios */
+  #schedView .day-head{ margin-bottom: 14px; }
+  #schedView .day-nav{ margin-bottom: 16px; }
+  .slot .zone{ gap: 0; }
+  .view-head{ margin-bottom: 18px; }
+  .filter-row .filtros-extra{ display: contents; }
+  .filter-row .filtros-extra[hidden]{ display: none; }
+  .day-group h3{ font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+  .rot-card{ background: transparent; border-left-width: 3px; }
+  .rot-card .chip{ background: transparent; padding: 0; color: var(--muted); }
+  .rot-card .task-tags{ gap: 10px; }
+
+  @media (max-width: 560px){
+    main{ padding: 18px 14px 26px; }
+    .day-head{ align-items: flex-start; }
+    .qa{ flex-wrap: wrap; }
+    .qa input[type=text]{ flex: 1 1 100%; }
+    .qa select{ flex: 1 1 auto; }
+    .task{ flex-wrap: nowrap; padding: 11px 2px; gap: 10px; }
+    .task-main{ flex: 1 1 auto; }
+    .task-time, .task-time.none{ width: 36px; }
+    .task-time.none:empty{ display: none; }
+  }
 </style>
 </head>
 <body>
@@ -1226,7 +1346,6 @@
     <div class="topbar">
       <div class="brand">
         <h1>My<span>Tasks</span></h1>
-        <span class="tag">painel diário</span>
       </div>
       <div class="top-actions">
         <button class="btn btn-primary" id="btnNovaTop" type="button" onclick="openForm()" title="Nova atividade (atalho: tecla N)">+ Nova atividade</button>
@@ -1239,27 +1358,19 @@
       </div>
     </div>
     <div class="sync-note">
-      <span><span class="dot-live" id="syncDot"></span><span id="syncText">sincronizado na nuvem</span></span>
+      <span><span class="dot-live" id="syncDot"></span><span id="syncText">sincronizado</span></span>
       <span id="googleStatus"></span>
     </div>
-
-    <div class="kpis" id="kpis" role="group" aria-label="Indicadores de hoje"></div>
 
     <div class="tabs">
       <button class="tab active" id="tabHoje" onclick="setTab('hoje')">
         Hoje <span class="count" id="countHoje">0</span>
       </button>
-      <button class="tab" id="tabCronograma" onclick="setTab('cronograma')">
-        Cronograma
-      </button>
       <button class="tab" id="tabRotina" onclick="setTab('rotina')">
-        Rotina diária <span class="count" id="countRotina">0</span>
+        Rotina <span class="count" id="countRotina">0</span>
       </button>
       <button class="tab" id="tabProximos" onclick="setTab('proximos')">
         Próximos dias <span class="count" id="countProximos">0</span>
-      </button>
-      <button class="tab" id="tabAtividades" onclick="setTab('atividades')">
-        Atividades <span class="count" id="countAtividades">0</span>
       </button>
       <button class="tab" id="tabPendencias" onclick="setTab('pendencias')">
         Pendências <span class="count" id="countPendencias">0</span>
@@ -1275,47 +1386,32 @@
   <main>
 
     <!-- ============ HOJE (lista do dia) ============ -->
-    <section id="todayView">
-      <div class="today-head">
-        <div class="today-date" id="todayDate"></div>
-        <div class="legend"><span class="chip chip-rec">🔁 rotina</span> <span class="chip chip-google">📅 Google Agenda</span> <span>sem selo: adicionada por você</span></div>
+    <section id="todayView" class="narrow">
+      <div class="day-head">
+        <div>
+          <h2 class="day-title" id="todayDate"></h2>
+          <div class="day-stats" id="kpis"></div>
+        </div>
+        <div class="seg" role="tablist" aria-label="Modo de visualização">
+          <button type="button" class="active">Lista</button>
+          <button type="button" onclick="setTab('cronograma')">Horários</button>
+        </div>
       </div>
-      <form class="quick-add" id="quickAdd" autocomplete="off">
+      <div class="day-progress"><span id="progBar"></span></div>
+      <form class="qa" id="quickAdd" autocomplete="off">
         <label class="sr-only" for="qaTitulo">Nova tarefa</label>
-        <input type="text" id="qaTitulo" placeholder="Novo chamado ou serviço para hoje — digite e aperte Enter" maxlength="200">
-        <div class="qa-crit">
-          <label for="qaCriterio">Prioridade</label>
-          <select id="qaCriterio">
-            <option value="URGENTE">Urgente</option>
-            <option value="ALTO">Alta</option>
-            <option value="MEDIO" selected>Média</option>
-            <option value="BAIXO">Baixa</option>
-          </select>
-        </div>
-        <div class="qa-crit">
-          <label for="qaCategoria">Categoria</label>
-          <select id="qaCategoria"></select>
-        </div>
-        <div class="qa-crit">
-          <label for="qaHora">Horário</label>
-          <input type="time" id="qaHora">
-        </div>
-        <button type="submit" class="qa-btn" title="Adicionar tarefa" aria-label="Adicionar tarefa">+</button>
+        <input type="text" id="qaTitulo" placeholder="Adicionar tarefa para hoje (ex.: 14:30 Reunião com TI)" maxlength="200">
+        <select id="qaCriterio" aria-label="Prioridade">
+          <option value="URGENTE">Urgente</option>
+          <option value="ALTO">Alta</option>
+          <option value="MEDIO" selected>Média</option>
+          <option value="BAIXO">Baixa</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Adicionar</button>
       </form>
-      <div class="qa-hint">Só o título é obrigatório. Dica: comece com o horário ("14:30 Reunião com TI") para já entrar no cronograma.</div>
-      <div class="today-layout">
-        <aside class="today-panel today-cats">
-          <h2 class="panel-label">Prioridades</h2>
-          <div class="cat-list" id="catList"></div>
-          <h2 class="panel-label agenda-label">Agenda de hoje</h2>
-          <div id="todayAgenda"></div>
-        </aside>
-        <div class="today-panel today-tasks">
-          <h2 class="panel-label" id="todayListTitle">Tarefas de hoje</h2>
-          <div id="todaySections"></div>
-          <div class="today-empty" id="todayEmpty" hidden></div>
-        </div>
-      </div>
+      <div class="list-head" id="todayListTitle"></div>
+      <div id="todaySections"></div>
+      <div class="today-empty" id="todayEmpty" hidden></div>
     </section>
 
     <!-- ============ CRONOGRAMA ============ -->
@@ -1358,7 +1454,7 @@
           <option value="BAIXO">Baixa</option>
         </select>
         <select class="sort" id="categoriaFilter" onchange="render()" title="Mostrar só uma categoria"></select>
-        <select class="sort" id="origemFilter" onchange="render()" title="Mostrar só uma origem">
+        <select class="sort" id="origemFilter" onchange="render()" title="Mostrar só uma origem" hidden>
           <option value="">Origem: todas</option>
           <option value="manual">Adicionadas por você</option>
           <option value="rotina">Rotina</option>
@@ -1367,7 +1463,7 @@
       </div>
       <div class="action-group">
         <button class="btn btn-primary" id="addBtn" onclick="openForm()" title="Criar um novo item, do zero">+ Nova</button>
-        <button class="btn" id="importAgendaBtn" onclick="sincronizarGoogle({manual:true})" title="Busca agora os compromissos da sua Google Agenda">📅 Google Agenda</button>
+        <button class="btn" id="importAgendaBtn" hidden onclick="sincronizarGoogle({manual:true})" title="Busca agora os compromissos da sua Google Agenda">📅 Google Agenda</button>
       </div>
     </div>
 
@@ -1526,6 +1622,7 @@
 
 <button class="fab" type="button" onclick="openForm()">+ Nova atividade</button>
 
+<div class="menu" id="menu" role="menu"></div>
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
 <script type="module">
@@ -2144,13 +2241,15 @@ service cloud.firestore {
   function getUnderlyingList(){ return state.tab === 'atividades' ? state.atividades : state.pendencias; }
 
   // ---------- tabs ----------
-  const TAB_IDS = { hoje:'tabHoje', cronograma:'tabCronograma', rotina:'tabRotina', proximos:'tabProximos', atividades:'tabAtividades', pendencias:'tabPendencias', finalizadas:'tabFinalizadas' };
+  // Cronograma é o modo "Horários" da aba Hoje. A aba Atividades (quadro) saiu do menu:
+  // atividades futuras e sem data aparecem em Próximos dias.
+  const TAB_IDS = { hoje:'tabHoje', rotina:'tabRotina', proximos:'tabProximos', pendencias:'tabPendencias', finalizadas:'tabFinalizadas' };
   const VIEW_IDS = { hoje:'todayView', cronograma:'schedView', rotina:'rotinaView', proximos:'proxView', finalizadas:'concView' };
   function setTab(tab){
-    if (!TAB_IDS[tab]) tab = 'hoje';
+    if (!TAB_IDS[tab] && tab !== 'cronograma') tab = 'hoje';
     state.tab = tab;
     lsSet('mt_tab', tab);
-    Object.keys(TAB_IDS).forEach(t => document.getElementById(TAB_IDS[t]).classList.toggle('active', t === tab));
+    Object.keys(TAB_IDS).forEach(t => document.getElementById(TAB_IDS[t]).classList.toggle('active', t === tab || (t === 'hoje' && tab === 'cronograma')));
     Object.keys(VIEW_IDS).forEach(t => { document.getElementById(VIEW_IDS[t]).hidden = t !== tab; });
     // o quadro (estilo Trello) continua nas abas Atividades e Pendências
     document.getElementById('boardView').hidden = !(tab === 'atividades' || tab === 'pendencias');
@@ -2167,7 +2266,7 @@ service cloud.firestore {
     document.getElementById('groupByGroup').style.display = (tab === 'pendencias') ? 'flex' : 'none';
 
     document.getElementById('criterioFilter').value = '';
-    if (tab !== 'hoje') state.todayStatus = 'todas';
+    if (tab !== 'hoje' && tab !== 'cronograma') state.todayStatus = 'todas';
     if (tab !== 'finalizadas') state.filtroRotinaId = '';
     render();
   }
@@ -2376,7 +2475,7 @@ service cloud.firestore {
     const prazoBadge = item.prazo ? `<span class="badge badge-prazo">${isOverdue(item) ? '⚠' : '📅'} ${formatPrazo(item.prazo)}</span>` : '';
     const recorrenciaLabel = formatRecorrencia(item.recorrencia);
     const recorrenciaBadge = recorrenciaLabel ? `<span class="badge badge-recorrente">🔁 ${recorrenciaLabel}</span>` : '';
-    const horaBadge = item.horaInicio ? `<span class="badge badge-prazo">🕘 ${item.horaInicio}${item.horaFim ? '–' + item.horaFim : ''}</span>` : '';
+    const horaBadge = item.horaInicio ? `<span class="badge badge-prazo">${item.horaInicio}${item.horaFim ? '–' + item.horaFim : ''}</span>` : '';
     const metaRow = criterioBadge + overdueBadge + prazoBadge + horaBadge + recorrenciaBadge + chipsExtras(item, { semAtraso: true });
 
     let footerRight = '';
@@ -2409,7 +2508,6 @@ service cloud.firestore {
     card.innerHTML = `
       <div class="card-actions">
         <button class="icon-btn" title="Editar" onclick="openForm('${item.id}')">✎</button>
-        ${!isDone(item) ? `<button class="icon-btn" title="Reagendar" onclick="openReagendar('${item.id}')">📅</button>` : ''}
         <button class="icon-btn" title="${rotuloExcluir(item)}" onclick="deleteItem('${item.id}')">✕</button>
       </div>
       <div class="card-title">${highlight(item.titulo, query)}</div>
@@ -3046,12 +3144,11 @@ service cloud.firestore {
     let h = '';
     const cat = categoriaDe(item.categoria);
     if (cat) h += `<span class="chip" style="--c:${escapeHTML(cat.cor)}">${escapeHTML(cat.nome)}</span>`;
-    if (item.rotinaId) h += `<span class="chip chip-rec" title="Ocorrência da rotina">🔁 Rotina</span>`;
-    if (item.googleEventId) h += `<span class="chip chip-google" title="Importado do Google Agenda">📅 ${escapeHTML(item.googleCalendarNome || 'Google')}</span>`;
-    if (item.status === 'EM ANDAMENTO') h += `<span class="chip chip-doing">▶ Em andamento</span>`;
+    if (item.rotinaId) h += `<span class="chip chip-rec" title="Ocorrência da rotina">Rotina</span>`;
+    if (item.googleEventId) h += `<span class="chip chip-google" title="Importado do Google Agenda">Google</span>`;
+    if (item.status === 'EM ANDAMENTO') h += `<span class="chip chip-doing">Em andamento</span>`;
     if (item.prazoEntrega) h += `<span class="chip ${!isDone(item) && item.prazoEntrega < todayStr() ? 'chip-late' : 'chip-plain'}">Entrega ${formatPrazo(item.prazoEntrega).slice(0,5)}</span>`;
-    if (item.googleLocal) h += `<span class="chip chip-plain">📍 ${escapeHTML(item.googleLocal.slice(0, 40))}</span>`;
-    if (item.observacoes) h += `<span class="chip chip-plain" title="${escapeHTML(item.observacoes)}">📝 obs.</span>`;
+    if (item.observacoes) h += `<span class="chip chip-plain" title="${escapeHTML(item.observacoes)}">obs.</span>`;
     if (item.naoRealizada) h += `<span class="chip chip-late">Não realizada</span>`;
     return h;
   }
@@ -3705,9 +3802,10 @@ service cloud.firestore {
   function renderGoogleStatus(){
     const el = document.getElementById('googleStatus');
     if (!el) return;
-    let h = '📅 Google Agenda: ';
+    let h = 'Google Agenda: ';
     if (!googleClientId()){
-      h += 'não configurada · <button class="linkish" onclick="openConfig()">configurar</button>';
+      el.innerHTML = '';
+      return;
     } else if (G.sincronizando){
       h += 'sincronizando…';
     } else if (G.erro){
@@ -3915,18 +4013,16 @@ service cloud.firestore {
   // ---------- cabeçalho: indicadores e contadores das abas ----------
   function renderHeader(){
     const r = resumoHoje();
-    const ativo = f => state.tab === 'hoje' && state.todayStatus === f ? ' active' : '';
-    document.getElementById('kpis').innerHTML = `
-      <button class="kpi${ativo('todas')}" type="button" onclick="filtrarHoje('todas')" title="Ver tudo de hoje"><span class="n">${r.total}</span><span class="l">Previstas para hoje</span></button>
-      <button class="kpi k-done${ativo('concluidas')}" type="button" onclick="filtrarHoje('concluidas')" title="Ver as concluídas de hoje"><span class="n">${r.feitas}</span><span class="l">Concluídas</span></button>
-      <button class="kpi${ativo('pendentes')}" type="button" onclick="filtrarHoje('pendentes')" title="Ver só as pendentes"><span class="n">${r.pend}</span><span class="l">Pendentes</span></button>
-      <button class="kpi k-late${ativo('atrasadas')}" type="button" onclick="filtrarHoje('atrasadas')" title="Ver só as atrasadas"><span class="n">${r.atrasadas}</span><span class="l">Atrasadas</span></button>
-      <button class="kpi k-prog" type="button" onclick="filtrarHoje('todas')" title="Progresso do dia">
-        <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-          <span class="l"><b>${r.feitas} de ${r.total}</b> atividades concluídas</span><span class="n">${r.pct}%</span>
-        </span>
-        <span class="bar"><span style="width:${r.pct}%"></span></span>
-      </button>`;
+    const ativo = f => state.todayStatus === f ? ' active' : '';
+    const plural = (n, um, varios) => n + ' ' + (n === 1 ? um : varios);
+    document.getElementById('kpis').innerHTML = r.total
+      ? `<button type="button" class="stat${ativo('concluidas')}" onclick="filtrarHoje('concluidas')"><b>${r.feitas}</b> de <b>${r.total}</b> concluídas</button>`
+        + `<span class="sep">·</span><button type="button" class="stat${ativo('pendentes')}" onclick="filtrarHoje('pendentes')">${plural(r.pend, 'pendente', 'pendentes')}</button>`
+        + (r.atrasadas ? `<span class="sep">·</span><button type="button" class="stat late${ativo('atrasadas')}" onclick="filtrarHoje('atrasadas')">${plural(r.atrasadas, 'atrasada', 'atrasadas')}</button>` : '')
+        + (state.todayStatus !== 'todas' ? `<span class="sep">·</span><button type="button" class="stat link" onclick="filtrarHoje('todas')">ver tudo</button>` : '')
+      : '<span class="stat-muted">Nenhuma atividade prevista para hoje</span>';
+    document.getElementById('progBar').style.width = r.pct + '%';
+    document.getElementById('progBar').title = r.pct + '% do dia concluído';
 
     const hoje = todayStr();
     const em7 = addDias(hoje, 7);
@@ -3934,7 +4030,6 @@ service cloud.firestore {
     document.getElementById('countHoje').textContent = r.pend;
     document.getElementById('countRotina').textContent = state.rotinas.filter(x => x.ativa !== false).length;
     document.getElementById('countProximos').textContent = state.atividades.filter(i => i.prazo > hoje && i.prazo <= em7).length;
-    document.getElementById('countAtividades').textContent = state.atividades.length;
     const cp = document.getElementById('countPendencias');
     cp.textContent = pendAbertas.length;
     cp.classList.toggle('alert', pendAbertas.some(isOverdue));
@@ -3957,60 +4052,116 @@ service cloud.firestore {
   }
 
   // ---------- linha de atividade (Hoje, Cronograma, Próximos, Concluídas) ----------
-  function linhaTarefa(item, o){
+  // Visual enxuto: prioridade pela cor da borda, detalhes numa linha de texto discreta
+  // e todas as ações num único menu "⋯".
+  function metaTexto(item, o){
     o = o || {};
     const hoje = todayStr();
+    const partes = [];
+    if (isOverdue(item)){
+      partes.push(`<span class="m-late">Atrasada${item.prazo && item.prazo < hoje ? ' desde ' + formatPrazo(item.prazo).slice(0,5) : ''}</span>`);
+    } else if (o.mostrarData && item.prazo && item.prazo !== hoje){
+      partes.push(formatPrazo(item.prazo).slice(0,5));
+    }
+    if (item.status === 'EM ANDAMENTO' && !isDone(item)) partes.push('<span class="m-doing">Em andamento</span>');
+    if (item.naoRealizada) partes.push('<span class="m-late">Não realizada</span>');
+    partes.push(critMeta(item.criterio).label);
+    const cat = categoriaDe(item.categoria);
+    if (cat) partes.push(escapeHTML(cat.nome));
+    if (item.rotinaId) partes.push('Rotina');
+    if (item.googleEventId) partes.push('Google Agenda' + (item.googleCalendarNome ? ' · ' + escapeHTML(item.googleCalendarNome) : ''));
+    if (item.prazoEntrega) partes.push('Entrega ' + formatPrazo(item.prazoEntrega).slice(0,5));
+    const ck = item.checklist || [];
+    if (ck.length) partes.push('Checklist ' + ck.filter(c => c.feito).length + '/' + ck.length);
+    if (item.googleLocal) partes.push(escapeHTML(item.googleLocal.slice(0, 40)));
+    if (item.prevista) partes.push('prevista');
+    return partes.join('<span class="dot-sep">·</span>');
+  }
+
+  function linhaTarefa(item, o){
+    o = o || {};
     const recem = !!state.recem[item.id];
     const done = isDone(item);
     const prevista = !!item.prevista;
     const google = !!item.googleEventId;
-    const meta = critMeta(item.criterio);
     const late = isOverdue(item);
     const cls = ['task',
       done ? (recem ? 'done just-done' : 'done') : '',
-      item.status === 'EM ANDAMENTO' ? 'doing' : '',
+      item.status === 'EM ANDAMENTO' && !done ? 'doing' : '',
       google ? 'o-google' : '',
       prevista ? 'prevista' : '',
       o.zitem ? 'zitem' : ''].join(' ');
-    const pc = late ? 'var(--atrasada)' : (google && item.googleCor ? escapeHTML(item.googleCor) : meta.color);
+    const pc = late ? 'var(--atrasada)' : (google ? 'var(--google)' : critMeta(item.criterio).color);
     const tempo = item.horaInicio
       ? `<div class="task-time">${item.horaInicio}${item.horaFim ? `<small>${item.horaFim}</small>` : ''}</div>`
-      : (o.semHora ? '' : `<div class="task-time none">${item.diaInteiro ? 'dia<small>todo</small>' : '—'}</div>`);
-
-    let tags = (prevista || done)
-      ? `<span class="chip" style="--c:${meta.color}">${meta.label}</span>`
-      : `<button type="button" class="chip" style="--c:${meta.color}" title="Clique para mudar a prioridade" onclick="mudarPrioridade('${item.id}')">${meta.label}</button>`;
-    if (late) tags += `<span class="chip chip-late">Atrasada${item.prazo && item.prazo < hoje ? ' · ' + formatPrazo(item.prazo).slice(0,5) : ''}</span>`;
-    if (o.mostrarData && item.prazo && !(late && item.prazo < hoje)) tags += `<span class="chip chip-plain">📅 ${formatPrazo(item.prazo).slice(0,5)}</span>`;
-    tags += chipsExtras(item);
-    const ck = item.checklist || [];
-    if (ck.length) tags += `<span class="chip chip-plain">☑ ${ck.filter(c => c.feito).length}/${ck.length}</span>`;
-    if (prevista) tags += `<span class="chip chip-plain">prevista</span>`;
-
+      : (o.semHora ? '' : `<div class="task-time none">${item.diaInteiro ? 'dia todo' : ''}</div>`);
     const abrir = prevista ? `openRotina('${item.rotinaId}')` : `openForm('${item.id}')`;
-    let acoes = '';
-    if (done && !recem){
-      const hc = item.concluidaEmTs ? horaDoTs(item.concluidaEmTs) : '';
-      acoes = `<span class="done-time" title="Concluída em ${formatPrazo(item.concluidaEm || hoje)}">${item.naoRealizada ? '' : '✓ ' + (hc || formatPrazo(item.concluidaEm || hoje).slice(0,5))}</span>`
-        + `<button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="${abrir}">${EDIT_SVG}</button>`;
-    } else if (!prevista && !done){
-      if (!google) acoes += `<button type="button" class="task-btn play" title="${item.status === 'EM ANDAMENTO' ? 'Pausar (voltar a pendente)' : 'Iniciar (em andamento)'}" onclick="iniciarItem('${item.id}')">${item.status === 'EM ANDAMENTO' ? '⏸' : '▶'}</button>`;
-      if (!google) acoes += `<button type="button" class="task-btn" title="Reagendar / adiar" onclick="openReagendar('${item.id}')">${CAL_SVG}</button>`;
-      if (google && item.googleLink) acoes += `<a class="task-btn" href="${escapeHTML(item.googleLink)}" target="_blank" rel="noopener" title="Abrir no Google Agenda">↗</a>`;
-      acoes += `<button type="button" class="task-btn" title="Editar" aria-label="Editar ${escapeHTML(item.titulo)}" onclick="${abrir}">${EDIT_SVG}</button>`;
-      acoes += `<button type="button" class="task-btn task-del" title="${rotuloExcluir(item)}" aria-label="${rotuloExcluir(item)}" onclick="deleteItem('${item.id}')">${google ? '🙈' : TRASH_SVG}</button>`;
-    }
+    const direita = (done && !recem && !item.naoRealizada && item.concluidaEmTs)
+      ? `<span class="done-time" title="Concluída às ${horaDoTs(item.concluidaEmTs)}">${horaDoTs(item.concluidaEmTs)}</span>` : '';
+    const menu = prevista ? '' : `<button type="button" class="more-btn" title="Ações" aria-label="Ações de ${escapeHTML(item.titulo)}" onclick="abrirMenu('${item.id}', this)">⋯</button>`;
 
-    return `<li class="${cls}" style="--pc:${pc}; border-left-color:${pc}" data-id="${item.id}" ${o.arrastavel ? 'data-drag="1"' : ''}>
-      <input type="checkbox" class="task-check" ${done ? 'checked' : ''} ${prevista ? 'disabled title="Prevista: aparece no dia"' : ''} aria-label="Concluir ${escapeHTML(item.titulo)}" onchange="toggleToday('${item.id}', this.checked)">
+    return `<li class="${cls}" style="--pc:${pc}" data-id="${item.id}" ${o.arrastavel ? 'data-drag="1"' : ''}>
+      <input type="checkbox" class="task-check" ${done && !item.naoRealizada ? 'checked' : ''} ${prevista ? 'disabled title="Aparece no dia"' : ''} aria-label="Concluir ${escapeHTML(item.titulo)}" onchange="toggleToday('${item.id}', this.checked)">
       ${tempo}
       <div class="task-main">
         <button type="button" class="task-title" onclick="${abrir}">${escapeHTML(item.titulo)}</button>
-        <div class="task-tags">${tags}</div>
+        <div class="task-meta">${metaTexto(item, o)}</div>
       </div>
-      <div class="task-acts" style="display:flex;gap:4px;align-items:center">${acoes}</div>
+      ${direita}${menu}
     </li>`;
   }
+
+  // ---------- menu de ações "⋯" ----------
+  function abrirMenu(id, btn){
+    const item = findItem(id);
+    if (!item) return;
+    const m = document.getElementById('menu');
+    if (m.classList.contains('open') && m.dataset.id === id){ fecharMenu(); return; }
+    const done = isDone(item);
+    const google = !!item.googleEventId;
+    let h = '';
+    if (!done && !google) h += `<button onclick="fecharMenu(); iniciarItem('${id}')">${item.status === 'EM ANDAMENTO' ? 'Pausar' : 'Iniciar'}</button>`;
+    h += `<button onclick="fecharMenu(); openForm('${id}')">Editar</button>`;
+    if (!done && !google){
+      h += `<button onclick="fecharMenu(); openReagendar('${id}')">Reagendar…</button>`;
+      h += `<button onclick="fecharMenu(); adiarItem('${id}')">Adiar para amanhã</button>`;
+    }
+    if (done) h += `<button onclick="fecharMenu(); toggleToday('${id}', false)">Reabrir</button>`;
+    if (google && item.googleLink) h += `<a href="${escapeHTML(item.googleLink)}" target="_blank" rel="noopener" onclick="fecharMenu()">Abrir no Google Agenda</a>`;
+    if (item.rotinaId && findRotina(item.rotinaId)) h += `<button onclick="fecharMenu(); openRotina('${item.rotinaId}')">Editar a rotina</button>`;
+    if (!done){
+      h += '<div class="menu-label">Prioridade</div><div class="pri-row">' + CRITERIO_ORDER.map(c =>
+        `<button class="${item.criterio === c ? 'on' : ''}" style="--c:${CRITERIO_META[c].color}" onclick="fecharMenu(); definirPrioridade('${id}', '${c}')">${CRITERIO_META[c].label}</button>`).join('') + '</div>';
+    }
+    if (!(item.rotinaId && done)) h += `<div class="menu-sep"></div><button class="danger" onclick="fecharMenu(); deleteItem('${id}')">${rotuloExcluir(item)}</button>`;
+    m.innerHTML = h;
+    m.dataset.id = id;
+    m.classList.add('open');
+    const r = btn.getBoundingClientRect();
+    const w = m.offsetWidth, hgt = m.offsetHeight;
+    let left = Math.min(r.right - w, window.innerWidth - w - 8);
+    let top = r.bottom + 4;
+    if (top + hgt > window.innerHeight - 8) top = Math.max(8, r.top - hgt - 4);
+    m.style.left = Math.max(8, left) + 'px';
+    m.style.top = top + 'px';
+  }
+  window.abrirMenu = abrirMenu;
+  function fecharMenu(){ const m = document.getElementById('menu'); m.classList.remove('open'); m.dataset.id = ''; }
+  window.fecharMenu = fecharMenu;
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#menu') && !e.target.closest('.more-btn')) fecharMenu();
+  });
+  window.addEventListener('scroll', fecharMenu, true);
+  window.addEventListener('resize', fecharMenu);
+
+  function definirPrioridade(id, c){
+    const item = findItem(id);
+    if (!item || item.criterio === c) return;
+    item.criterio = c;
+    render();
+    persist();
+  }
+  window.definirPrioridade = definirPrioridade;
 
   function ordenarDoDia(a, b){
     const and = x => x.status === 'EM ANDAMENTO' ? 0 : 1;
@@ -4021,104 +4172,58 @@ service cloud.firestore {
   }
 
   function renderToday(){
-    const dataHoje = parseDateLocal(todayStr()).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const dataHoje = parseDateLocal(todayStr()).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
     document.getElementById('todayDate').textContent = dataHoje.charAt(0).toUpperCase() + dataHoje.slice(1);
-    preencherSelectCategorias(document.getElementById('qaCategoria'), 'form');
 
     const hoje = todayStr();
-    const all = getTodayItems();
-    const filtro = state.todayFiltro;
+    const items = getTodayItems();
     const st = state.todayStatus;
 
-    // painel de prioridades (filtra a lista ao clicar)
-    const abertas = all.filter(i => !isDone(i));
-    const cats = [{ key: '', label: 'Todas', color: 'var(--amber)' }]
-      .concat(CRITERIO_ORDER.map(c => ({ key: c, label: CRITERIO_META[c].label, color: CRITERIO_META[c].color })));
-    document.getElementById('catList').innerHTML = cats.map(c => {
-      const n = c.key ? abertas.filter(i => i.criterio === c.key).length : abertas.length;
-      return `<button type="button" class="cat ${filtro === c.key ? 'active' : ''}" style="--c:${c.color}" onclick="setTodayFiltro('${c.key}')">
-        <span class="dot" style="background:${c.color}"></span>
-        <span class="cat-name">${c.label}</span>
-        <span class="cat-n">${n}</span>
-      </button>`;
-    }).join('');
-
-    renderAgendaHoje(all);
-
-    const items = filtro ? all.filter(i => i.criterio === filtro) : all;
     const ativos = items.filter(i => !isDone(i) || state.recem[i.id]);
     const anteriores = ativos.filter(i => (i.prazo && i.prazo < hoje) || !i.prazo).sort((a, b) => (a.prazo || '').localeCompare(b.prazo || '') || ordenarDoDia(a, b));
     const doDia = ativos.filter(i => !anteriores.includes(i)).sort(ordenarDoDia);
     const feitas = items.filter(i => isDone(i) && !state.recem[i.id])
       .sort((a, b) => (b.concluidaEmTs || '').localeCompare(a.concluidaEmTs || ''));
 
-    const sufixo = filtro ? ' · ' + CRITERIO_META[filtro].label : '';
-    const titulos = { todas: 'Tarefas de hoje', pendentes: 'Pendentes de hoje', concluidas: 'Concluídas hoje', atrasadas: 'Atrasadas' };
-    document.getElementById('todayListTitle').innerHTML = escapeHTML(titulos[st] + sufixo)
-      + (st !== 'todas' ? ' <button class="linkish" style="text-transform:none;letter-spacing:0;font-family:var(--font-body);margin-left:8px" onclick="filtrarHoje(\'todas\')">ver tudo</button>' : '');
-
-    let html = '';
     const lista = (arr) => '<ul class="task-list">' + arr.map(i => linhaTarefa(i)).join('') + '</ul>';
+    let html = '';
+    let titulo = '';
     if (st === 'atrasadas'){
+      titulo = 'Atrasadas';
       const late = ativos.filter(i => isOverdue(i) || state.recem[i.id]);
       if (late.length) html += lista(late);
     } else if (st === 'concluidas'){
+      titulo = 'Concluídas hoje';
       if (feitas.length) html += lista(feitas);
     } else {
       const rotAntigas = anteriores.filter(i => i.rotinaId && !state.recem[i.id]).length;
-      if (anteriores.length) html += `<div class="sec-label late">De dias anteriores · ${anteriores.length}<span class="right">`
-        + (rotAntigas ? `<button class="linkish" onclick="dispensarRotinasAntigas()" title="As ocorrências da rotina de dias que já passaram ficam no histórico como não realizadas">dispensar ${rotAntigas} de rotina</button> · ` : '')
-        + `<button class="linkish" onclick="setTab('pendencias')">abrir Pendências</button></span></div>` + lista(anteriores);
-      if (doDia.length) html += (anteriores.length ? `<div class="sec-label">Para hoje · ${doDia.length}</div>` : '') + lista(doDia);
+      if (anteriores.length){
+        html += `<div class="sec-label late">De dias anteriores<span class="right">`
+          + (rotAntigas ? `<button class="linkish" onclick="dispensarRotinasAntigas()" title="Registra as ocorrências de rotina de dias passados como não realizadas">dispensar rotinas (${rotAntigas})</button>` : '')
+          + `</span></div>` + lista(anteriores);
+        if (doDia.length) html += '<div class="sec-label">Hoje</div>';
+      }
+      if (doDia.length) html += lista(doDia);
       if (st === 'todas' && feitas.length){
-        html += `<button type="button" class="done-toggle" onclick="state.todayMostrarFeitas=!state.todayMostrarFeitas; render()">${state.todayMostrarFeitas ? '▾ Ocultar' : '▸ Mostrar'} concluídas de hoje (${feitas.length})</button>`;
+        html += `<button type="button" class="done-toggle" onclick="state.todayMostrarFeitas=!state.todayMostrarFeitas; render()">${state.todayMostrarFeitas ? 'Ocultar' : 'Mostrar'} concluídas (${feitas.length})</button>`;
         if (state.todayMostrarFeitas) html += '<div style="margin-top:8px">' + lista(feitas) + '</div>';
       }
     }
+    document.getElementById('todayListTitle').textContent = titulo;
+    document.getElementById('todayListTitle').hidden = !titulo;
     document.getElementById('todaySections').innerHTML = html;
 
-    const vazio = !html;
     const empty = document.getElementById('todayEmpty');
-    empty.hidden = !vazio && !(st === 'todas' && !ativos.length && feitas.length);
-    if (st === 'todas' && !ativos.length && feitas.length){
-      empty.hidden = false;
-      empty.textContent = '🎉 Tudo feito por hoje! ' + feitas.length + ' atividade(s) concluída(s).';
-    } else if (vazio){
-      empty.textContent = st === 'concluidas' ? 'Nada concluído hoje ainda.'
-        : st === 'atrasadas' ? 'Nenhuma atividade atrasada. 👍'
-        : filtro ? 'Nenhuma tarefa ' + CRITERIO_META[filtro].label.toLowerCase() + ' para hoje.'
-        : 'Nada para hoje ainda. Escreva uma tarefa acima e aperte Enter.';
-    }
-  }
-
-  function renderAgendaHoje(all){
-    const hoje = todayStr();
-    const agora = agoraHM();
-    const comHora = all.filter(i => i.prazo === hoje && (i.horaInicio || i.diaInteiro))
-      .sort((a, b) => (a.horaInicio || '').localeCompare(b.horaInicio || ''));
-    const box = document.getElementById('todayAgenda');
-    if (!comHora.length){
-      box.innerHTML = '<div class="agenda-empty">Nada com horário hoje. Defina um horário ao criar a tarefa ou arraste no <button class="linkish" onclick="setTab(\'cronograma\')">Cronograma</button>.</div>';
-      return;
-    }
-    let h = '<ul class="agenda-list">';
-    let marcou = false;
-    comHora.forEach(i => {
-      if (!marcou && i.horaInicio && i.horaInicio > agora){ h += `<li class="now-line">agora ${agora}</li>`; marcou = true; }
-      const passou = i.horaInicio && (i.horaFim || i.horaInicio) < agora;
-      const cor = i.googleEventId ? (i.googleCor || 'var(--google)') : critMeta(i.criterio).color;
-      h += `<li class="agenda-item ${isDone(i) ? 'done' : ''} ${passou ? 'past' : ''}" onclick="openForm('${i.id}')">
-        <span class="t">${i.horaInicio || 'dia todo'}</span>
-        <span class="ttl" style="--c:${escapeHTML(cor)}">${i.googleEventId ? '📅 ' : i.rotinaId ? '🔁 ' : ''}${escapeHTML(i.titulo)}</span>
-      </li>`;
-    });
-    if (!marcou) h += `<li class="now-line">agora ${agora}</li>`;
-    box.innerHTML = h + '</ul>';
+    const tudoFeito = st === 'todas' && !ativos.length && feitas.length;
+    empty.hidden = !!html && !tudoFeito;
+    if (tudoFeito) empty.textContent = 'Tudo concluído por hoje.';
+    else if (!html) empty.textContent = st === 'concluidas' ? 'Nada concluído hoje ainda.'
+      : st === 'atrasadas' ? 'Nenhuma atividade atrasada.'
+      : 'Nenhuma tarefa para hoje. Adicione uma no campo acima.';
   }
 
   function setTodayFiltro(c){
     state.todayFiltro = c;
-    if (c) document.getElementById('qaCriterio').value = c;
     render();
   }
   window.setTodayFiltro = setTodayFiltro;
@@ -4172,10 +4277,10 @@ service cloud.firestore {
     const input = document.getElementById('qaTitulo');
     let titulo = input.value.trim();
     if (!titulo){ input.focus(); return; }
-    let hora = document.getElementById('qaHora').value;
+    let hora = '';
     const m = titulo.match(/^(\d{1,2})(?::|h)(\d{2})?\s*(?:-|–)?\s+(.+)$/i);
     if (m && Number(m[1]) < 24 && (!m[2] || Number(m[2]) < 60)){
-      hora = hora || (m[1].padStart(2, '0') + ':' + (m[2] || '00'));
+      hora = m[1].padStart(2, '0') + ':' + (m[2] || '00');
       titulo = m[3].trim();
     }
     state.atividades.push({
@@ -4183,7 +4288,7 @@ service cloud.firestore {
       titulo,
       descricao: '',
       criterio: document.getElementById('qaCriterio').value,
-      categoria: document.getElementById('qaCategoria').value,
+      categoria: '',
       prazo: todayStr(),
       horaInicio: hora || '',
       horaFim: '',
@@ -4193,7 +4298,6 @@ service cloud.firestore {
       _ts: Date.now()
     });
     input.value = '';
-    document.getElementById('qaHora').value = '';
     input.focus();
     render();
     persist(true);
@@ -4242,24 +4346,27 @@ service cloud.firestore {
     }
 
     document.getElementById('schedView').innerHTML = `
-      <div class="view-head">
+      <div class="day-head">
         <div>
-          <h2 class="view-title">${escapeHTML(rotuloDia(dia).replace(/^(\w)/, c => c.toUpperCase()))}</h2>
-          <p class="view-sub">${itens.length} atividade(s) · ${feitas} concluída(s) · ${semHora.length} sem horário${dia > hoje && itens.some(i => i.prevista) ? ' · rotinas previstas aparecem esmaecidas' : ''}</p>
+          <h2 class="day-title">${escapeHTML(rotuloDia(dia).replace(/^(\w)/, c => c.toUpperCase()))}</h2>
+          <div class="day-stats"><span class="stat-muted">${itens.length} atividade(s) · ${feitas} concluída(s)</span></div>
         </div>
-        <div class="day-nav">
-          <button class="btn btn-sm" type="button" onclick="cronoNav(-1)" aria-label="Dia anterior">‹</button>
-          <button class="btn btn-sm" type="button" onclick="cronoIr(todayStr())" ${ehHoje ? 'disabled' : ''}>Hoje</button>
-          <button class="btn btn-sm" type="button" onclick="cronoNav(1)" aria-label="Próximo dia">›</button>
-          <input type="date" value="${dia}" onchange="cronoIr(this.value)" aria-label="Escolher dia">
-          <button class="btn btn-sm btn-primary" type="button" onclick="openForm(null, { prazo: '${dia}' })">+ Neste dia</button>
+        <div class="seg" role="tablist" aria-label="Modo de visualização">
+          <button type="button" onclick="setTab('hoje')">Lista</button>
+          <button type="button" class="active">Horários</button>
         </div>
+      </div>
+      <div class="day-nav">
+        <button class="btn btn-sm" type="button" onclick="cronoNav(-1)" aria-label="Dia anterior">‹</button>
+        <button class="btn btn-sm" type="button" onclick="cronoIr(todayStr())" ${ehHoje ? 'disabled' : ''}>Hoje</button>
+        <button class="btn btn-sm" type="button" onclick="cronoNav(1)" aria-label="Próximo dia">›</button>
+        <input type="date" value="${dia}" onchange="cronoIr(this.value)" aria-label="Escolher dia">
       </div>
       <div class="sched-layout">
         <div class="today-panel">
-          <h2 class="panel-label">Sem horário definido · ${semHora.length}</h2>
+          <h2 class="panel-label">Sem horário definido</h2>
           <ul class="task-list semhora" data-zone="semhora">${semHora.map(i => linhaTarefa(i, Object.assign(opt(i), { semHora: true }))).join('')}</ul>
-          <div class="field-hint">Arraste uma atividade para um horário ao lado (ou de volta para cá para tirar o horário). No celular, segure um instante antes de arrastar. Compromissos do Google têm o horário do próprio Google.</div>
+          <div class="field-hint">Arraste para um horário para agendar.</div>
         </div>
         <div class="timeline">${slots}</div>
       </div>`;
@@ -4454,8 +4561,8 @@ service cloud.firestore {
       else if (!rotinaNoDia(r, hoje)) hojeTxt = 'Não programada para hoje.';
       else if (!occHoje) hojeTxt = 'Gerando a ocorrência de hoje…';
       else if (occHoje.naoRealizada) hojeTxt = 'Hoje: <b>pulada</b>.';
-      else if (isDone(occHoje)) hojeTxt = 'Hoje: <b>concluída' + (occHoje.concluidaEmTs ? ' às ' + horaDoTs(occHoje.concluidaEmTs) : '') + '</b> ✓';
-      else hojeTxt = 'Hoje: <b>' + (occHoje.status === 'EM ANDAMENTO' ? 'em andamento' : 'pendente') + '</b> <button class="btn btn-sm" type="button" onclick="toggleToday(\'' + occHoje.id + '\', true)">✓ Concluir</button>';
+      else if (isDone(occHoje)) hojeTxt = 'Hoje: <b>concluída' + (occHoje.concluidaEmTs ? ' às ' + horaDoTs(occHoje.concluidaEmTs) : '') + '</b>';
+      else hojeTxt = 'Hoje: <b>' + (occHoje.status === 'EM ANDAMENTO' ? 'em andamento' : 'pendente') + '</b> <button class="linkish" type="button" onclick="toggleToday(\'' + occHoje.id + '\', true)">concluir</button>';
 
       let heat = '';
       let prog = 0, feitas = 0;
@@ -4473,8 +4580,8 @@ service cloud.firestore {
           <div class="task-tags" style="margin-top:6px">
             <span class="chip" style="--c:${meta.color}">${meta.label}</span>
             ${cat ? `<span class="chip" style="--c:${escapeHTML(cat.cor)}">${escapeHTML(cat.nome)}</span>` : ''}
-            ${r.horaInicio ? `<span class="chip chip-plain">🕘 ${r.horaInicio}${r.horaFim ? '–' + r.horaFim : ''}</span>` : '<span class="chip chip-plain">sem horário</span>'}
-            ${(r.checklist || []).length ? `<span class="chip chip-plain">☑ ${(r.checklist || []).length} itens</span>` : ''}
+            ${r.horaInicio ? `<span class="chip chip-plain">${r.horaInicio}${r.horaFim ? '–' + r.horaFim : ''}</span>` : '<span class="chip chip-plain">sem horário</span>'}
+            ${(r.checklist || []).length ? `<span class="chip chip-plain">checklist ${(r.checklist || []).length}</span>` : ''}
           </div>
         </div>
         <div class="rot-days">${dias}</div>
@@ -4484,8 +4591,8 @@ service cloud.firestore {
           <div class="rot-today" style="margin-top:6px">${taxa}</div>
         </div>
         <div class="rot-actions">
-          <button class="btn btn-sm" type="button" onclick="openRotina('${r.id}')">✎ Editar</button>
-          <button class="btn btn-sm" type="button" onclick="alternarRotina('${r.id}')">${r.ativa === false ? '▶ Reativar' : '⏸ Pausar'}</button>
+          <button class="btn btn-sm" type="button" onclick="openRotina('${r.id}')">Editar</button>
+          <button class="btn btn-sm" type="button" onclick="alternarRotina('${r.id}')">${r.ativa === false ? 'Reativar' : 'Pausar'}</button>
           <button class="btn btn-sm" type="button" onclick="verHistoricoRotina('${r.id}')">Histórico</button>
           <button class="btn btn-sm btn-ghost btn-danger" type="button" onclick="excluirRotina('${r.id}')">Excluir</button>
         </div>
@@ -4496,7 +4603,7 @@ service cloud.firestore {
       <div class="view-head">
         <div>
           <h2 class="view-title">Rotina diária</h2>
-          <p class="view-sub">Atividades fixas do seu cargo. Cada uma vira uma atividade pendente nos dias programados; concluir hoje não muda os outros dias.</p>
+          <p class="view-sub">Tarefas fixas que aparecem sozinhas nos dias programados.</p>
         </div>
         <button class="btn btn-primary" type="button" onclick="openRotina()">+ Nova rotina</button>
       </div>
@@ -4507,7 +4614,7 @@ service cloud.firestore {
           <span><i style="background:var(--line)"></i>sem registro</span>
           <span><i style="border:1px dashed var(--line)"></i>não programada</span>
         </div><div class="rot-grid">${cards}</div>`
-      : `<div class="empty"><div class="emoji">🔁</div><div class="big">Nenhuma rotina ainda</div><div>Cadastre as tarefas que você faz todo dia (ex.: "Verificar chamados em aberto") e elas aparecem sozinhas na aba Hoje.</div><div style="margin-top:14px"><button class="btn btn-primary" type="button" onclick="openRotina()">+ Nova rotina</button></div></div>`}`;
+      : `<div class="empty"><div class="big">Nenhuma rotina ainda</div><div>Cadastre as tarefas que você faz todo dia (ex.: "Verificar chamados em aberto") e elas aparecem sozinhas na aba Hoje.</div><div style="margin-top:14px"><button class="btn btn-primary" type="button" onclick="openRotina()">+ Nova rotina</button></div></div>`}`;
   }
 
   function verHistoricoRotina(rid){
@@ -4521,10 +4628,13 @@ service cloud.firestore {
   // ---------- Próximos dias ----------
   // As listas com busca montam a barra de filtros uma vez só, para não perder o foco ao digitar.
   function filtrosHtml(prefixo){
-    return `<input type="search" id="${prefixo}Busca" placeholder="Buscar por título, descrição ou observação…" oninput="render()" aria-label="Buscar">
+    return `<input type="search" id="${prefixo}Busca" placeholder="Buscar…" oninput="render()" aria-label="Buscar">
+      <button type="button" class="btn btn-sm btn-ghost" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">Filtros</button>
+      <span class="filtros-extra" hidden>
       <select id="${prefixo}Crit" onchange="render()" aria-label="Prioridade"><option value="">Prioridade: todas</option>${CRITERIO_ORDER.map(c => `<option value="${c}">${CRITERIO_META[c].label}</option>`).join('')}</select>
       <select id="${prefixo}Cat" onchange="render()" aria-label="Categoria"></select>
-      <select id="${prefixo}Ori" onchange="render()" aria-label="Origem"><option value="">Origem: todas</option><option value="manual">Adicionadas por você</option><option value="rotina">Rotina</option><option value="google">Google Agenda</option></select>`;
+      <select id="${prefixo}Ori" onchange="render()" aria-label="Origem"><option value="">Origem: todas</option><option value="manual">Adicionadas por você</option><option value="rotina">Rotina</option><option value="google">Google Agenda</option></select>
+      </span>`;
   }
   function lerFiltros(prefixo){
     preencherSelectCategorias(document.getElementById(prefixo + 'Cat'), 'filtro');
@@ -4541,8 +4651,7 @@ service cloud.firestore {
     if (!document.getElementById('proxLista')){
       view.innerHTML = `
         <div class="view-head">
-          <div><h2 class="view-title">Próximos dias</h2><p class="view-sub">O que está programado a partir de amanhã, incluindo as rotinas previstas.</p></div>
-          <button class="btn btn-primary" type="button" onclick="openForm(null, { prazo: addDias(todayStr(), 1) })">+ Para amanhã</button>
+          <div><h2 class="view-title">Próximos dias</h2><p class="view-sub">A partir de amanhã.</p></div>
         </div>
         <div class="filter-row">${filtrosHtml('prox')}
           <select id="proxDias" onchange="state.proxDias=Number(this.value); lsSet('mt_proxDias', this.value); render()" aria-label="Período">
@@ -4561,15 +4670,15 @@ service cloud.firestore {
       const itens = itensDoDia(d).concat(previstasDoDia(d)).filter(i => passaFiltros(i, f)).sort(ordenarDoDia);
       if (!itens.length) continue;
       total += itens.length;
-      html += `<div class="day-group"><h3>${escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))} <small>${itens.length} atividade(s)</small>
-        <button class="linkish" style="font-size:12px;margin-left:auto" onclick="state.cronoDia='${d}'; setTab('cronograma')">ver no cronograma</button></h3>
+      html += `<div class="day-group"><h3>${escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))}
+        <button class="linkish" style="font-size:12px;margin-left:auto;font-weight:400" onclick="state.cronoDia='${d}'; setTab('cronograma')">horários</button></h3>
         <ul class="task-list">${itens.map(i => linhaTarefa(i)).join('')}</ul></div>`;
     }
     const semData = state.atividades.filter(i => !i.prazo && passaFiltros(i, f)).sort(ordenarDoDia);
     if (semData.length){
-      html += `<div class="day-group"><h3>Sem data definida <small>${semData.length}</small></h3><ul class="task-list">${semData.map(i => linhaTarefa(i)).join('')}</ul></div>`;
+      html += `<div class="day-group"><h3>Sem data</h3><ul class="task-list">${semData.map(i => linhaTarefa(i)).join('')}</ul></div>`;
     }
-    document.getElementById('proxLista').innerHTML = html || '<div class="empty"><div class="emoji">🗓️</div><div class="big">Nada programado</div><div>Nenhuma atividade nos próximos ' + state.proxDias + ' dias com esses filtros.</div></div>';
+    document.getElementById('proxLista').innerHTML = html || '<div class="today-empty">Nada programado para os próximos ' + state.proxDias + ' dias.</div>';
   }
 
   // ---------- Concluídas (histórico) ----------
@@ -4578,7 +4687,7 @@ service cloud.firestore {
     if (!document.getElementById('concLista')){
       view.innerHTML = `
         <div class="view-head">
-          <div><h2 class="view-title">Concluídas</h2><p class="view-sub">Histórico com dia e horário de conclusão. Desmarque a caixinha para reabrir.</p></div>
+          <div><h2 class="view-title">Concluídas</h2><p class="view-sub">Histórico com dia e horário.</p></div>
         </div>
         <div class="filter-row">${filtrosHtml('conc')}
           <select id="concPeriodo" onchange="state.concPeriodo=this.value; lsSet('mt_concPeriodo', this.value); render()" aria-label="Período">
@@ -4616,9 +4725,9 @@ service cloud.firestore {
     const grupos = {};
     itens.forEach(i => { const d = i.concluidaEm || 'sem data'; (grupos[d] = grupos[d] || []).push(i); });
     const html = Object.keys(grupos).map(d => `
-      <div class="day-group"><h3>${d === 'sem data' ? 'Sem data registrada' : escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))} <small>${grupos[d].length} item(ns)</small></h3>
+      <div class="day-group"><h3>${d === 'sem data' ? 'Sem data registrada' : escapeHTML(rotuloDia(d).replace(/^(\w)/, c => c.toUpperCase()))}</h3>
       <ul class="task-list">${grupos[d].map(i => linhaTarefa(i, { mostrarData: true })).join('')}</ul></div>`).join('');
-    document.getElementById('concLista').innerHTML = html || '<div class="empty"><div class="emoji">✅</div><div class="big">Nada concluído nesse período</div><div>Ajuste o período ou os filtros.</div></div>';
+    document.getElementById('concLista').innerHTML = html || '<div class="today-empty">Nada concluído nesse período.</div>';
   }
 
   async function consultarArquivo(){
